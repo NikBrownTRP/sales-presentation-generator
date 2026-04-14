@@ -68,89 +68,100 @@
     var total = slides.length;
     var title = state.meta.title || 'Presentation';
 
-    // Show progress modal
-    showExportProgress(dom, 'Preparing slides...', 0);
+    showExportProgress(dom, 'Preparing all slides...', 0);
 
-    // Create an offscreen container for rendering
+    // Phase 1: Pre-render ALL slide DOMs so fonts/images/CSS fully resolve
     var offscreen = document.createElement('div');
-    offscreen.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
+    offscreen.style.cssText = 'position:absolute;left:0;top:0;z-index:-1;opacity:0;pointer-events:none;';
     document.body.appendChild(offscreen);
 
-    // Build the jsPDF instance — landscape, px units, custom slide size
-    var pdf = new jspdf.jsPDF({
-      orientation: 'landscape',
-      unit: 'px',
-      format: [SLIDE_W, SLIDE_H],
-      hotfixes: ['px_scaling']
+    var wrappers = [];
+    slides.forEach(function (slide) {
+      var template = window.SlideTemplates[slide.templateId];
+      if (!template) { wrappers.push(null); return; }
+      var w = document.createElement('div');
+      w.setAttribute('data-theme', slide.theme || theme);
+      w.style.cssText = 'width:' + SLIDE_W + 'px;height:' + SLIDE_H + 'px;position:relative;overflow:hidden;margin-bottom:4px;';
+      var rendered = template.render(slide.data);
+      // Use DOM parsing to avoid direct innerHTML string assignment issues
+      var parser = new DOMParser();
+      var frag = parser.parseFromString('<div>' + rendered + '</div>', 'text/html');
+      var content = frag.body.firstChild;
+      while (content.firstChild) w.appendChild(content.firstChild);
+      offscreen.appendChild(w);
+      wrappers.push(w);
     });
 
-    var slideIndex = 0;
+    // Phase 2: Wait for ALL images + fonts
+    var imgPromises = [];
+    wrappers.forEach(function (w) {
+      if (!w) return;
+      w.querySelectorAll('img').forEach(function (img) {
+        if (!img.complete) {
+          imgPromises.push(new Promise(function (res) {
+            img.onload = res; img.onerror = res;
+          }));
+        }
+      });
+    });
 
-    function renderNext() {
-      if (slideIndex >= total) {
-        // Done — save and clean up
-        document.body.removeChild(offscreen);
-        var pdfBlob = pdf.output('blob');
-        downloadBlob(pdfBlob, sanitizeFilename(title) + '.pdf', 'application/pdf');
-        hideExportProgress(dom);
-        return;
-      }
+    var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
 
-      var slide = slides[slideIndex];
-      var template = window.SlideTemplates[slide.templateId];
-      if (!template) { slideIndex++; renderNext(); return; }
+    Promise.all([fontsReady, Promise.all(imgPromises)]).then(function () {
+      // Extra settle time for CSS custom properties + layout
+      return new Promise(function (r) { setTimeout(r, 600); });
+    }).then(function () {
+      // Phase 3: Capture one by one
+      var pdf = new jspdf.jsPDF({ orientation: 'landscape', unit: 'px', format: [SLIDE_W, SLIDE_H], hotfixes: ['px_scaling'] });
+      var idx = 0;
 
-      showExportProgress(dom, 'Rendering slide ' + (slideIndex + 1) + ' of ' + total + '...', ((slideIndex) / total) * 100);
-
-      // Create slide DOM
-      var wrapper = document.createElement('div');
-      wrapper.setAttribute('data-theme', slide.theme || theme);
-      wrapper.style.cssText = 'width:' + SLIDE_W + 'px;height:' + SLIDE_H + 'px;position:relative;overflow:hidden;';
-      wrapper.innerHTML = template.render(slide.data);
-      offscreen.appendChild(wrapper);
-
-      // Wait for images to load
-      waitForImages(wrapper).then(function () {
-        return html2canvas(wrapper, {
-          width: SLIDE_W,
-          height: SLIDE_H,
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: null
-        });
-      }).then(function (canvas) {
-        var imgData = canvas.toDataURL('image/jpeg', 0.92);
-
-        if (slideIndex > 0) {
-          pdf.addPage([SLIDE_W, SLIDE_H], 'landscape');
+      function captureNext() {
+        if (idx >= total) {
+          document.body.removeChild(offscreen);
+          var pdfBlob = pdf.output('blob');
+          downloadBlob(pdfBlob, sanitizeFilename(title) + '.pdf', 'application/pdf');
+          hideExportProgress(dom);
+          return;
         }
 
-        pdf.addImage(imgData, 'JPEG', 0, 0, SLIDE_W, SLIDE_H);
+        showExportProgress(dom, 'Capturing slide ' + (idx + 1) + ' of ' + total + '...', (idx / total) * 100);
+        var wrapper = wrappers[idx];
 
-        offscreen.removeChild(wrapper);
-        slideIndex++;
+        if (!wrapper) {
+          if (idx > 0) pdf.addPage([SLIDE_W, SLIDE_H], 'landscape');
+          idx++;
+          setTimeout(captureNext, 50);
+          return;
+        }
 
-        showExportProgress(dom, 'Rendering slide ' + Math.min(slideIndex + 1, total) + ' of ' + total + '...', (slideIndex / total) * 100);
+        var bgColor = getComputedStyle(wrapper).getPropertyValue('--pres-bg').trim() || '#000000';
 
-        // Use setTimeout to allow the UI to update between renders
-        setTimeout(renderNext, 50);
-      }).catch(function (err) {
-        console.error('Error rendering slide ' + (slideIndex + 1) + ':', err);
-        offscreen.removeChild(wrapper);
-        slideIndex++;
-        setTimeout(renderNext, 50);
-      });
-    }
+        html2canvas(wrapper, {
+          width: SLIDE_W, height: SLIDE_H, scale: 2,
+          useCORS: true, allowTaint: true, logging: false,
+          backgroundColor: bgColor
+        }).then(function (canvas) {
+          if (idx > 0) pdf.addPage([SLIDE_W, SLIDE_H], 'landscape');
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, SLIDE_W, SLIDE_H);
+          idx++;
+          showExportProgress(dom, 'Capturing slide ' + Math.min(idx + 1, total) + ' of ' + total + '...', (idx / total) * 100);
+          setTimeout(captureNext, 150);
+        }).catch(function (err) {
+          console.error('PDF capture error on slide ' + (idx + 1) + ':', err);
+          if (idx > 0) pdf.addPage([SLIDE_W, SLIDE_H], 'landscape');
+          // Fill with theme background so it's not blank white
+          try {
+            var r = parseInt(bgColor.substr(1,2),16), g = parseInt(bgColor.substr(3,2),16), b = parseInt(bgColor.substr(5,2),16);
+            pdf.setFillColor(r, g, b);
+          } catch(e) { pdf.setFillColor(0, 0, 0); }
+          pdf.rect(0, 0, SLIDE_W, SLIDE_H, 'F');
+          idx++;
+          setTimeout(captureNext, 150);
+        });
+      }
 
-    // Ensure fonts are loaded before starting
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(function () {
-        setTimeout(renderNext, 200);
-      });
-    } else {
-      setTimeout(renderNext, 500);
-    }
+      captureNext();
+    });
   }
 
   /* -----------------------------------------------------------------------

@@ -1403,3 +1403,169 @@ body.builder-body {
   background: var(--builder-surface-alt);
   color: var(--builder-text);
 }
+
+/* --------------------------------------------------------------------------
+   Image Editor Modal
+   -------------------------------------------------------------------------- */
+.modal__content--wide {
+  max-width: 860px;
+  width: 95%;
+}
+
+.image-editor {
+  display: flex;
+  gap: 20px;
+  min-height: 400px;
+}
+
+.image-editor__canvas-area {
+  flex: 1;
+  background: #0A0A0A;
+  border-radius: var(--builder-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  min-height: 380px;
+}
+
+.image-editor__canvas-area canvas {
+  cursor: crosshair;
+}
+
+.image-editor__sidebar {
+  width: 150px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.image-editor__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.image-editor__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--builder-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.image-editor__btn-row {
+  display: flex;
+  gap: 6px;
+}
+
+.image-editor__btn-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.image-editor__btn {
+  padding: 8px 12px;
+  background: var(--builder-surface-alt);
+  border: 1px solid var(--builder-border);
+  border-radius: var(--builder-radius-sm);
+  color: var(--builder-text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--builder-transition);
+  flex: 1;
+}
+
+.image-editor__btn:hover {
+  background: var(--builder-surface-hover);
+  color: var(--builder-text);
+  border-color: var(--builder-text-muted);
+}
+
+.image-editor__btn--reset {
+  width: 100%;
+  color: var(--builder-text-muted);
+  font-size: 11px;
+}
+
+.image-editor__ratio-btn {
+  padding: 6px 10px;
+  background: var(--builder-surface-alt);
+  border: 1px solid var(--builder-border);
+  border-radius: var(--builder-radius-sm);
+  color: var(--builder-text-secondary);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  transition: all var(--builder-transition);
+}
+
+.image-editor__ratio-btn:hover {
+  border-color: var(--builder-text-muted);
+  color: var(--builder-text);
+}
+
+.image-editor__ratio-btn--active {
+  border-color: var(--builder-accent);
+  color: var(--builder-accent);
+  background: rgba(227, 24, 55, 0.08);
+}
+
+.image-editor__spacer {
+  flex: 1;
+}
+
+.image-editor__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.image-editor__actions .builder-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Edit overlay on image preview in editor */
+.form-image-upload__edit-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: var(--builder-radius-sm);
+}
+
+.form-image-upload__preview:hover .form-image-upload__edit-overlay {
+  opacity: 1;
+}
+
+.form-image-upload__edit-btn {
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--builder-radius-sm);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.form-image-upload__edit-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}

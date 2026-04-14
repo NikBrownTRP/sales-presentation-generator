@@ -933,10 +933,16 @@
   z-index: 3;
 }
 
-/* Hide placeholders during presentation (slideshow + exported HTML) */
-.pres-slide--animated .pres-placeholder,
-.slideshow-slide .pres-placeholder {
+/* Hide placeholders everywhere by default */
+.pres-placeholder {
   display: none;
+}
+
+/* Only show placeholders inside the builder's live preview + editor thumbnails */
+.builder-preview .pres-placeholder,
+.slide-item__thumbnail .pres-placeholder,
+.template-card__preview .pres-placeholder {
+  display: flex;
 }
 
 /* --------------------------------------------------------------------------
