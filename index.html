@@ -299,23 +299,32 @@
           h += '<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">\n';
           h += '<style>\n*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}\nhtml,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:"Inter",sans-serif}\n';
           h += cssContent + '\n';
-          h += '.slideshow-nav{position:fixed;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:linear-gradient(to bottom,rgba(0,0,0,0.7),transparent);z-index:100}\n';
+          h += '.slideshow-nav{position:fixed;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:linear-gradient(to bottom,rgba(0,0,0,0.7),transparent);z-index:100;transition:opacity 0.3s ease}\n';
+          h += '.slideshow-nav--hidden{opacity:0;pointer-events:none}\n';
           h += '.slideshow-counter{font-size:14px;font-weight:600;color:rgba(255,255,255,0.7);min-width:60px}\n';
-          h += '.slideshow-title{font-size:13px;color:rgba(255,255,255,0.5)}\n';
+          h += '.slideshow-title{font-size:13px;color:rgba(255,255,255,0.5);flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 12px}\n';
           h += '.slideshow-controls{display:flex;gap:8px}\n';
-          h += '.slideshow-btn{padding:6px 14px;background:rgba(255,255,255,0.1);border:none;color:#fff;border-radius:4px;cursor:pointer;font-size:16px}\n';
+          h += '.slideshow-btn{padding:8px 14px;background:rgba(255,255,255,0.1);border:none;color:#fff;border-radius:4px;cursor:pointer;font-size:16px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}\n';
           h += '.slideshow-btn:hover{background:rgba(255,255,255,0.2)}\n';
-          h += '.slideshow-stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}\n';
+          h += '.slideshow-stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:pan-y}\n';
           h += '.slideshow-slide{position:absolute;width:960px;height:540px;overflow:hidden;transition:opacity 0.5s ease;transform-origin:center center}\n';
           h += '.slideshow-slide--active{opacity:1}\n.slideshow-slide--prev,.slideshow-slide--next{opacity:0;pointer-events:none}\n';
-          h += '.slideshow-dots{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:100}\n';
-          h += '.slideshow-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);border:none;cursor:pointer}\n';
+          h += '.slideshow-tap-zone{position:fixed;top:0;bottom:0;width:30%;z-index:50;cursor:pointer;-webkit-tap-highlight-color:transparent}\n';
+          h += '.slideshow-tap-zone--left{left:0}.slideshow-tap-zone--right{right:0}\n';
+          h += '.slideshow-dots{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:100;padding:10px;transition:opacity 0.3s ease}\n';
+          h += '.slideshow-dots--hidden{opacity:0;pointer-events:none}\n';
+          h += '.slideshow-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.3);border:none;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;position:relative}\n';
+          h += '.slideshow-dot::after{content:"";position:absolute;inset:-8px}\n'; // expand tap target
           h += '.slideshow-dot--active{background:#E31837;transform:scale(1.3)}\n';
+          h += '@media (max-width:640px){.slideshow-nav{padding:0 12px;height:44px}.slideshow-title{font-size:11px}.slideshow-counter{font-size:12px;min-width:44px}.slideshow-btn{padding:8px 10px;font-size:18px}}\n';
+          h += '@media (hover:none){.slideshow-btn:hover{background:rgba(255,255,255,0.1)}}\n';
           h += '</style>\n</head>\n<body>\n';
           h += '<div class="slideshow-nav"><span class="slideshow-counter" id="counter">1 / '+slides.length+'</span><span class="slideshow-title">'+title.replace(/</g,'&lt;')+'</span>';
           h += '<div class="slideshow-controls"><button onclick="prev()" class="slideshow-btn">&larr;</button><button onclick="next()" class="slideshow-btn">&rarr;</button>';
           h += '<button onclick="toggleFullscreen()" class="slideshow-btn">&#x26F6;</button></div></div>\n';
           h += '<div class="slideshow-stage" id="stage">\n'+slidesHtml+'</div>\n';
+          h += '<div class="slideshow-tap-zone slideshow-tap-zone--left" onclick="prev()" aria-label="Previous slide"></div>\n';
+          h += '<div class="slideshow-tap-zone slideshow-tap-zone--right" onclick="next()" aria-label="Next slide"></div>\n';
           h += '<div class="slideshow-dots" id="dots">\n';
           slides.forEach(function(s,i){h+='<button class="slideshow-dot'+(i===0?' slideshow-dot--active':'')+'" onclick="goTo('+i+')"></button>\n'});
           h += '</div>\n';
@@ -326,6 +335,12 @@
           h += 'function toggleFullscreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen().then(scaleSlides)}else{document.exitFullscreen().then(scaleSlides)}}document.addEventListener("fullscreenchange",function(){setTimeout(scaleSlides,100)});\n';
           h += 'function scaleSlides(){var vw=window.innerWidth-40,vh=window.innerHeight-80,sw=960,sh=540,scale=Math.min(vw/sw,vh/sh,2);document.querySelectorAll(".slideshow-slide").forEach(function(el){el.style.transform="scale("+scale+")"})}\n';
           h += 'document.addEventListener("keydown",function(e){if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();next()}else if(e.key==="ArrowLeft"){e.preventDefault();prev()}else if(e.key==="f"||e.key==="F"){e.preventDefault();toggleFullscreen()}});\n';
+          // Touch/swipe navigation
+          h += 'var tsX=0,tsY=0,tsT=0;document.addEventListener("touchstart",function(e){var t=e.changedTouches[0];tsX=t.clientX;tsY=t.clientY;tsT=Date.now()},{passive:true});\n';
+          h += 'document.addEventListener("touchend",function(e){if(Date.now()-tsT>600)return;var t=e.changedTouches[0];var dx=t.clientX-tsX,dy=t.clientY-tsY;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){if(dx<0)next();else prev()}},{passive:true});\n';
+          // Auto-hide nav after inactivity
+          h += 'var hideTimer;function showNav(){document.querySelector(".slideshow-nav").classList.remove("slideshow-nav--hidden");document.getElementById("dots").classList.remove("slideshow-dots--hidden");clearTimeout(hideTimer);hideTimer=setTimeout(function(){document.querySelector(".slideshow-nav").classList.add("slideshow-nav--hidden");document.getElementById("dots").classList.add("slideshow-dots--hidden")},3000)}\n';
+          h += 'document.addEventListener("mousemove",showNav);document.addEventListener("touchstart",showNav,{passive:true});document.addEventListener("keydown",showNav);showNav();\n';
           h += 'window.addEventListener("resize",scaleSlides);scaleSlides();\n';
           h += 'document.querySelectorAll(".slideshow-slide:not(.slideshow-slide--active)").forEach(function(s){s.classList.add("slideshow-slide--next")});\n';
           h += '<\/script>\n</body>\n</html>';
