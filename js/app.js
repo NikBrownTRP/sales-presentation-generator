@@ -94,6 +94,10 @@
     if (slide.data.hasOwnProperty('logo') && !slide.data.logo) {
       slide.data.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
     }
+    // Prefill brand line for title slides
+    if (slide.data.hasOwnProperty('brandLine') && !slide.data.brandLine) {
+      slide.data.brandLine = slide.theme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+    }
     state.lastTheme = slide.theme;
     // Insert after the currently active slide, or at the end
     var activeIdx = state.activeSlideId ? slideIndex(state.activeSlideId) : -1;
@@ -399,6 +403,13 @@
           var oldLogo = oldTheme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
           if (!slide.data.logo || slide.data.logo === oldLogo) {
             slide.data.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+          }
+        }
+        // Swap brand line if it's still the default
+        if (slide.data.hasOwnProperty('brandLine')) {
+          var oldBrand = oldTheme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+          if (!slide.data.brandLine || slide.data.brandLine === oldBrand) {
+            slide.data.brandLine = slide.theme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
           }
         }
         renderEditor();
