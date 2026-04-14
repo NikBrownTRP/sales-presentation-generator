@@ -27,11 +27,14 @@
       var img = new Image();
       img.onload = function () {
         var ratio = Math.min(maxW / img.width, maxH / img.height, 1);
+        if (ratio >= 1) { resolve(dataUrl); return; } // No resize needed
         var c = document.createElement('canvas');
         c.width = Math.round(img.width * ratio);
         c.height = Math.round(img.height * ratio);
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        resolve(c.toDataURL('image/jpeg', quality || 0.85));
+        // Preserve PNG transparency; use JPEG only for non-transparent images
+        var isPng = dataUrl.indexOf('data:image/png') === 0;
+        resolve(isPng ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', quality || 0.85));
       };
       img.onerror = function () { resolve(dataUrl); };
       img.src = dataUrl;
@@ -44,7 +47,7 @@
   var state = {
     slides: [],
     activeSlideId: null,
-    theme: 'tektro-dark',
+    theme: 'trp-dark',
     meta: { title: 'Untitled Presentation', updatedAt: null }
   };
 
@@ -62,7 +65,7 @@
     dom.previewScaler = document.getElementById('preview-scaler');
     dom.previewSlideInfo = document.getElementById('preview-slide-info');
     dom.previewPanel = document.getElementById('preview-panel');
-    dom.themeSelect = document.getElementById('theme-select');
+    dom.themeSelect = document.getElementById('theme-select'); // may be null (per-slide themes)
     dom.modalAddSlide = document.getElementById('modal-add-slide');
     dom.templateGrid = document.getElementById('template-grid');
     dom.slideshowModal = document.getElementById('slideshow-modal');
@@ -74,18 +77,31 @@
     dom.exportProgressFill = document.getElementById('export-progress-fill');
     dom.fileInputLoad = document.getElementById('file-input-load');
     dom.fileInputImage = document.getElementById('file-input-image');
+    dom.presTitle = document.getElementById('pres-title');
   }
 
   /* -----------------------------------------------------------------------
      Slide CRUD
      ----------------------------------------------------------------------- */
-  function addSlide(templateId) {
+  function addSlide(templateId, theme) {
     var slide = {
       id: uid(),
       templateId: templateId,
+      theme: theme || state.lastTheme || 'trp-dark',
       data: window.SlideTemplates.getDefaults(templateId)
     };
-    state.slides.push(slide);
+    // Prefill brand logo for templates that have a logo field
+    if (slide.data.hasOwnProperty('logo') && !slide.data.logo) {
+      slide.data.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+    }
+    state.lastTheme = slide.theme;
+    // Insert after the currently active slide, or at the end
+    var activeIdx = state.activeSlideId ? slideIndex(state.activeSlideId) : -1;
+    if (activeIdx !== -1) {
+      state.slides.splice(activeIdx + 1, 0, slide);
+    } else {
+      state.slides.push(slide);
+    }
     selectSlide(slide.id);
     renderSidebar();
     autoSave();
@@ -125,6 +141,31 @@
     if (idx === -1 || newIndex === idx) return;
     var slide = state.slides.splice(idx, 1)[0];
     state.slides.splice(newIndex, 0, slide);
+    renderSidebar();
+    autoSave();
+  }
+
+  function duplicateSlide(slideId) {
+    var idx = slideIndex(slideId);
+    if (idx === -1) return;
+    var original = state.slides[idx];
+    var copy = {
+      id: uid(),
+      templateId: original.templateId,
+      theme: original.theme,
+      hidden: false,
+      data: JSON.parse(JSON.stringify(original.data))
+    };
+    state.slides.splice(idx + 1, 0, copy);
+    selectSlide(copy.id);
+    renderSidebar();
+    autoSave();
+  }
+
+  function toggleHideSlide(slideId) {
+    var slide = state.slides.find(function (s) { return s.id === slideId; });
+    if (!slide) return;
+    slide.hidden = !slide.hidden;
     renderSidebar();
     autoSave();
   }
@@ -181,7 +222,8 @@
       var isActive = slide.id === state.activeSlideId;
       var title = template ? template.getTitle(slide.data) : 'Slide';
 
-      html += '<li class="slide-item' + (isActive ? ' slide-item--active' : '') + '" data-slide-id="' + slide.id + '" draggable="true">';
+      var isHidden = slide.hidden === true;
+      html += '<li class="slide-item' + (isActive ? ' slide-item--active' : '') + (isHidden ? ' slide-item--hidden' : '') + '" data-slide-id="' + slide.id + '" draggable="true">';
 
       // Drag handle
       html += '<span class="slide-item__drag-handle" title="Drag to reorder">';
@@ -190,7 +232,7 @@
 
       // Thumbnail
       html += '<div class="slide-item__thumbnail" id="thumb-' + slide.id + '">';
-      html += '<div class="slide-item__thumbnail-inner" data-theme="' + state.theme + '">';
+      html += '<div class="slide-item__thumbnail-inner" data-theme="' + (slide.theme || state.theme) + '">';
       if (template) {
         html += template.render(slide.data);
       }
@@ -206,6 +248,8 @@
       html += '<div class="slide-item__actions">';
       html += '<button class="slide-item__action" data-action="move-up" data-slide-id="' + slide.id + '" title="Move up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18,15 12,9 6,15"/></svg></button>';
       html += '<button class="slide-item__action" data-action="move-down" data-slide-id="' + slide.id + '" title="Move down"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg></button>';
+      html += '<button class="slide-item__action" data-action="duplicate" data-slide-id="' + slide.id + '" title="Duplicate slide"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>';
+      html += '<button class="slide-item__action' + (isHidden ? ' slide-item__action--active' : '') + '" data-action="toggle-hide" data-slide-id="' + slide.id + '" title="' + (isHidden ? 'Show slide' : 'Hide slide') + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + (isHidden ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/>' : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>') + '</svg></button>';
       html += '<button class="slide-item__action slide-item__action--delete" data-action="delete" data-slide-id="' + slide.id + '" title="Delete slide"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"/></svg></button>';
       html += '</div>';
 
@@ -246,8 +290,10 @@
         var action = btn.dataset.action;
         if (action === 'move-up') moveSlide(slideId, -1);
         else if (action === 'move-down') moveSlide(slideId, 1);
+        else if (action === 'duplicate') duplicateSlide(slideId);
+        else if (action === 'toggle-hide') toggleHideSlide(slideId);
         else if (action === 'delete') {
-          if (confirm('Delete this slide?')) deleteSlide(slideId);
+          Dialog.confirm('Delete Slide', 'Are you sure you want to delete this slide? This cannot be undone.', { confirmLabel: 'Delete', confirmStyle: 'danger', icon: 'warning' }).then(function(ok) { if (ok) deleteSlide(slideId); });
         }
       });
     });
@@ -329,12 +375,39 @@
     dom.editorTemplateName.textContent = template.name;
     dom.previewSlideInfo.textContent = 'Slide ' + (idx + 1) + ' of ' + state.slides.length;
 
-    var html = '';
+    var slideTheme = slide.theme || 'trp-dark';
+    var html = '<div class="form-group form-group--theme">';
+    html += '<label class="form-label">Slide Theme</label>';
+    html += '<div class="form-theme-toggle">';
+    html += '<button class="form-theme-btn' + (slideTheme === 'trp-dark' ? ' form-theme-btn--active' : '') + '" data-set-theme="trp-dark">TRP Racing</button>';
+    html += '<button class="form-theme-btn' + (slideTheme === 'tektro-light' ? ' form-theme-btn--active' : '') + '" data-set-theme="tektro-light">Tektro</button>';
+    html += '</div></div>';
+
     template.fields.forEach(function (field) {
       html += renderField(field, slide);
     });
 
     dom.editorForm.innerHTML = html;
+
+    // Theme toggle events
+    dom.editorForm.querySelectorAll('[data-set-theme]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var oldTheme = slide.theme;
+        slide.theme = btn.dataset.setTheme;
+        // Swap brand logo if it's still the default
+        if (slide.data.hasOwnProperty('logo')) {
+          var oldLogo = oldTheme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+          if (!slide.data.logo || slide.data.logo === oldLogo) {
+            slide.data.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+          }
+        }
+        renderEditor();
+        renderSidebar();
+        updatePreview();
+        autoSave();
+      });
+    });
+
     setupEditorEvents(slide);
   }
 
@@ -620,7 +693,7 @@
     }
 
     if (window.PreviewRenderer) {
-      window.PreviewRenderer.renderLivePreview(slide, state.theme, dom.previewSlide, dom.previewScaler, dom.previewPanel);
+      window.PreviewRenderer.renderLivePreview(slide, slide.theme || state.theme, dom.previewSlide, dom.previewScaler, dom.previewPanel);
     }
   }
 
@@ -633,25 +706,65 @@
   /* -----------------------------------------------------------------------
      Modal: Template picker
      ----------------------------------------------------------------------- */
-  function openTemplateModal() {
-    var templates = window.SlideTemplates.getOrderedList();
-    var html = '';
+  var modalTheme = 'trp-dark';
 
+  function openTemplateModal() {
+    modalTheme = state.lastTheme || 'trp-dark';
+    renderTemplateGrid();
+    openModal(dom.modalAddSlide);
+  }
+
+  function renderTemplateGrid() {
+    var templates = window.SlideTemplates.getOrderedList();
+
+    // Theme picker
+    var html = '<div class="template-theme-picker">';
+    html += '<button class="template-theme-btn' + (modalTheme === 'trp-dark' ? ' template-theme-btn--active' : '') + '" data-pick-theme="trp-dark">TRP Racing</button>';
+    html += '<button class="template-theme-btn' + (modalTheme === 'tektro-light' ? ' template-theme-btn--active' : '') + '" data-pick-theme="tektro-light">Tektro</button>';
+    html += '</div>';
+
+    // Template cards with live previews
+    html += '<div class="template-grid__cards">';
     templates.forEach(function (t) {
+      var previewData = window.SlideTemplates.getDefaults(t.id);
+      var previewHtml = t.render(previewData);
       html += '<div class="template-card" data-template-id="' + t.id + '">';
-      html += '<div class="template-card__icon">' + t.icon + '</div>';
+      html += '<div class="template-card__preview" data-theme="' + modalTheme + '">';
+      html += '<div class="template-card__preview-inner">' + previewHtml + '</div>';
+      html += '</div>';
       html += '<div class="template-card__name">' + t.name + '</div>';
       html += '<div class="template-card__desc">' + t.description + '</div>';
       html += '</div>';
     });
+    html += '</div>';
 
     dom.templateGrid.innerHTML = html;
-    openModal(dom.modalAddSlide);
 
-    // Bind clicks
+    // Scale previews to fit cards after layout settles
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        dom.templateGrid.querySelectorAll('.template-card__preview').forEach(function (preview) {
+          var inner = preview.querySelector('.template-card__preview-inner');
+          if (inner) {
+            var scale = preview.offsetWidth / 960;
+            inner.style.transform = 'scale(' + scale + ')';
+          }
+        });
+      });
+    });
+
+    // Theme picker clicks
+    dom.templateGrid.querySelectorAll('[data-pick-theme]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        modalTheme = btn.dataset.pickTheme;
+        renderTemplateGrid();
+      });
+    });
+
+    // Template card clicks
     dom.templateGrid.querySelectorAll('.template-card').forEach(function (card) {
       card.addEventListener('click', function () {
-        addSlide(card.dataset.templateId);
+        addSlide(card.dataset.templateId, modalTheme);
         closeModal(dom.modalAddSlide);
       });
     });
@@ -676,11 +789,12 @@
   var slideshowIndex = 0;
 
   function openSlideshow() {
-    if (state.slides.length === 0) return;
+    var visibleSlides = state.slides.filter(function (s) { return !s.hidden; });
+    if (visibleSlides.length === 0) return;
     slideshowIndex = 0;
 
     if (window.PreviewRenderer) {
-      window.PreviewRenderer.openSlideshow(state.slides, state.theme);
+      window.PreviewRenderer.openSlideshow(visibleSlides, state.theme);
     }
   }
 
@@ -689,11 +803,19 @@
      ----------------------------------------------------------------------- */
   function loadState(newState) {
     state.slides = newState.slides || [];
-    state.theme = newState.theme || 'tektro-dark';
+    state.theme = newState.theme || 'trp-dark';
     state.meta = newState.meta || { title: 'Untitled Presentation', updatedAt: null };
     state.activeSlideId = state.slides.length > 0 ? state.slides[0].id : null;
 
-    dom.themeSelect.value = state.theme;
+    // Backward compatibility: add per-slide theme if missing
+    state.slides.forEach(function (slide) {
+      if (!slide.theme) slide.theme = state.theme || 'trp-dark';
+    });
+
+    if (dom.themeSelect) dom.themeSelect.value = state.theme;
+    if (dom.presTitle) {
+      dom.presTitle.value = state.meta.title || 'Untitled Presentation';
+    }
     renderSidebar();
     renderEditor();
     updatePreview();
@@ -718,6 +840,53 @@
       addSlide('title');
     }
 
+    // --- Presentation title ---
+    dom.presTitle.value = state.meta.title || 'Untitled Presentation';
+    dom.presTitle.addEventListener('input', function () {
+      state.meta.title = dom.presTitle.value || 'Untitled Presentation';
+      debouncedAutoSave();
+    });
+    dom.presTitle.addEventListener('blur', function () {
+      if (!dom.presTitle.value.trim()) {
+        dom.presTitle.value = 'Untitled Presentation';
+        state.meta.title = 'Untitled Presentation';
+      }
+    });
+
+    // --- New presentation ---
+    document.getElementById('btn-new').addEventListener('click', function () {
+      if (state.slides.length > 0) {
+        Dialog.confirm('New Presentation', 'Your current presentation will be cleared completely.\n\nTo edit it later, save it first as a .json file using the Save button, then load it back in with the Load button.', { confirmLabel: 'Start New', confirmStyle: 'danger', icon: 'warning' }).then(function(ok) {
+          if (!ok) return;
+          state.slides = [];
+          state.activeSlideId = null;
+          state.theme = 'trp-dark';
+          state.meta = { title: 'Untitled Presentation', updatedAt: null };
+          if (dom.themeSelect) dom.themeSelect.value = state.theme;
+          dom.presTitle.value = '';
+          dom.presTitle.focus();
+          dom.presTitle.select();
+          renderSidebar();
+          renderEditor();
+          updatePreview();
+          autoSave();
+        });
+        return;
+      }
+      state.slides = [];
+      state.activeSlideId = null;
+      state.theme = 'trp-dark';
+      state.meta = { title: 'Untitled Presentation', updatedAt: null };
+      if (dom.themeSelect) dom.themeSelect.value = state.theme;
+      dom.presTitle.value = '';
+      dom.presTitle.focus();
+      dom.presTitle.select();
+      renderSidebar();
+      renderEditor();
+      updatePreview();
+      autoSave();
+    });
+
     // --- Header buttons ---
     document.getElementById('btn-add-slide').addEventListener('click', openTemplateModal);
 
@@ -726,15 +895,19 @@
     });
 
     document.getElementById('btn-load').addEventListener('click', function () {
-      // Show a choice: load JSON or HTML
-      var choice = prompt('Load from:\n1 = JSON file\n2 = HTML presentation file\n\nEnter 1 or 2:', '1');
-      if (choice === '1') {
-        dom.fileInputLoad.accept = '.json';
-        dom.fileInputLoad.click();
-      } else if (choice === '2') {
-        dom.fileInputLoad.accept = '.html,.htm';
-        dom.fileInputLoad.click();
-      }
+      Dialog.choose('Load Presentation', 'Choose the file format to load:', [
+        { label: 'JSON Project File', style: 'primary', value: 'json' },
+        { label: 'HTML Presentation', style: 'secondary', value: 'html' },
+        { label: 'Cancel', style: 'ghost', value: null }
+      ]).then(function (choice) {
+        if (choice === 'json') {
+          dom.fileInputLoad.accept = '.json';
+          dom.fileInputLoad.click();
+        } else if (choice === 'html') {
+          dom.fileInputLoad.accept = '.html,.htm';
+          dom.fileInputLoad.click();
+        }
+      });
     });
 
     dom.fileInputLoad.addEventListener('change', function (e) {
@@ -751,14 +924,14 @@
           try {
             parsed = JSON.parse(content);
           } catch (err) {
-            alert('Error: Invalid JSON file.');
+            Dialog.alert('Invalid File', 'This file is not a valid JSON file.', 'error');
             return;
           }
         } else if (file.name.endsWith('.html') || file.name.endsWith('.htm')) {
           // HTML format — extract embedded JSON
           parsed = extractStateFromHtml(content);
           if (!parsed) {
-            alert('Error: This HTML file does not contain embedded presentation data.\nOnly HTML files exported from this tool can be re-imported.');
+            Dialog.alert('Cannot Import', 'This HTML file does not contain embedded presentation data.\n\nOnly HTML files exported from this tool can be re-imported.', 'error');
             return;
           }
         }
@@ -767,7 +940,7 @@
           loadState(parsed);
           autoSave();
         } else {
-          alert('Error: File does not contain valid presentation data.');
+          Dialog.alert('Invalid File', 'This file does not contain valid presentation data.', 'error');
         }
       };
       reader.readAsText(file);
@@ -786,7 +959,7 @@
 
     document.getElementById('btn-export-pdf').addEventListener('click', function () {
       if (state.slides.length === 0) {
-        alert('Add at least one slide before exporting.');
+        Dialog.alert('No Slides', 'Add at least one slide before exporting.', 'warning');
         return;
       }
       if (window.ExportManager) {
@@ -796,7 +969,7 @@
 
     document.getElementById('btn-export-html').addEventListener('click', function () {
       if (state.slides.length === 0) {
-        alert('Add at least one slide before exporting.');
+        Dialog.alert('No Slides', 'Add at least one slide before exporting.', 'warning');
         return;
       }
       if (window.ExportManager) {
@@ -804,13 +977,7 @@
       }
     });
 
-    // Theme select
-    dom.themeSelect.addEventListener('change', function () {
-      state.theme = dom.themeSelect.value;
-      renderSidebar();
-      updatePreview();
-      autoSave();
-    });
+    // Theme select (per-slide, handled in editor — global selector removed)
 
     // Close modals
     document.querySelectorAll('[data-close-modal]').forEach(function (el) {

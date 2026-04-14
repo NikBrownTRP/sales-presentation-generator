@@ -9,6 +9,11 @@
 
   var checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>';
 
+  function renderSlideLogo(data) {
+    if (!data.logo) return '';
+    return '<img class="pres-slide-logo" src="' + data.logo + '" alt="">';
+  }
+
   /* -----------------------------------------------------------------------
      SVG Chart Renderer — builds inline SVG from data
      ----------------------------------------------------------------------- */
@@ -234,7 +239,8 @@
         { key: 'category', type: 'text', label: 'Category', placeholder: 'e.g., Disc Brakes / MTB' },
         { key: 'productImage', type: 'image', label: 'Product Image' },
         { key: 'sellingPoints', type: 'list', label: 'Key Selling Points', placeholder: 'Add a selling point...', maxItems: 5 },
-        { key: 'badgeText', type: 'text', label: 'Badge Text', placeholder: 'e.g., NEW 2026' }
+        { key: 'badgeText', type: 'text', label: 'Badge Text', placeholder: 'e.g., NEW 2026' },
+        { key: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -289,6 +295,7 @@
 
         html += '</div>'; // image area
         html += '</div>'; // content
+        html += renderSlideLogo(data);
         html += '</div>'; // slide
 
         return html;
@@ -309,7 +316,8 @@
         { key: 'productImage', type: 'image', label: 'Product Image' },
         { key: 'specs', type: 'keyvalue', label: 'Specifications', keyPlaceholder: 'Spec name', valuePlaceholder: 'Value' },
         { key: 'features', type: 'list', label: 'Key Features', placeholder: 'Add a feature...', maxItems: 6 },
-        { key: 'footnote', type: 'text', label: 'Footnote', placeholder: 'e.g., *Weight without rotors' }
+        { key: 'footnote', type: 'text', label: 'Footnote', placeholder: 'e.g., *Weight without rotors' },
+        { key: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -377,6 +385,7 @@
         }
 
         html += '</div>'; // content
+        html += renderSlideLogo(data);
         html += '</div>'; // slide
 
         return html;
@@ -405,7 +414,8 @@
             { value: 'text-full', label: 'Full Width (no image)' },
             { value: 'text-center', label: 'Centered' }
           ]
-        }
+        },
+        { key: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -465,6 +475,7 @@
 
         html += '</div>'; // body
         html += '</div>'; // content
+        html += renderSlideLogo(data);
         html += '</div>'; // slide
 
         return html;
@@ -496,7 +507,8 @@
             { value: '1-2', label: '1 Large + 2 Small' },
             { value: '2col', label: '2 Columns (no 3rd)' }
           ]
-        }
+        },
+        { key: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -546,6 +558,7 @@
 
         html += '</div>'; // grid
         html += '</div>'; // content
+        html += renderSlideLogo(data);
         html += '</div>'; // slide
 
         return html;
@@ -577,7 +590,8 @@
         { key: 'yAxisLabel', type: 'text', label: 'Y-Axis Label', placeholder: 'e.g., Units Sold' },
         { key: 'chartImage', type: 'image', label: 'Image (for image mode)' },
         { key: 'notes', type: 'list', label: 'Detail Notes', placeholder: 'Add a note...', maxItems: 4 },
-        { key: 'footnote', type: 'text', label: 'Footnote / Source', placeholder: 'e.g., Source: Internal sales data' }
+        { key: 'footnote', type: 'text', label: 'Footnote / Source', placeholder: 'e.g., Source: Internal sales data' },
+        { key: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -667,6 +681,7 @@
         }
 
         html += '</div>'; // content
+        html += renderSlideLogo(data);
         html += '</div>'; // slide
 
         return html;

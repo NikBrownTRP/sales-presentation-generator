@@ -83,7 +83,7 @@
 
       var posClass = i === 0 ? 'slideshow-modal__slide--active' : 'slideshow-modal__slide--next';
       html += '<div class="slideshow-modal__slide ' + posClass + '" data-slide-index="' + i + '">';
-      html += '<div data-theme="' + theme + '" style="width:' + SLIDE_W + 'px;height:' + SLIDE_H + 'px;">';
+      html += '<div data-theme="' + (slide.theme || theme) + '" style="width:' + SLIDE_W + 'px;height:' + SLIDE_H + 'px;">';
       html += template.render(slide.data);
       // Add animation class to active slide
       if (i === 0) {

@@ -1,66 +1,41 @@
 /* ==========================================================================
    Sales Presentation Generator — Slide Styles & Themes
-   Presentation rendering styles for all 4 templates + animations
+   Two brand design systems: TRP Dark + Tektro Light
+   Aligned with Stitch MCP-generated corporate design systems
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   Theme: Tektro Dark (Default)
+   Theme: TRP Dark
+   Performance racing brand — from tektro.eu Shopify theme
+   Fonts: Oswald (heading, matches Zurich Extended) + Inter (body, matches Zurich)
+   Primary: Blue-grey #54748a | Secondary: Red #de2a2a
    -------------------------------------------------------------------------- */
-[data-theme="tektro-dark"] {
-  --pres-bg: #0A0A0A;
-  --pres-bg-alt: #111111;
-  --pres-bg-surface: #1A1A1A;
+[data-theme="trp-dark"] {
+  --pres-bg: #000000;
+  --pres-bg-alt: #0A0A0A;
+  --pres-bg-surface: #161616;
   --pres-text: #FFFFFF;
   --pres-text-secondary: #B0B0B0;
-  --pres-text-muted: #666666;
-  --pres-accent: #E31837;
-  --pres-accent-light: #FF2D4B;
-  --pres-accent-glow: rgba(227, 24, 55, 0.3);
-  --pres-border: #2A2A2A;
-  --pres-font-heading: 'Montserrat', sans-serif;
-  --pres-font-body: 'Inter', sans-serif;
-  --pres-heading-weight: 800;
-}
-
-/* --------------------------------------------------------------------------
-   Theme: TRP Racing
-   -------------------------------------------------------------------------- */
-[data-theme="trp-racing"] {
-  --pres-bg: #080808;
-  --pres-bg-alt: #0F0F0F;
-  --pres-bg-surface: #181818;
-  --pres-text: #FFFFFF;
-  --pres-text-secondary: #999999;
   --pres-text-muted: #555555;
-  --pres-accent: #CC0000;
-  --pres-accent-light: #FF1A1A;
-  --pres-accent-glow: rgba(204, 0, 0, 0.35);
-  --pres-border: #222222;
-  --pres-font-heading: 'Montserrat', sans-serif;
+  --pres-accent: #54748a;
+  --pres-accent-light: #6a8da6;
+  --pres-accent-secondary: #de2a2a;
+  --pres-accent-glow: rgba(84, 116, 138, 0.25);
+  --pres-border: #1E1E1E;
+  --pres-font-heading: 'Oswald', sans-serif;
   --pres-font-body: 'Inter', sans-serif;
-  --pres-heading-weight: 900;
+  --pres-heading-weight: 700;
+  --pres-heading-transform: uppercase;
+  --pres-heading-tracking: -0.02em;
+  --pres-corner-size: 40px;
+  --pres-corner-weight: 1px;
+  --pres-accent-bar-height: 3px;
+  --pres-underline-height: 2px;
+  --pres-radius: 0px;
 }
 
-/* --------------------------------------------------------------------------
-   Theme: Carbon Fiber
-   -------------------------------------------------------------------------- */
-[data-theme="carbon-fiber"] {
-  --pres-bg: #0D0D0D;
-  --pres-bg-alt: #151515;
-  --pres-bg-surface: #1E1E1E;
-  --pres-text: #F0F0F0;
-  --pres-text-secondary: #999999;
-  --pres-text-muted: #555555;
-  --pres-accent: #E31837;
-  --pres-accent-light: #FFD700;
-  --pres-accent-glow: rgba(227, 24, 55, 0.25);
-  --pres-border: #2A2A2A;
-  --pres-font-heading: 'Montserrat', sans-serif;
-  --pres-font-body: 'Inter', sans-serif;
-  --pres-heading-weight: 800;
-}
-
-[data-theme="carbon-fiber"] .pres-slide::before {
+/* TRP Dark — carbon fiber texture overlay */
+[data-theme="trp-dark"] .pres-slide::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -76,22 +51,32 @@
 }
 
 /* --------------------------------------------------------------------------
-   Theme: Clean Light
+   Theme: Tektro Light
+   Editorial, magazine feel — generous whitespace, pure monochrome
+   Fonts: Manrope (heading) + Inter (body) — from Stitch design system
    -------------------------------------------------------------------------- */
-[data-theme="clean-light"] {
+[data-theme="tektro-light"] {
   --pres-bg: #FFFFFF;
-  --pres-bg-alt: #F5F5F5;
-  --pres-bg-surface: #EEEEEE;
-  --pres-text: #1A1A1A;
-  --pres-text-secondary: #555555;
+  --pres-bg-alt: #F9F9F9;
+  --pres-bg-surface: #F0F0F0;
+  --pres-text: #000000;
+  --pres-text-secondary: #5E5E5E;
   --pres-text-muted: #999999;
-  --pres-accent: #E31837;
-  --pres-accent-light: #FF2D4B;
-  --pres-accent-glow: rgba(227, 24, 55, 0.15);
-  --pres-border: #E0E0E0;
-  --pres-font-heading: 'Montserrat', sans-serif;
+  --pres-accent: #000000;
+  --pres-accent-light: #3B3B3B;
+  --pres-accent-secondary: #5E5E5E;
+  --pres-accent-glow: rgba(0, 0, 0, 0.05);
+  --pres-border: #DADADA;
+  --pres-font-heading: 'Manrope', sans-serif;
   --pres-font-body: 'Inter', sans-serif;
   --pres-heading-weight: 700;
+  --pres-heading-transform: none;
+  --pres-heading-tracking: -0.02em;
+  --pres-corner-size: 0px;
+  --pres-corner-weight: 1px;
+  --pres-accent-bar-height: 2px;
+  --pres-underline-height: 2px;
+  --pres-radius: 6px;
 }
 
 /* --------------------------------------------------------------------------
@@ -122,7 +107,7 @@
 
 /* Accent bar (top of every slide) */
 .pres-accent-bar {
-  height: 4px;
+  height: var(--pres-accent-bar-height, 4px);
   background: var(--pres-accent);
   flex-shrink: 0;
 }
@@ -195,7 +180,8 @@
   font-weight: var(--pres-heading-weight);
   font-size: 52px;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--pres-heading-tracking, -0.02em);
+  text-transform: var(--pres-heading-transform, none);
   color: var(--pres-text);
   margin-bottom: 16px;
 }
@@ -231,19 +217,25 @@
 /* Decorative corner accents for title slide */
 .pres-slide--title .pres-corner {
   position: absolute;
-  width: 40px;
-  height: 40px;
+  width: var(--pres-corner-size, 40px);
+  height: var(--pres-corner-size, 40px);
   z-index: 2;
+  display: var(--pres-corner-size, block);
 }
 .pres-slide--title .pres-corner--tl {
   top: 24px; left: 24px;
-  border-top: 2px solid var(--pres-accent);
-  border-left: 2px solid var(--pres-accent);
+  border-top: var(--pres-corner-weight, 2px) solid var(--pres-accent);
+  border-left: var(--pres-corner-weight, 2px) solid var(--pres-accent);
 }
 .pres-slide--title .pres-corner--br {
   bottom: 24px; right: 24px;
-  border-bottom: 2px solid var(--pres-accent);
-  border-right: 2px solid var(--pres-accent);
+  border-bottom: var(--pres-corner-weight, 2px) solid var(--pres-accent);
+  border-right: var(--pres-corner-weight, 2px) solid var(--pres-accent);
+}
+
+/* Hide corners for Tektro (clean editorial, no decorations) */
+[data-theme="tektro-light"] .pres-corner {
+  display: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -277,7 +269,8 @@
   font-weight: var(--pres-heading-weight);
   font-size: 40px;
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--pres-heading-tracking, -0.02em);
+  text-transform: var(--pres-heading-transform, none);
   color: var(--pres-text);
   margin-bottom: 10px;
 }
@@ -347,7 +340,7 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  background: var(--pres-accent);
+  background: var(--pres-accent-secondary, var(--pres-accent));
   color: #fff;
   font-family: var(--pres-font-heading);
   font-size: 11px;
@@ -355,8 +348,13 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   padding: 6px 14px;
-  border-radius: 3px;
+  border-radius: var(--pres-radius, 3px);
   z-index: 3;
+}
+
+/* Tektro badge — white text on dark accent */
+[data-theme="tektro-light"] .pres-badge {
+  color: #FFFFFF;
 }
 
 /* Vertical accent line separator */
@@ -395,13 +393,15 @@
   font-weight: var(--pres-heading-weight);
   font-size: 32px;
   line-height: 1.2;
+  letter-spacing: var(--pres-heading-tracking, -0.02em);
+  text-transform: var(--pres-heading-transform, none);
   color: var(--pres-text);
   margin-bottom: 4px;
 }
 
 .pres-slide--spec .pres-spec-underline {
   width: 48px;
-  height: 3px;
+  height: var(--pres-underline-height, 3px);
   background: var(--pres-accent);
   border-radius: 2px;
 }
@@ -514,11 +514,10 @@
 
 /* Spec product image */
 .pres-spec-product-img {
-  max-width: 90%;
-  max-height: 180px;
+  max-width: 95%;
+  max-height: 85%;
   object-fit: contain;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
-  margin-bottom: 16px;
 }
 
 .pres-slide--spec .pres-footnote {
@@ -548,6 +547,8 @@
   font-weight: var(--pres-heading-weight);
   font-size: 36px;
   line-height: 1.15;
+  letter-spacing: var(--pres-heading-tracking, -0.02em);
+  text-transform: var(--pres-heading-transform, none);
   color: var(--pres-text);
   margin-bottom: 4px;
 }
@@ -561,7 +562,7 @@
 
 .pres-slide--generic .pres-generic-underline {
   width: 48px;
-  height: 3px;
+  height: var(--pres-underline-height, 3px);
   background: var(--pres-accent);
   border-radius: 2px;
 }
@@ -615,8 +616,8 @@
 }
 
 .pres-slide--generic .pres-generic-img {
-  max-width: 90%;
-  max-height: 90%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   border-radius: 4px;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
@@ -659,6 +660,7 @@
   display: flex;
   flex-direction: column;
   padding: 0;
+  overflow: hidden;
 }
 
 .pres-slide--gallery .pres-gallery-header {
@@ -670,6 +672,8 @@
   font-weight: var(--pres-heading-weight);
   font-size: 30px;
   line-height: 1.15;
+  letter-spacing: var(--pres-heading-tracking, -0.02em);
+  text-transform: var(--pres-heading-transform, none);
   color: var(--pres-text);
   margin-bottom: 4px;
 }
@@ -683,7 +687,7 @@
 
 .pres-slide--gallery .pres-gallery-underline {
   width: 48px;
-  height: 3px;
+  height: var(--pres-underline-height, 3px);
   background: var(--pres-accent);
   border-radius: 2px;
 }
@@ -694,6 +698,8 @@
   gap: 16px;
   padding: 16px 48px 32px;
   align-items: stretch;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .pres-gallery-grid--3col {
@@ -712,12 +718,13 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
 }
 
 .pres-gallery-image-wrap {
   flex: 1;
   background: var(--pres-bg-alt);
-  border-radius: 6px;
+  border-radius: var(--pres-radius, 6px);
   border: 1px solid var(--pres-border);
   display: flex;
   align-items: center;
@@ -729,6 +736,7 @@
 .pres-gallery-img {
   width: 100%;
   height: 100%;
+  max-height: 100%;
   object-fit: cover;
   border-radius: 5px;
 }
@@ -759,6 +767,8 @@
   font-weight: var(--pres-heading-weight);
   font-size: 28px;
   line-height: 1.15;
+  letter-spacing: var(--pres-heading-tracking, -0.02em);
+  text-transform: var(--pres-heading-transform, none);
   color: var(--pres-text);
   margin-bottom: 4px;
 }
@@ -772,7 +782,7 @@
 
 .pres-slide--graph .pres-graph-underline {
   width: 48px;
-  height: 3px;
+  height: var(--pres-underline-height, 3px);
   background: var(--pres-accent);
   border-radius: 2px;
 }
@@ -889,7 +899,7 @@
   position: absolute;
   bottom: 10px;
   left: 48px;
-  right: 48px;
+  right: 120px;
   font-size: 10px;
   color: var(--pres-text-muted);
   font-style: italic;
@@ -909,6 +919,24 @@
   gap: 8px;
   font-size: 12px;
   opacity: 0.4;
+}
+
+/* Slide logo — bottom-right brand mark on all non-title slides */
+.pres-slide-logo {
+  position: absolute;
+  bottom: 12px;
+  right: 24px;
+  max-height: 20px;
+  max-width: 80px;
+  object-fit: contain;
+  opacity: 0.4;
+  z-index: 3;
+}
+
+/* Hide placeholders during presentation (slideshow + exported HTML) */
+.pres-slide--animated .pres-placeholder,
+.slideshow-slide .pres-placeholder {
+  display: none;
 }
 
 /* --------------------------------------------------------------------------

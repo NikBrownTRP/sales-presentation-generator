@@ -13,11 +13,16 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/builder.css">
   <link rel="stylesheet" href="css/slides.css">
+
+  <!-- Slides CSS embedded as JS string for reliable export (works on file:// URLs) -->
+  <script id="slides-css-data">
+    window.__SLIDES_CSS__ = "/* ==========================================================================\n   Sales Presentation Generator \u2014 Slide Styles & Themes\n   Two brand design systems: TRP Dark + Tektro Light\n   Aligned with Stitch MCP-generated corporate design systems\n   ========================================================================== */\n\n/* --------------------------------------------------------------------------\n   Theme: TRP Dark\n   Performance racing brand \u2014 from tektro.eu Shopify theme\n   Fonts: Oswald (heading, matches Zurich Extended) + Inter (body, matches Zurich)\n   Primary: Blue-grey #54748a | Secondary: Red #de2a2a\n   -------------------------------------------------------------------------- */\n[data-theme=\"trp-dark\"] {\n  --pres-bg: #000000;\n  --pres-bg-alt: #0A0A0A;\n  --pres-bg-surface: #161616;\n  --pres-text: #FFFFFF;\n  --pres-text-secondary: #B0B0B0;\n  --pres-text-muted: #555555;\n  --pres-accent: #54748a;\n  --pres-accent-light: #6a8da6;\n  --pres-accent-secondary: #de2a2a;\n  --pres-accent-glow: rgba(84, 116, 138, 0.25);\n  --pres-border: #1E1E1E;\n  --pres-font-heading: 'Oswald', sans-serif;\n  --pres-font-body: 'Inter', sans-serif;\n  --pres-heading-weight: 700;\n  --pres-heading-transform: uppercase;\n  --pres-heading-tracking: -0.02em;\n  --pres-corner-size: 40px;\n  --pres-corner-weight: 1px;\n  --pres-accent-bar-height: 3px;\n  --pres-underline-height: 2px;\n  --pres-radius: 0px;\n}\n\n/* TRP Dark \u2014 carbon fiber texture overlay */\n[data-theme=\"trp-dark\"] .pres-slide::before {\n  content: '';\n  position: absolute;\n  inset: 0;\n  background-image: repeating-linear-gradient(\n    45deg,\n    transparent,\n    transparent 2px,\n    rgba(255, 255, 255, 0.012) 2px,\n    rgba(255, 255, 255, 0.012) 4px\n  );\n  pointer-events: none;\n  z-index: 0;\n}\n\n/* --------------------------------------------------------------------------\n   Theme: Tektro Light\n   Editorial, magazine feel \u2014 generous whitespace, pure monochrome\n   Fonts: Manrope (heading) + Inter (body) \u2014 from Stitch design system\n   -------------------------------------------------------------------------- */\n[data-theme=\"tektro-light\"] {\n  --pres-bg: #FFFFFF;\n  --pres-bg-alt: #F9F9F9;\n  --pres-bg-surface: #F0F0F0;\n  --pres-text: #000000;\n  --pres-text-secondary: #5E5E5E;\n  --pres-text-muted: #999999;\n  --pres-accent: #000000;\n  --pres-accent-light: #3B3B3B;\n  --pres-accent-secondary: #5E5E5E;\n  --pres-accent-glow: rgba(0, 0, 0, 0.05);\n  --pres-border: #DADADA;\n  --pres-font-heading: 'Manrope', sans-serif;\n  --pres-font-body: 'Inter', sans-serif;\n  --pres-heading-weight: 700;\n  --pres-heading-transform: none;\n  --pres-heading-tracking: -0.02em;\n  --pres-corner-size: 0px;\n  --pres-corner-weight: 1px;\n  --pres-accent-bar-height: 2px;\n  --pres-underline-height: 2px;\n  --pres-radius: 6px;\n}\n\n/* --------------------------------------------------------------------------\n   Base Slide\n   -------------------------------------------------------------------------- */\n.pres-slide {\n  width: 960px;\n  height: 540px;\n  position: relative;\n  overflow: hidden;\n  font-family: var(--pres-font-body);\n  color: var(--pres-text);\n  background: var(--pres-bg);\n}\n\n.pres-slide * {\n  box-sizing: border-box;\n}\n\n.pres-slide__content {\n  position: relative;\n  z-index: 1;\n  width: 100%;\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n\n/* Accent bar (top of every slide) */\n.pres-accent-bar {\n  height: var(--pres-accent-bar-height, 4px);\n  background: var(--pres-accent);\n  flex-shrink: 0;\n}\n\n/* Slide footer strip */\n.pres-slide-footer {\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  padding: 10px 48px;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  font-size: 10px;\n  color: var(--pres-text-muted);\n  z-index: 2;\n}\n\n/* --------------------------------------------------------------------------\n   TEMPLATE 1: Title Page\n   -------------------------------------------------------------------------- */\n.pres-slide--title {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.pres-slide--title .pres-slide__bg {\n  position: absolute;\n  inset: 0;\n  background-size: cover;\n  background-position: center;\n  z-index: 0;\n}\n\n.pres-slide--title .pres-slide__overlay {\n  position: absolute;\n  inset: 0;\n  background: linear-gradient(\n    135deg,\n    rgba(0, 0, 0, 0.85) 0%,\n    rgba(0, 0, 0, 0.5) 50%,\n    rgba(0, 0, 0, 0.7) 100%\n  );\n  z-index: 1;\n}\n\n.pres-slide--title .pres-slide__content {\n  position: relative;\n  z-index: 2;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  padding: 48px 64px;\n  text-align: center;\n  height: 100%;\n}\n\n.pres-slide--title .pres-logo {\n  max-height: 60px;\n  max-width: 200px;\n  margin-bottom: 32px;\n  object-fit: contain;\n}\n\n.pres-slide--title .pres-title {\n  font-family: var(--pres-font-heading);\n  font-weight: var(--pres-heading-weight);\n  font-size: 52px;\n  line-height: 1.1;\n  letter-spacing: var(--pres-heading-tracking, -0.02em);\n  text-transform: var(--pres-heading-transform, none);\n  color: var(--pres-text);\n  margin-bottom: 16px;\n}\n\n.pres-slide--title .pres-subtitle {\n  font-family: var(--pres-font-body);\n  font-size: 22px;\n  font-weight: 400;\n  color: var(--pres-text-secondary);\n  letter-spacing: 0.02em;\n  margin-bottom: 24px;\n}\n\n.pres-slide--title .pres-accent-line {\n  width: 64px;\n  height: 4px;\n  background: var(--pres-accent);\n  border-radius: 2px;\n  margin: 0 auto 20px;\n}\n\n.pres-slide--title .pres-brandline {\n  font-family: var(--pres-font-heading);\n  font-size: 13px;\n  font-weight: 600;\n  text-transform: uppercase;\n  letter-spacing: 0.15em;\n  color: var(--pres-accent);\n  position: absolute;\n  bottom: 40px;\n}\n\n/* Decorative corner accents for title slide */\n.pres-slide--title .pres-corner {\n  position: absolute;\n  width: var(--pres-corner-size, 40px);\n  height: var(--pres-corner-size, 40px);\n  z-index: 2;\n  display: var(--pres-corner-size, block);\n}\n.pres-slide--title .pres-corner--tl {\n  top: 24px; left: 24px;\n  border-top: var(--pres-corner-weight, 2px) solid var(--pres-accent);\n  border-left: var(--pres-corner-weight, 2px) solid var(--pres-accent);\n}\n.pres-slide--title .pres-corner--br {\n  bottom: 24px; right: 24px;\n  border-bottom: var(--pres-corner-weight, 2px) solid var(--pres-accent);\n  border-right: var(--pres-corner-weight, 2px) solid var(--pres-accent);\n}\n\n/* Hide corners for Tektro (clean editorial, no decorations) */\n[data-theme=\"tektro-light\"] .pres-corner {\n  display: none;\n}\n\n/* --------------------------------------------------------------------------\n   TEMPLATE 2: Product Presentation\n   -------------------------------------------------------------------------- */\n.pres-slide--product .pres-slide__content {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  height: 100%;\n}\n\n.pres-slide--product .pres-product-info {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  padding: 48px 40px 48px 48px;\n}\n\n.pres-slide--product .pres-category {\n  font-family: var(--pres-font-heading);\n  font-size: 11px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.15em;\n  color: var(--pres-accent);\n  margin-bottom: 12px;\n}\n\n.pres-slide--product .pres-product-name {\n  font-family: var(--pres-font-heading);\n  font-weight: var(--pres-heading-weight);\n  font-size: 40px;\n  line-height: 1.1;\n  letter-spacing: var(--pres-heading-tracking, -0.02em);\n  text-transform: var(--pres-heading-transform, none);\n  color: var(--pres-text);\n  margin-bottom: 10px;\n}\n\n.pres-slide--product .pres-tagline {\n  font-size: 16px;\n  color: var(--pres-text-secondary);\n  margin-bottom: 24px;\n  font-weight: 400;\n}\n\n.pres-slide--product .pres-selling-points {\n  list-style: none;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n}\n\n.pres-slide--product .pres-selling-point {\n  display: flex;\n  align-items: flex-start;\n  gap: 10px;\n  font-size: 14px;\n  color: var(--pres-text-secondary);\n  line-height: 1.4;\n}\n\n.pres-slide--product .pres-selling-point::before {\n  content: '';\n  display: inline-block;\n  width: 8px;\n  height: 8px;\n  min-width: 8px;\n  background: var(--pres-accent);\n  transform: rotate(45deg);\n  margin-top: 5px;\n}\n\n.pres-slide--product .pres-product-image-area {\n  position: relative;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  overflow: hidden;\n}\n\n.pres-slide--product .pres-product-image-area::before {\n  content: '';\n  position: absolute;\n  width: 350px;\n  height: 350px;\n  border-radius: 50%;\n  background: radial-gradient(circle, var(--pres-accent-glow) 0%, transparent 70%);\n  z-index: 0;\n}\n\n.pres-slide--product .pres-product-img {\n  position: relative;\n  z-index: 1;\n  max-width: 85%;\n  max-height: 85%;\n  object-fit: contain;\n  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));\n}\n\n.pres-slide--product .pres-badge {\n  position: absolute;\n  top: 20px;\n  right: 20px;\n  background: var(--pres-accent-secondary, var(--pres-accent));\n  color: #fff;\n  font-family: var(--pres-font-heading);\n  font-size: 11px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  padding: 6px 14px;\n  border-radius: var(--pres-radius, 3px);\n  z-index: 3;\n}\n\n/* Tektro badge \u2014 white text on dark accent */\n[data-theme=\"tektro-light\"] .pres-badge {\n  color: #FFFFFF;\n}\n\n/* Vertical accent line separator */\n.pres-slide--product .pres-divider {\n  position: absolute;\n  top: 20%;\n  bottom: 20%;\n  left: 50%;\n  width: 1px;\n  background: linear-gradient(\n    to bottom,\n    transparent,\n    var(--pres-border) 30%,\n    var(--pres-border) 70%,\n    transparent\n  );\n  z-index: 2;\n}\n\n/* --------------------------------------------------------------------------\n   TEMPLATE 3: Product Spec\n   -------------------------------------------------------------------------- */\n.pres-slide--spec .pres-slide__content {\n  padding: 0;\n  display: flex;\n  flex-direction: column;\n}\n\n.pres-slide--spec .pres-spec-header {\n  padding: 32px 48px 20px;\n  border-bottom: 1px solid var(--pres-border);\n}\n\n.pres-slide--spec .pres-spec-product-name {\n  font-family: var(--pres-font-heading);\n  font-weight: var(--pres-heading-weight);\n  font-size: 32px;\n  line-height: 1.2;\n  letter-spacing: var(--pres-heading-tracking, -0.02em);\n  text-transform: var(--pres-heading-transform, none);\n  color: var(--pres-text);\n  margin-bottom: 4px;\n}\n\n.pres-slide--spec .pres-spec-underline {\n  width: 48px;\n  height: var(--pres-underline-height, 3px);\n  background: var(--pres-accent);\n  border-radius: 2px;\n}\n\n.pres-slide--spec .pres-spec-body {\n  flex: 1;\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 0;\n  overflow: hidden;\n}\n\n.pres-slide--spec .pres-spec-left {\n  padding: 24px 24px 24px 48px;\n  overflow: hidden;\n}\n\n.pres-slide--spec .pres-spec-right {\n  padding: 24px 48px 24px 24px;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n}\n\n.pres-slide--spec .pres-spec-right::before {\n  content: '';\n  position: absolute;\n  top: 10%;\n  bottom: 10%;\n  left: 0;\n  width: 1px;\n  background: linear-gradient(to bottom, transparent, var(--pres-border) 20%, var(--pres-border) 80%, transparent);\n}\n\n/* Spec Table */\n.pres-spec-table {\n  width: 100%;\n  border-collapse: collapse;\n}\n\n.pres-spec-table tr {\n  border-bottom: 1px solid var(--pres-border);\n}\n\n.pres-spec-table tr:last-child {\n  border-bottom: none;\n}\n\n.pres-spec-table td {\n  padding: 8px 12px;\n  font-size: 13px;\n  vertical-align: top;\n}\n\n.pres-spec-table td:first-child {\n  font-weight: 600;\n  color: var(--pres-text);\n  width: 40%;\n  white-space: nowrap;\n}\n\n.pres-spec-table td:last-child {\n  color: var(--pres-text-secondary);\n}\n\n.pres-spec-table tr:nth-child(even) {\n  background: var(--pres-bg-alt);\n}\n\n/* Spec features list */\n.pres-spec-features {\n  list-style: none;\n  display: flex;\n  flex-direction: column;\n  gap: 10px;\n  margin-top: 16px;\n}\n\n.pres-spec-features__title {\n  font-family: var(--pres-font-heading);\n  font-size: 12px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.1em;\n  color: var(--pres-accent);\n  margin-bottom: 4px;\n}\n\n.pres-spec-feature {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  font-size: 13px;\n  color: var(--pres-text-secondary);\n  line-height: 1.4;\n}\n\n.pres-spec-feature__icon {\n  width: 16px;\n  height: 16px;\n  min-width: 16px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: var(--pres-accent);\n  margin-top: 1px;\n}\n\n/* Spec product image */\n.pres-spec-product-img {\n  max-width: 95%;\n  max-height: 85%;\n  object-fit: contain;\n  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));\n}\n\n.pres-slide--spec .pres-footnote {\n  position: absolute;\n  bottom: 12px;\n  left: 48px;\n  font-size: 10px;\n  color: var(--pres-text-muted);\n  font-style: italic;\n}\n\n/* --------------------------------------------------------------------------\n   TEMPLATE 4: Generic Header + List\n   -------------------------------------------------------------------------- */\n.pres-slide--generic .pres-slide__content {\n  display: flex;\n  flex-direction: column;\n  padding: 0;\n}\n\n.pres-slide--generic .pres-generic-header {\n  padding: 36px 48px 20px;\n}\n\n.pres-slide--generic .pres-generic-heading {\n  font-family: var(--pres-font-heading);\n  font-weight: var(--pres-heading-weight);\n  font-size: 36px;\n  line-height: 1.15;\n  letter-spacing: var(--pres-heading-tracking, -0.02em);\n  text-transform: var(--pres-heading-transform, none);\n  color: var(--pres-text);\n  margin-bottom: 4px;\n}\n\n.pres-slide--generic .pres-generic-subheading {\n  font-size: 16px;\n  color: var(--pres-text-secondary);\n  font-weight: 400;\n  margin-bottom: 8px;\n}\n\n.pres-slide--generic .pres-generic-underline {\n  width: 48px;\n  height: var(--pres-underline-height, 3px);\n  background: var(--pres-accent);\n  border-radius: 2px;\n}\n\n.pres-slide--generic .pres-generic-body {\n  flex: 1;\n  overflow: hidden;\n}\n\n/* Layout: text-left (text left, image right) */\n.pres-slide--generic .pres-generic-body--text-left,\n.pres-slide--generic .pres-generic-body--text-right {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n}\n\n.pres-slide--generic .pres-generic-body--text-right {\n  direction: rtl;\n}\n.pres-slide--generic .pres-generic-body--text-right > * {\n  direction: ltr;\n}\n\n/* Layout: text-full */\n.pres-slide--generic .pres-generic-body--text-full {\n  padding: 0 48px 48px;\n}\n\n/* Layout: text-center */\n.pres-slide--generic .pres-generic-body--text-center {\n  padding: 0 80px 48px;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  text-align: center;\n}\n\n.pres-slide--generic .pres-generic-text {\n  padding: 16px 32px 32px 48px;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-start;\n}\n\n.pres-slide--generic .pres-generic-image-area {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 16px;\n  overflow: hidden;\n}\n\n.pres-slide--generic .pres-generic-img {\n  width: 100%;\n  height: 100%;\n  object-fit: contain;\n  border-radius: 4px;\n  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));\n}\n\n/* Bullet List */\n.pres-bullet-list {\n  list-style: none;\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n.pres-bullet-item {\n  display: flex;\n  align-items: flex-start;\n  gap: 12px;\n  font-size: 15px;\n  color: var(--pres-text-secondary);\n  line-height: 1.5;\n}\n\n.pres-bullet-item__marker {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 6px;\n  width: 6px;\n  height: 6px;\n  border-radius: 50%;\n  background: var(--pres-accent);\n  margin-top: 8px;\n  flex-shrink: 0;\n}\n\n/* --------------------------------------------------------------------------\n   TEMPLATE 5: Product Gallery\n   -------------------------------------------------------------------------- */\n.pres-slide--gallery .pres-slide__content {\n  display: flex;\n  flex-direction: column;\n  padding: 0;\n  overflow: hidden;\n}\n\n.pres-slide--gallery .pres-gallery-header {\n  padding: 32px 48px 16px;\n}\n\n.pres-slide--gallery .pres-gallery-heading {\n  font-family: var(--pres-font-heading);\n  font-weight: var(--pres-heading-weight);\n  font-size: 30px;\n  line-height: 1.15;\n  letter-spacing: var(--pres-heading-tracking, -0.02em);\n  text-transform: var(--pres-heading-transform, none);\n  color: var(--pres-text);\n  margin-bottom: 4px;\n}\n\n.pres-slide--gallery .pres-gallery-subheading {\n  font-size: 14px;\n  color: var(--pres-text-secondary);\n  font-weight: 400;\n  margin-bottom: 6px;\n}\n\n.pres-slide--gallery .pres-gallery-underline {\n  width: 48px;\n  height: var(--pres-underline-height, 3px);\n  background: var(--pres-accent);\n  border-radius: 2px;\n}\n\n.pres-gallery-grid {\n  flex: 1;\n  display: grid;\n  gap: 16px;\n  padding: 16px 48px 32px;\n  align-items: stretch;\n  min-height: 0;\n  overflow: hidden;\n}\n\n.pres-gallery-grid--3col {\n  grid-template-columns: 1fr 1fr 1fr;\n}\n\n.pres-gallery-grid--2col {\n  grid-template-columns: 1fr 1fr;\n}\n\n.pres-gallery-grid--1-2 {\n  grid-template-columns: 1.4fr 1fr 1fr;\n}\n\n.pres-gallery-item {\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  min-height: 0;\n}\n\n.pres-gallery-image-wrap {\n  flex: 1;\n  background: var(--pres-bg-alt);\n  border-radius: var(--pres-radius, 6px);\n  border: 1px solid var(--pres-border);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  overflow: hidden;\n  min-height: 0;\n}\n\n.pres-gallery-img {\n  width: 100%;\n  height: 100%;\n  max-height: 100%;\n  object-fit: cover;\n  border-radius: 5px;\n}\n\n.pres-gallery-caption {\n  font-size: 12px;\n  color: var(--pres-text-secondary);\n  text-align: center;\n  padding: 8px 4px 0;\n  font-weight: 500;\n}\n\n/* --------------------------------------------------------------------------\n   TEMPLATE 6: Data & Graph\n   -------------------------------------------------------------------------- */\n.pres-slide--graph .pres-slide__content {\n  display: flex;\n  flex-direction: column;\n  padding: 0;\n}\n\n.pres-slide--graph .pres-graph-header {\n  padding: 28px 48px 14px;\n}\n\n.pres-slide--graph .pres-graph-heading {\n  font-family: var(--pres-font-heading);\n  font-weight: var(--pres-heading-weight);\n  font-size: 28px;\n  line-height: 1.15;\n  letter-spacing: var(--pres-heading-tracking, -0.02em);\n  text-transform: var(--pres-heading-transform, none);\n  color: var(--pres-text);\n  margin-bottom: 4px;\n}\n\n.pres-slide--graph .pres-graph-subheading {\n  font-size: 14px;\n  color: var(--pres-text-secondary);\n  font-weight: 400;\n  margin-bottom: 6px;\n}\n\n.pres-slide--graph .pres-graph-underline {\n  width: 48px;\n  height: var(--pres-underline-height, 3px);\n  background: var(--pres-accent);\n  border-radius: 2px;\n}\n\n.pres-graph-body {\n  flex: 1;\n  display: flex;\n  padding: 8px 48px 12px;\n  gap: 24px;\n  overflow: hidden;\n  min-height: 0;\n}\n\n.pres-graph-main {\n  flex: 1;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  min-width: 0;\n  position: relative;\n}\n\n.pres-graph-chart-wrap {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n}\n\n.pres-graph-chart-wrap svg {\n  max-width: 100%;\n  max-height: 100%;\n  color: var(--pres-text);\n}\n\n.pres-graph-xlabel {\n  font-size: 10px;\n  color: var(--pres-text-muted);\n  text-align: center;\n  margin-top: 4px;\n  font-weight: 500;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n}\n\n.pres-graph-ylabel {\n  position: absolute;\n  left: -8px;\n  top: 50%;\n  transform: rotate(-90deg) translateX(-50%);\n  transform-origin: left center;\n  font-size: 10px;\n  color: var(--pres-text-muted);\n  font-weight: 500;\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  white-space: nowrap;\n}\n\n.pres-graph-image-wrap {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 100%;\n  height: 100%;\n}\n\n.pres-graph-img {\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;\n  border-radius: 4px;\n  border: 1px solid var(--pres-border);\n  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.3));\n}\n\n.pres-graph-notes {\n  width: 220px;\n  flex-shrink: 0;\n  padding: 8px 0 8px 24px;\n  border-left: 1px solid var(--pres-border);\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.pres-graph-notes-title {\n  font-family: var(--pres-font-heading);\n  font-size: 11px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.1em;\n  color: var(--pres-accent);\n}\n\n.pres-graph-notes .pres-bullet-list {\n  gap: 8px;\n}\n\n.pres-graph-notes .pres-bullet-item {\n  font-size: 12px;\n  line-height: 1.4;\n  gap: 8px;\n}\n\n.pres-graph-notes .pres-bullet-item__marker {\n  margin-top: 5px;\n}\n\n.pres-graph-footnote {\n  position: absolute;\n  bottom: 10px;\n  left: 48px;\n  right: 120px;\n  font-size: 10px;\n  color: var(--pres-text-muted);\n  font-style: italic;\n}\n\n/* --------------------------------------------------------------------------\n   Placeholder State (no image)\n   -------------------------------------------------------------------------- */\n.pres-placeholder {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  width: 100%;\n  height: 100%;\n  color: var(--pres-text-muted);\n  gap: 8px;\n  font-size: 12px;\n  opacity: 0.4;\n}\n\n/* Slide logo \u2014 bottom-right brand mark on all non-title slides */\n.pres-slide-logo {\n  position: absolute;\n  bottom: 12px;\n  right: 24px;\n  max-height: 20px;\n  max-width: 80px;\n  object-fit: contain;\n  opacity: 0.4;\n  z-index: 3;\n}\n\n/* Hide placeholders during presentation (slideshow + exported HTML) */\n.pres-slide--animated .pres-placeholder,\n.slideshow-slide .pres-placeholder {\n  display: none;\n}\n\n/* --------------------------------------------------------------------------\n   Slide Animations (for slideshow mode)\n   -------------------------------------------------------------------------- */\n@keyframes pressFadeIn {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@keyframes pressSlideUp {\n  from { opacity: 0; transform: translateY(20px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n\n@keyframes pressSlideLeft {\n  from { opacity: 0; transform: translateX(-20px); }\n  to { opacity: 1; transform: translateX(0); }\n}\n\n@keyframes pressScaleIn {\n  from { opacity: 0; transform: scale(0.95); }\n  to { opacity: 1; transform: scale(1); }\n}\n\n@keyframes pressAccentLine {\n  from { width: 0; }\n  to { width: 64px; }\n}\n\n/* Animated class \u2014 applied in slideshow mode */\n.pres-slide--animated .pres-logo {\n  animation: pressFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;\n}\n\n.pres-slide--animated .pres-title,\n.pres-slide--animated .pres-product-name,\n.pres-slide--animated .pres-spec-product-name,\n.pres-slide--animated .pres-generic-heading {\n  animation: pressSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;\n}\n\n.pres-slide--animated .pres-subtitle,\n.pres-slide--animated .pres-tagline,\n.pres-slide--animated .pres-generic-subheading {\n  animation: pressSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.35s both;\n}\n\n.pres-slide--animated .pres-accent-line,\n.pres-slide--animated .pres-spec-underline,\n.pres-slide--animated .pres-generic-underline {\n  animation: pressAccentLine 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;\n}\n\n.pres-slide--animated .pres-brandline {\n  animation: pressFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both;\n}\n\n.pres-slide--animated .pres-category,\n.pres-slide--animated .pres-badge {\n  animation: pressFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;\n}\n\n.pres-slide--animated .pres-product-img,\n.pres-slide--animated .pres-spec-product-img,\n.pres-slide--animated .pres-generic-img {\n  animation: pressScaleIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;\n}\n\n.pres-slide--animated .pres-selling-point:nth-child(1) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both; }\n.pres-slide--animated .pres-selling-point:nth-child(2) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both; }\n.pres-slide--animated .pres-selling-point:nth-child(3) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both; }\n.pres-slide--animated .pres-selling-point:nth-child(4) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.7s both; }\n.pres-slide--animated .pres-selling-point:nth-child(5) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both; }\n\n.pres-slide--animated .pres-bullet-item:nth-child(1) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both; }\n.pres-slide--animated .pres-bullet-item:nth-child(2) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both; }\n.pres-slide--animated .pres-bullet-item:nth-child(3) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both; }\n.pres-slide--animated .pres-bullet-item:nth-child(4) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both; }\n.pres-slide--animated .pres-bullet-item:nth-child(5) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.7s both; }\n.pres-slide--animated .pres-bullet-item:nth-child(6) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both; }\n.pres-slide--animated .pres-bullet-item:nth-child(7) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.9s both; }\n.pres-slide--animated .pres-bullet-item:nth-child(8) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 1.0s both; }\n\n.pres-slide--animated .pres-spec-table tr:nth-child(1) { animation: pressFadeIn 0.4s ease 0.3s both; }\n.pres-slide--animated .pres-spec-table tr:nth-child(2) { animation: pressFadeIn 0.4s ease 0.38s both; }\n.pres-slide--animated .pres-spec-table tr:nth-child(3) { animation: pressFadeIn 0.4s ease 0.46s both; }\n.pres-slide--animated .pres-spec-table tr:nth-child(4) { animation: pressFadeIn 0.4s ease 0.54s both; }\n.pres-slide--animated .pres-spec-table tr:nth-child(5) { animation: pressFadeIn 0.4s ease 0.62s both; }\n.pres-slide--animated .pres-spec-table tr:nth-child(6) { animation: pressFadeIn 0.4s ease 0.70s both; }\n.pres-slide--animated .pres-spec-table tr:nth-child(7) { animation: pressFadeIn 0.4s ease 0.78s both; }\n.pres-slide--animated .pres-spec-table tr:nth-child(8) { animation: pressFadeIn 0.4s ease 0.86s both; }\n\n.pres-slide--animated .pres-spec-feature:nth-child(1) { animation: pressSlideLeft 0.4s ease 0.5s both; }\n.pres-slide--animated .pres-spec-feature:nth-child(2) { animation: pressSlideLeft 0.4s ease 0.58s both; }\n.pres-slide--animated .pres-spec-feature:nth-child(3) { animation: pressSlideLeft 0.4s ease 0.66s both; }\n.pres-slide--animated .pres-spec-feature:nth-child(4) { animation: pressSlideLeft 0.4s ease 0.74s both; }\n.pres-slide--animated .pres-spec-feature:nth-child(5) { animation: pressSlideLeft 0.4s ease 0.82s both; }\n.pres-slide--animated .pres-spec-feature:nth-child(6) { animation: pressSlideLeft 0.4s ease 0.90s both; }\n\n/* Corner animations */\n.pres-slide--animated .pres-corner {\n  animation: pressFadeIn 0.8s ease 0.1s both;\n}\n\n/* Gallery animations */\n.pres-slide--animated .pres-gallery-heading {\n  animation: pressSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;\n}\n.pres-slide--animated .pres-gallery-underline {\n  animation: pressAccentLine 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.35s both;\n}\n.pres-slide--animated .pres-gallery-item:nth-child(1) { animation: pressScaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both; }\n.pres-slide--animated .pres-gallery-item:nth-child(2) { animation: pressScaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.45s both; }\n.pres-slide--animated .pres-gallery-item:nth-child(3) { animation: pressScaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both; }\n\n/* Graph/data animations */\n.pres-slide--animated .pres-graph-heading {\n  animation: pressSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;\n}\n.pres-slide--animated .pres-graph-underline {\n  animation: pressAccentLine 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.35s both;\n}\n.pres-slide--animated .pres-graph-chart-wrap,\n.pres-slide--animated .pres-graph-image-wrap {\n  animation: pressScaleIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;\n}\n.pres-slide--animated .pres-graph-notes {\n  animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both;\n}\n\n/* Reduced motion */\n@media (prefers-reduced-motion: reduce) {\n  .pres-slide--animated *,\n  .pres-slide--animated *::before,\n  .pres-slide--animated *::after {\n    animation-duration: 0.01ms !important;\n    animation-delay: 0ms !important;\n  }\n}\n";
+  </script>
 </head>
 <body class="builder-body">
 
@@ -28,19 +33,15 @@
         <rect x="2" y="3" width="20" height="14" rx="2"/>
         <path d="M8 21h8M12 17v4"/>
       </svg>
-      <h1 class="builder-header__title">Presentation Generator</h1>
+      <input type="text" id="pres-title" class="builder-header__title-input" value="Untitled Presentation" placeholder="Presentation name..." title="Click to rename">
     </div>
     <div class="builder-header__actions">
-      <div class="builder-header__theme-group">
-        <label for="theme-select" class="builder-header__label">Theme</label>
-        <select id="theme-select" class="builder-select">
-          <option value="tektro-dark" selected>Tektro Dark</option>
-          <option value="trp-racing">TRP Racing</option>
-          <option value="carbon-fiber">Carbon Fiber</option>
-          <option value="clean-light">Clean Light</option>
-        </select>
-      </div>
+      <!-- Theme is now per-slide, selected in Add Slide modal and editor -->
       <div class="builder-header__btn-group">
+        <button id="btn-new" class="builder-btn builder-btn--ghost" title="New presentation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+          <span>New</span>
+        </button>
         <button id="btn-save" class="builder-btn builder-btn--ghost" title="Save presentation (Ctrl+S)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
           <span>Save</span>
@@ -178,6 +179,16 @@
     </div>
   </div>
 
+  <!-- ===== Custom Dialog Modal ===== -->
+  <div class="dialog-overlay" id="dialog-overlay" aria-hidden="true">
+    <div class="dialog">
+      <div class="dialog__icon" id="dialog-icon"></div>
+      <h3 class="dialog__title" id="dialog-title"></h3>
+      <p class="dialog__message" id="dialog-message"></p>
+      <div class="dialog__actions" id="dialog-actions"></div>
+    </div>
+  </div>
+
   <!-- Hidden file input for loading -->
   <input type="file" id="file-input-load" accept=".json" style="display:none">
   <input type="file" id="file-input-image" accept="image/*" style="display:none">
@@ -187,10 +198,181 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 
+  <!-- Preload slides CSS + override export to guarantee CSS embedding -->
+  <script>
+    (function() {
+      // Preload slides.css into a global
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'css/slides.css', true);
+      xhr.onload = function() { if (xhr.status === 200) window.__SLIDES_CSS__ = xhr.responseText; };
+      xhr.send();
+
+      // After all scripts load, override exportToHTML to use preloaded CSS
+      window.addEventListener('load', function() {
+        if (!window.ExportManager) return;
+
+        window.ExportManager.exportToHTML = function(state) {
+          var cssContent = window.__SLIDES_CSS__ || '';
+          if (!cssContent) {
+            var el = document.getElementById('slides-css-export');
+            if (el && el.textContent.length > 100) cssContent = el.textContent;
+          }
+          if (!cssContent) {
+            try { var x = new XMLHttpRequest(); x.open('GET','css/slides.css',false); x.send(); if(x.status===200||x.status===0) cssContent = x.responseText; } catch(e){}
+          }
+          if (!cssContent) {
+            try {
+              var sheets = document.styleSheets;
+              for (var i = 0; i < sheets.length; i++) {
+                if ((sheets[i].href||'').indexOf('slides.css') !== -1) {
+                  var rules = sheets[i].cssRules || sheets[i].rules;
+                  if (rules) { cssContent = ''; for (var j = 0; j < rules.length; j++) cssContent += rules[j].cssText + '\n'; }
+                  break;
+                }
+              }
+            } catch(e){}
+          }
+          if (!cssContent) { Dialog.alert('Export Error', 'Could not load slide styles. Please refresh the page and try again.', 'error'); return; }
+
+          var slides = state.slides.filter(function(s){return !s.hidden}), theme = state.theme, title = state.meta.title || 'Presentation';
+          var slidesHtml = '';
+          slides.forEach(function(slide, i) {
+            var t = window.SlideTemplates[slide.templateId]; if(!t) return;
+            var r = t.render(slide.data);
+            if (i===0) r = r.replace('class="pres-slide ','class="pres-slide pres-slide--animated ');
+            var st = slide.theme || theme || 'trp-dark';
+            slidesHtml += '<div class="slideshow-slide'+(i===0?' slideshow-slide--active':'')+'" data-index="'+i+'" data-theme="'+st+'">'+r+'</div>';
+          });
+
+          var sj = JSON.stringify({_format:'pres-generator-v1',slides:state.slides,theme:state.theme,meta:{title:title,updatedAt:new Date().toISOString()}});
+          var h = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n';
+          h += '<title>'+title.replace(/</g,'&lt;')+'</title>\n';
+          h += '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n';
+          h += '<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">\n';
+          h += '<style>\n*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}\nhtml,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:"Inter",sans-serif}\n';
+          h += cssContent + '\n';
+          h += '.slideshow-nav{position:fixed;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:linear-gradient(to bottom,rgba(0,0,0,0.7),transparent);z-index:100}\n';
+          h += '.slideshow-counter{font-size:14px;font-weight:600;color:rgba(255,255,255,0.7);min-width:60px}\n';
+          h += '.slideshow-title{font-size:13px;color:rgba(255,255,255,0.5)}\n';
+          h += '.slideshow-controls{display:flex;gap:8px}\n';
+          h += '.slideshow-btn{padding:6px 14px;background:rgba(255,255,255,0.1);border:none;color:#fff;border-radius:4px;cursor:pointer;font-size:16px}\n';
+          h += '.slideshow-btn:hover{background:rgba(255,255,255,0.2)}\n';
+          h += '.slideshow-stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}\n';
+          h += '.slideshow-slide{position:absolute;width:960px;height:540px;overflow:hidden;transition:opacity 0.5s ease;transform-origin:center center}\n';
+          h += '.slideshow-slide--active{opacity:1}\n.slideshow-slide--prev,.slideshow-slide--next{opacity:0;pointer-events:none}\n';
+          h += '.slideshow-dots{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:100}\n';
+          h += '.slideshow-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);border:none;cursor:pointer}\n';
+          h += '.slideshow-dot--active{background:#E31837;transform:scale(1.3)}\n';
+          h += '</style>\n</head>\n<body>\n';
+          h += '<div class="slideshow-nav"><span class="slideshow-counter" id="counter">1 / '+slides.length+'</span><span class="slideshow-title">'+title.replace(/</g,'&lt;')+'</span>';
+          h += '<div class="slideshow-controls"><button onclick="prev()" class="slideshow-btn">&larr;</button><button onclick="next()" class="slideshow-btn">&rarr;</button>';
+          h += '<button onclick="toggleFullscreen()" class="slideshow-btn">&#x26F6;</button></div></div>\n';
+          h += '<div class="slideshow-stage" id="stage">\n'+slidesHtml+'</div>\n';
+          h += '<div class="slideshow-dots" id="dots">\n';
+          slides.forEach(function(s,i){h+='<button class="slideshow-dot'+(i===0?' slideshow-dot--active':'')+'" onclick="goTo('+i+')"></button>\n'});
+          h += '</div>\n';
+          h += '<script type="application/json" id="presentation-data">'+sj+'<\/script>\n';
+          h += '<script>\nvar current=0,total='+slides.length+';\n';
+          h += 'function goTo(i){if(i<0||i>=total)return;document.querySelectorAll(".slideshow-slide").forEach(function(s,idx){s.classList.remove("slideshow-slide--active","slideshow-slide--prev","slideshow-slide--next");var ps=s.querySelector(".pres-slide");if(ps)ps.classList.remove("pres-slide--animated");if(idx===i){s.classList.add("slideshow-slide--active");if(ps)ps.classList.add("pres-slide--animated")}else if(idx<i)s.classList.add("slideshow-slide--prev");else s.classList.add("slideshow-slide--next")});document.querySelectorAll(".slideshow-dot").forEach(function(d,idx){d.classList.toggle("slideshow-dot--active",idx===i)});document.getElementById("counter").textContent=(i+1)+" / "+total;current=i;scaleSlides()}\n';
+          h += 'function next(){goTo(current+1)}function prev(){goTo(current-1)}\n';
+          h += 'function toggleFullscreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen().then(scaleSlides)}else{document.exitFullscreen().then(scaleSlides)}}document.addEventListener("fullscreenchange",function(){setTimeout(scaleSlides,100)});\n';
+          h += 'function scaleSlides(){var vw=window.innerWidth-40,vh=window.innerHeight-80,sw=960,sh=540,scale=Math.min(vw/sw,vh/sh,2);document.querySelectorAll(".slideshow-slide").forEach(function(el){el.style.transform="scale("+scale+")"})}\n';
+          h += 'document.addEventListener("keydown",function(e){if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();next()}else if(e.key==="ArrowLeft"){e.preventDefault();prev()}else if(e.key==="f"||e.key==="F"){e.preventDefault();toggleFullscreen()}});\n';
+          h += 'window.addEventListener("resize",scaleSlides);scaleSlides();\n';
+          h += 'document.querySelectorAll(".slideshow-slide:not(.slideshow-slide--active)").forEach(function(s){s.classList.add("slideshow-slide--next")});\n';
+          h += '<\/script>\n</body>\n</html>';
+
+          var blob = new Blob([h],{type:'text/html'});
+          if (window.showSaveFilePicker) {
+            window.showSaveFilePicker({suggestedName:(title||'presentation').replace(/[^a-zA-Z0-9_\- ]/g,'').replace(/\\s+/g,'_').substring(0,60)+'.html',types:[{description:'HTML Files',accept:{'text/html':['.html']}}]}).then(function(fh){return fh.createWritable().then(function(w){return w.write(blob).then(function(){return w.close()})})}).catch(function(e){if(e.name!=='AbortError')console.error(e)});
+          } else {
+            var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=(title||'presentation').replace(/[^a-zA-Z0-9_\- ]/g,'').replace(/\\s+/g,'_').substring(0,60)+'.html';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url)},200);
+          }
+        };
+      });
+    })();
+  </script>
+
+  <!-- Custom dialog system -->
+  <script>
+  window.Dialog = (function() {
+    var svgWarning = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+    var svgError = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    var svgInfo = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>';
+    var svgQuestion = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+    var svgFile = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>';
+    var svgMap = { warning: svgWarning, error: svgError, info: svgInfo, question: svgQuestion, file: svgFile, success: svgInfo };
+
+    function show(opts) {
+      return new Promise(function(resolve) {
+        var overlay = document.getElementById('dialog-overlay');
+        var iconEl = document.getElementById('dialog-icon');
+        var titleEl = document.getElementById('dialog-title');
+        var msgEl = document.getElementById('dialog-message');
+        var actionsEl = document.getElementById('dialog-actions');
+
+        iconEl.className = 'dialog__icon dialog__icon--' + (opts.type || 'info');
+        while (iconEl.firstChild) iconEl.removeChild(iconEl.firstChild);
+        var tmp = document.createElement('span');
+        tmp.innerHTML = svgMap[opts.icon || opts.type || 'info'] || svgInfo;
+        while (tmp.firstChild) iconEl.appendChild(tmp.firstChild);
+
+        titleEl.textContent = opts.title || '';
+        msgEl.textContent = opts.message || '';
+
+        while (actionsEl.firstChild) actionsEl.removeChild(actionsEl.firstChild);
+        (opts.buttons || []).forEach(function(b, i) {
+          var btn = document.createElement('button');
+          btn.className = 'dialog__btn dialog__btn--' + (b.style || 'secondary');
+          btn.textContent = b.label;
+          btn.addEventListener('click', function() { close(b.value !== undefined ? b.value : i); });
+          actionsEl.appendChild(btn);
+        });
+
+        overlay.classList.add('dialog-overlay--visible');
+        overlay.setAttribute('aria-hidden', 'false');
+
+        function close(value) {
+          overlay.classList.remove('dialog-overlay--visible');
+          overlay.setAttribute('aria-hidden', 'true');
+          document.removeEventListener('keydown', onKey);
+          resolve(value);
+        }
+
+        function onKey(e) {
+          if (e.key === 'Escape') close(null);
+        }
+        document.addEventListener('keydown', onKey);
+
+        var firstPrimary = actionsEl.querySelector('.dialog__btn--primary, .dialog__btn--danger');
+        if (firstPrimary) setTimeout(function() { firstPrimary.focus(); }, 50);
+      });
+    }
+
+    return {
+      alert: function(title, message, type) {
+        return show({ type: type || 'info', icon: type || 'info', title: title, message: message,
+          buttons: [{ label: 'OK', style: 'primary', value: true }] });
+      },
+      confirm: function(title, message, opts) {
+        var o = opts || {};
+        return show({ type: o.type || 'warning', icon: o.icon || 'question', title: title, message: message,
+          buttons: [
+            { label: o.cancelLabel || 'Cancel', style: 'secondary', value: false },
+            { label: o.confirmLabel || 'Confirm', style: o.confirmStyle || 'primary', value: true }
+          ] });
+      },
+      choose: function(title, message, choices) {
+        return show({ type: 'info', icon: 'file', title: title, message: message, buttons: choices });
+      }
+    };
+  })();
+  </script>
+
   <!-- App modules -->
-  <script src="js/templates.js" defer></script>
-  <script src="js/preview.js" defer></script>
-  <script src="js/export.js" defer></script>
-  <script src="js/app.js" defer></script>
+  <script src="js/templates.js?v=4" defer></script>
+  <script src="js/preview.js?v=4" defer></script>
+  <script src="js/exporter.js?v=4" defer></script>
+  <script src="js/app.js?v=4" defer></script>
 </body>
 </html>
