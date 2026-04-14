@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Presentation Generator | TEKTRO / TRP</title>
+  <meta name="description" content="Create professional sales presentations for TEKTRO and TRP cycling components.">
+  <meta name="theme-color" content="#0A0A0A">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23E31837'/><text x='50' y='38' font-family='sans-serif' font-size='20' font-weight='bold' fill='white' text-anchor='middle'>SALES</text><text x='50' y='72' font-family='sans-serif' font-size='28' font-weight='bold' fill='white' text-anchor='middle'>DECK</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/builder.css">
+  <link rel="stylesheet" href="css/slides.css">
+</head>
+<body class="builder-body">
+
+  <!-- ===== HEADER ===== -->
+  <header class="builder-header">
+    <div class="builder-header__brand">
+      <svg class="builder-header__icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <path d="M8 21h8M12 17v4"/>
+      </svg>
+      <h1 class="builder-header__title">Presentation Generator</h1>
+    </div>
+    <div class="builder-header__actions">
+      <div class="builder-header__theme-group">
+        <label for="theme-select" class="builder-header__label">Theme</label>
+        <select id="theme-select" class="builder-select">
+          <option value="tektro-dark" selected>Tektro Dark</option>
+          <option value="trp-racing">TRP Racing</option>
+          <option value="carbon-fiber">Carbon Fiber</option>
+          <option value="clean-light">Clean Light</option>
+        </select>
+      </div>
+      <div class="builder-header__btn-group">
+        <button id="btn-save" class="builder-btn builder-btn--ghost" title="Save presentation (Ctrl+S)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+          <span>Save</span>
+        </button>
+        <button id="btn-load" class="builder-btn builder-btn--ghost" title="Load presentation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Load</span>
+        </button>
+        <button id="btn-preview-all" class="builder-btn builder-btn--secondary" title="Preview full presentation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg>
+          <span>Preview</span>
+        </button>
+        <button id="btn-export-html" class="builder-btn builder-btn--secondary" title="Export as shareable HTML presentation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg>
+          <span>Export HTML</span>
+        </button>
+        <button id="btn-export-pdf" class="builder-btn builder-btn--primary" title="Export as PDF">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Export PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <div class="builder-layout">
+
+    <!-- LEFT SIDEBAR: Slide List -->
+    <aside class="builder-sidebar" id="slide-sidebar">
+      <div class="builder-sidebar__header">
+        <h2 class="builder-sidebar__title">Slides</h2>
+        <button id="btn-add-slide" class="builder-btn builder-btn--accent builder-btn--sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Slide
+        </button>
+      </div>
+      <ul class="slide-list" id="slide-list">
+        <!-- Dynamically rendered slide items -->
+      </ul>
+      <div class="builder-sidebar__footer">
+        <button id="btn-preview-all-sidebar" class="builder-btn builder-btn--ghost builder-btn--block">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21"/></svg>
+          Preview All Slides
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="builder-main">
+
+      <!-- Live Preview -->
+      <section class="builder-preview" id="preview-panel">
+        <div class="builder-preview__header">
+          <span class="builder-preview__label">Live Preview</span>
+          <span class="builder-preview__slide-info" id="preview-slide-info"></span>
+        </div>
+        <div class="builder-preview__container">
+          <div class="builder-preview__scaler" id="preview-scaler">
+            <div class="preview-slide" id="preview-slide">
+              <!-- Live rendered slide preview -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Content Editor -->
+      <section class="builder-editor" id="editor-panel">
+        <div class="builder-editor__header">
+          <span class="builder-editor__label">Slide Editor</span>
+          <span class="builder-editor__template-name" id="editor-template-name"></span>
+        </div>
+        <div class="builder-editor__form" id="editor-form">
+          <div class="editor-empty-state" id="editor-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <path d="M8 21h8M12 17v4"/>
+            </svg>
+            <p>Add a slide to get started</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ===== MODAL: Template Picker ===== -->
+  <div class="modal" id="modal-add-slide" aria-hidden="true">
+    <div class="modal__overlay" data-close-modal></div>
+    <div class="modal__content">
+      <div class="modal__header">
+        <h3 class="modal__title">Choose Slide Template</h3>
+        <button class="modal__close" data-close-modal aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="template-grid" id="template-grid">
+        <!-- Dynamically rendered template cards -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: Fullscreen Slideshow ===== -->
+  <div class="slideshow-modal" id="slideshow-modal" aria-hidden="true">
+    <div class="slideshow-modal__header">
+      <span class="slideshow-modal__counter" id="slideshow-counter">1 / 1</span>
+      <button class="slideshow-modal__close" id="slideshow-close" aria-label="Close slideshow">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="slideshow-modal__stage" id="slideshow-stage">
+      <!-- Rendered slides for slideshow -->
+    </div>
+    <button class="slideshow-modal__nav slideshow-modal__nav--prev" id="slideshow-prev" aria-label="Previous slide">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+    </button>
+    <button class="slideshow-modal__nav slideshow-modal__nav--next" id="slideshow-next" aria-label="Next slide">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,6 15,12 9,18"/></svg>
+    </button>
+    <div class="slideshow-modal__dots" id="slideshow-dots">
+      <!-- Dot navigation -->
+    </div>
+  </div>
+
+  <!-- ===== MODAL: Export Progress ===== -->
+  <div class="modal modal--sm" id="modal-export" aria-hidden="true">
+    <div class="modal__overlay"></div>
+    <div class="modal__content modal__content--centered">
+      <div class="export-progress">
+        <div class="export-progress__spinner"></div>
+        <p class="export-progress__text" id="export-progress-text">Generating PDF...</p>
+        <div class="export-progress__bar">
+          <div class="export-progress__fill" id="export-progress-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden file input for loading -->
+  <input type="file" id="file-input-load" accept=".json" style="display:none">
+  <input type="file" id="file-input-image" accept="image/*" style="display:none">
+
+  <!-- ===== SCRIPTS ===== -->
+  <!-- CDN: html2canvas + jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+  <!-- App modules -->
+  <script src="js/templates.js" defer></script>
+  <script src="js/preview.js" defer></script>
+  <script src="js/export.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>

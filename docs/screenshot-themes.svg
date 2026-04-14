@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" font-family="Inter, system-ui, sans-serif">
+  <rect width="1200" height="340" fill="#0A0A0A"/>
+
+  <text x="600" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF" font-family="Montserrat, sans-serif">Presentation Themes</text>
+  <rect x="576" y="38" width="48" height="3" rx="1.5" fill="#E31837"/>
+
+  <!-- Theme 1: Tektro Dark -->
+  <g transform="translate(30, 60)">
+    <rect width="270" height="152" rx="4" fill="#0A0A0A" stroke="#2A2A2A" stroke-width="1"/>
+    <rect width="270" height="3" fill="#E31837"/>
+    <text x="135" y="60" text-anchor="middle" font-size="18" font-weight="800" fill="#FFFFFF" font-family="Montserrat, sans-serif">Title Text</text>
+    <rect x="103" y="68" width="64" height="2.5" rx="1" fill="#E31837"/>
+    <text x="135" y="88" text-anchor="middle" font-size="10" fill="#B0B0B0">Subtitle goes here</text>
+    <circle x="30" y="110" cx="115" cy="114" r="3" fill="#E31837"/>
+    <text x="125" y="118" font-size="9" fill="#B0B0B0">Bullet point item</text>
+    <circle cx="115" cy="132" r="3" fill="#E31837"/>
+    <text x="125" y="136" font-size="9" fill="#B0B0B0">Another point item</text>
+  </g>
+  <text x="165" y="234" text-anchor="middle" font-size="12" font-weight="600" fill="#FFFFFF">Tektro Dark</text>
+  <text x="165" y="250" text-anchor="middle" font-size="10" fill="#A0A0A0">Default dark theme</text>
+  <text x="165" y="266" text-anchor="middle" font-size="10" fill="#A0A0A0">Red accent #E31837</text>
+  <rect x="140" y="278" width="50" height="14" rx="7" fill="#E31837"/>
+
+  <!-- Theme 2: TRP Racing -->
+  <g transform="translate(330, 60)">
+    <rect width="270" height="152" rx="4" fill="#080808" stroke="#222222" stroke-width="1"/>
+    <rect width="270" height="4" fill="#CC0000"/>
+    <text x="135" y="60" text-anchor="middle" font-size="20" font-weight="900" fill="#FFFFFF" font-family="Montserrat, sans-serif">Title Text</text>
+    <rect x="103" y="70" width="64" height="3" rx="1" fill="#CC0000"/>
+    <text x="135" y="92" text-anchor="middle" font-size="10" fill="#999999">Subtitle goes here</text>
+    <circle cx="115" cy="114" r="3" fill="#CC0000"/>
+    <text x="125" y="118" font-size="9" fill="#999">Bullet point item</text>
+    <circle cx="115" cy="132" r="3" fill="#CC0000"/>
+    <text x="125" y="136" font-size="9" fill="#999">Another point item</text>
+  </g>
+  <text x="465" y="234" text-anchor="middle" font-size="12" font-weight="600" fill="#FFFFFF">TRP Racing</text>
+  <text x="465" y="250" text-anchor="middle" font-size="10" fill="#A0A0A0">Bolder, more aggressive</text>
+  <text x="465" y="266" text-anchor="middle" font-size="10" fill="#A0A0A0">Deep red #CC0000</text>
+  <rect x="440" y="278" width="50" height="14" rx="7" fill="#CC0000"/>
+
+  <!-- Theme 3: Carbon Fiber -->
+  <g transform="translate(630, 60)">
+    <rect width="270" height="152" rx="4" fill="#0D0D0D" stroke="#2A2A2A" stroke-width="1"/>
+    <!-- Carbon fiber pattern hint -->
+    <line x1="0" y1="0" x2="270" y2="152" stroke="rgba(255,255,255,0.02)" stroke-width="30"/>
+    <line x1="0" y1="40" x2="230" y2="152" stroke="rgba(255,255,255,0.015)" stroke-width="30"/>
+    <line x1="40" y1="0" x2="270" y2="120" stroke="rgba(255,255,255,0.015)" stroke-width="30"/>
+    <rect width="270" height="3" fill="#E31837"/>
+    <text x="135" y="60" text-anchor="middle" font-size="18" font-weight="800" fill="#F0F0F0" font-family="Montserrat, sans-serif">Title Text</text>
+    <rect x="103" y="68" width="64" height="2.5" rx="1" fill="#E31837"/>
+    <text x="135" y="88" text-anchor="middle" font-size="10" fill="#999">Subtitle goes here</text>
+    <circle cx="115" cy="114" r="3" fill="#E31837"/>
+    <text x="125" y="118" font-size="9" fill="#999">Bullet point item</text>
+    <circle cx="115" cy="132" r="3" fill="#FFD700"/>
+    <text x="125" y="136" font-size="9" fill="#999">Another point item</text>
+  </g>
+  <text x="765" y="234" text-anchor="middle" font-size="12" font-weight="600" fill="#FFFFFF">Carbon Fiber</text>
+  <text x="765" y="250" text-anchor="middle" font-size="10" fill="#A0A0A0">Motorsport-inspired</text>
+  <text x="765" y="266" text-anchor="middle" font-size="10" fill="#A0A0A0">Red + Gold accent</text>
+  <rect x="730" y="278" width="24" height="14" rx="7" fill="#E31837"/>
+  <rect x="758" y="278" width="24" height="14" rx="7" fill="#FFD700"/>
+
+  <!-- Theme 4: Clean Light -->
+  <g transform="translate(930, 60)">
+    <rect width="270" height="152" rx="4" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
+    <rect width="270" height="3" fill="#E31837"/>
+    <text x="135" y="60" text-anchor="middle" font-size="18" font-weight="700" fill="#1A1A1A" font-family="Montserrat, sans-serif">Title Text</text>
+    <rect x="103" y="68" width="64" height="2.5" rx="1" fill="#E31837"/>
+    <text x="135" y="88" text-anchor="middle" font-size="10" fill="#555555">Subtitle goes here</text>
+    <circle cx="115" cy="114" r="3" fill="#E31837"/>
+    <text x="125" y="118" font-size="9" fill="#555">Bullet point item</text>
+    <circle cx="115" cy="132" r="3" fill="#E31837"/>
+    <text x="125" y="136" font-size="9" fill="#555">Another point item</text>
+  </g>
+  <text x="1065" y="234" text-anchor="middle" font-size="12" font-weight="600" fill="#FFFFFF">Clean Light</text>
+  <text x="1065" y="250" text-anchor="middle" font-size="10" fill="#A0A0A0">Print-friendly, minimal</text>
+  <text x="1065" y="266" text-anchor="middle" font-size="10" fill="#A0A0A0">White with red accent</text>
+  <rect x="1040" y="278" width="50" height="14" rx="7" fill="#E31837"/>
+</svg>

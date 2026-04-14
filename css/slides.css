@@ -1,0 +1,1051 @@
+/* ==========================================================================
+   Sales Presentation Generator — Slide Styles & Themes
+   Presentation rendering styles for all 4 templates + animations
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Theme: Tektro Dark (Default)
+   -------------------------------------------------------------------------- */
+[data-theme="tektro-dark"] {
+  --pres-bg: #0A0A0A;
+  --pres-bg-alt: #111111;
+  --pres-bg-surface: #1A1A1A;
+  --pres-text: #FFFFFF;
+  --pres-text-secondary: #B0B0B0;
+  --pres-text-muted: #666666;
+  --pres-accent: #E31837;
+  --pres-accent-light: #FF2D4B;
+  --pres-accent-glow: rgba(227, 24, 55, 0.3);
+  --pres-border: #2A2A2A;
+  --pres-font-heading: 'Montserrat', sans-serif;
+  --pres-font-body: 'Inter', sans-serif;
+  --pres-heading-weight: 800;
+}
+
+/* --------------------------------------------------------------------------
+   Theme: TRP Racing
+   -------------------------------------------------------------------------- */
+[data-theme="trp-racing"] {
+  --pres-bg: #080808;
+  --pres-bg-alt: #0F0F0F;
+  --pres-bg-surface: #181818;
+  --pres-text: #FFFFFF;
+  --pres-text-secondary: #999999;
+  --pres-text-muted: #555555;
+  --pres-accent: #CC0000;
+  --pres-accent-light: #FF1A1A;
+  --pres-accent-glow: rgba(204, 0, 0, 0.35);
+  --pres-border: #222222;
+  --pres-font-heading: 'Montserrat', sans-serif;
+  --pres-font-body: 'Inter', sans-serif;
+  --pres-heading-weight: 900;
+}
+
+/* --------------------------------------------------------------------------
+   Theme: Carbon Fiber
+   -------------------------------------------------------------------------- */
+[data-theme="carbon-fiber"] {
+  --pres-bg: #0D0D0D;
+  --pres-bg-alt: #151515;
+  --pres-bg-surface: #1E1E1E;
+  --pres-text: #F0F0F0;
+  --pres-text-secondary: #999999;
+  --pres-text-muted: #555555;
+  --pres-accent: #E31837;
+  --pres-accent-light: #FFD700;
+  --pres-accent-glow: rgba(227, 24, 55, 0.25);
+  --pres-border: #2A2A2A;
+  --pres-font-heading: 'Montserrat', sans-serif;
+  --pres-font-body: 'Inter', sans-serif;
+  --pres-heading-weight: 800;
+}
+
+[data-theme="carbon-fiber"] .pres-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.012) 2px,
+    rgba(255, 255, 255, 0.012) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Theme: Clean Light
+   -------------------------------------------------------------------------- */
+[data-theme="clean-light"] {
+  --pres-bg: #FFFFFF;
+  --pres-bg-alt: #F5F5F5;
+  --pres-bg-surface: #EEEEEE;
+  --pres-text: #1A1A1A;
+  --pres-text-secondary: #555555;
+  --pres-text-muted: #999999;
+  --pres-accent: #E31837;
+  --pres-accent-light: #FF2D4B;
+  --pres-accent-glow: rgba(227, 24, 55, 0.15);
+  --pres-border: #E0E0E0;
+  --pres-font-heading: 'Montserrat', sans-serif;
+  --pres-font-body: 'Inter', sans-serif;
+  --pres-heading-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Base Slide
+   -------------------------------------------------------------------------- */
+.pres-slide {
+  width: 960px;
+  height: 540px;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--pres-font-body);
+  color: var(--pres-text);
+  background: var(--pres-bg);
+}
+
+.pres-slide * {
+  box-sizing: border-box;
+}
+
+.pres-slide__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Accent bar (top of every slide) */
+.pres-accent-bar {
+  height: 4px;
+  background: var(--pres-accent);
+  flex-shrink: 0;
+}
+
+/* Slide footer strip */
+.pres-slide-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--pres-text-muted);
+  z-index: 2;
+}
+
+/* --------------------------------------------------------------------------
+   TEMPLATE 1: Title Page
+   -------------------------------------------------------------------------- */
+.pres-slide--title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pres-slide--title .pres-slide__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.pres-slide--title .pres-slide__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  z-index: 1;
+}
+
+.pres-slide--title .pres-slide__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 64px;
+  text-align: center;
+  height: 100%;
+}
+
+.pres-slide--title .pres-logo {
+  max-height: 60px;
+  max-width: 200px;
+  margin-bottom: 32px;
+  object-fit: contain;
+}
+
+.pres-slide--title .pres-title {
+  font-family: var(--pres-font-heading);
+  font-weight: var(--pres-heading-weight);
+  font-size: 52px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--pres-text);
+  margin-bottom: 16px;
+}
+
+.pres-slide--title .pres-subtitle {
+  font-family: var(--pres-font-body);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--pres-text-secondary);
+  letter-spacing: 0.02em;
+  margin-bottom: 24px;
+}
+
+.pres-slide--title .pres-accent-line {
+  width: 64px;
+  height: 4px;
+  background: var(--pres-accent);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+
+.pres-slide--title .pres-brandline {
+  font-family: var(--pres-font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--pres-accent);
+  position: absolute;
+  bottom: 40px;
+}
+
+/* Decorative corner accents for title slide */
+.pres-slide--title .pres-corner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  z-index: 2;
+}
+.pres-slide--title .pres-corner--tl {
+  top: 24px; left: 24px;
+  border-top: 2px solid var(--pres-accent);
+  border-left: 2px solid var(--pres-accent);
+}
+.pres-slide--title .pres-corner--br {
+  bottom: 24px; right: 24px;
+  border-bottom: 2px solid var(--pres-accent);
+  border-right: 2px solid var(--pres-accent);
+}
+
+/* --------------------------------------------------------------------------
+   TEMPLATE 2: Product Presentation
+   -------------------------------------------------------------------------- */
+.pres-slide--product .pres-slide__content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+}
+
+.pres-slide--product .pres-product-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 40px 48px 48px;
+}
+
+.pres-slide--product .pres-category {
+  font-family: var(--pres-font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--pres-accent);
+  margin-bottom: 12px;
+}
+
+.pres-slide--product .pres-product-name {
+  font-family: var(--pres-font-heading);
+  font-weight: var(--pres-heading-weight);
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--pres-text);
+  margin-bottom: 10px;
+}
+
+.pres-slide--product .pres-tagline {
+  font-size: 16px;
+  color: var(--pres-text-secondary);
+  margin-bottom: 24px;
+  font-weight: 400;
+}
+
+.pres-slide--product .pres-selling-points {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pres-slide--product .pres-selling-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--pres-text-secondary);
+  line-height: 1.4;
+}
+
+.pres-slide--product .pres-selling-point::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  background: var(--pres-accent);
+  transform: rotate(45deg);
+  margin-top: 5px;
+}
+
+.pres-slide--product .pres-product-image-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.pres-slide--product .pres-product-image-area::before {
+  content: '';
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--pres-accent-glow) 0%, transparent 70%);
+  z-index: 0;
+}
+
+.pres-slide--product .pres-product-img {
+  position: relative;
+  z-index: 1;
+  max-width: 85%;
+  max-height: 85%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
+}
+
+.pres-slide--product .pres-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--pres-accent);
+  color: #fff;
+  font-family: var(--pres-font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  border-radius: 3px;
+  z-index: 3;
+}
+
+/* Vertical accent line separator */
+.pres-slide--product .pres-divider {
+  position: absolute;
+  top: 20%;
+  bottom: 20%;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--pres-border) 30%,
+    var(--pres-border) 70%,
+    transparent
+  );
+  z-index: 2;
+}
+
+/* --------------------------------------------------------------------------
+   TEMPLATE 3: Product Spec
+   -------------------------------------------------------------------------- */
+.pres-slide--spec .pres-slide__content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pres-slide--spec .pres-spec-header {
+  padding: 32px 48px 20px;
+  border-bottom: 1px solid var(--pres-border);
+}
+
+.pres-slide--spec .pres-spec-product-name {
+  font-family: var(--pres-font-heading);
+  font-weight: var(--pres-heading-weight);
+  font-size: 32px;
+  line-height: 1.2;
+  color: var(--pres-text);
+  margin-bottom: 4px;
+}
+
+.pres-slide--spec .pres-spec-underline {
+  width: 48px;
+  height: 3px;
+  background: var(--pres-accent);
+  border-radius: 2px;
+}
+
+.pres-slide--spec .pres-spec-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  overflow: hidden;
+}
+
+.pres-slide--spec .pres-spec-left {
+  padding: 24px 24px 24px 48px;
+  overflow: hidden;
+}
+
+.pres-slide--spec .pres-spec-right {
+  padding: 24px 48px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.pres-slide--spec .pres-spec-right::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--pres-border) 20%, var(--pres-border) 80%, transparent);
+}
+
+/* Spec Table */
+.pres-spec-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pres-spec-table tr {
+  border-bottom: 1px solid var(--pres-border);
+}
+
+.pres-spec-table tr:last-child {
+  border-bottom: none;
+}
+
+.pres-spec-table td {
+  padding: 8px 12px;
+  font-size: 13px;
+  vertical-align: top;
+}
+
+.pres-spec-table td:first-child {
+  font-weight: 600;
+  color: var(--pres-text);
+  width: 40%;
+  white-space: nowrap;
+}
+
+.pres-spec-table td:last-child {
+  color: var(--pres-text-secondary);
+}
+
+.pres-spec-table tr:nth-child(even) {
+  background: var(--pres-bg-alt);
+}
+
+/* Spec features list */
+.pres-spec-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pres-spec-features__title {
+  font-family: var(--pres-font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pres-accent);
+  margin-bottom: 4px;
+}
+
+.pres-spec-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--pres-text-secondary);
+  line-height: 1.4;
+}
+
+.pres-spec-feature__icon {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pres-accent);
+  margin-top: 1px;
+}
+
+/* Spec product image */
+.pres-spec-product-img {
+  max-width: 90%;
+  max-height: 180px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+  margin-bottom: 16px;
+}
+
+.pres-slide--spec .pres-footnote {
+  position: absolute;
+  bottom: 12px;
+  left: 48px;
+  font-size: 10px;
+  color: var(--pres-text-muted);
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   TEMPLATE 4: Generic Header + List
+   -------------------------------------------------------------------------- */
+.pres-slide--generic .pres-slide__content {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.pres-slide--generic .pres-generic-header {
+  padding: 36px 48px 20px;
+}
+
+.pres-slide--generic .pres-generic-heading {
+  font-family: var(--pres-font-heading);
+  font-weight: var(--pres-heading-weight);
+  font-size: 36px;
+  line-height: 1.15;
+  color: var(--pres-text);
+  margin-bottom: 4px;
+}
+
+.pres-slide--generic .pres-generic-subheading {
+  font-size: 16px;
+  color: var(--pres-text-secondary);
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.pres-slide--generic .pres-generic-underline {
+  width: 48px;
+  height: 3px;
+  background: var(--pres-accent);
+  border-radius: 2px;
+}
+
+.pres-slide--generic .pres-generic-body {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Layout: text-left (text left, image right) */
+.pres-slide--generic .pres-generic-body--text-left,
+.pres-slide--generic .pres-generic-body--text-right {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.pres-slide--generic .pres-generic-body--text-right {
+  direction: rtl;
+}
+.pres-slide--generic .pres-generic-body--text-right > * {
+  direction: ltr;
+}
+
+/* Layout: text-full */
+.pres-slide--generic .pres-generic-body--text-full {
+  padding: 0 48px 48px;
+}
+
+/* Layout: text-center */
+.pres-slide--generic .pres-generic-body--text-center {
+  padding: 0 80px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.pres-slide--generic .pres-generic-text {
+  padding: 16px 32px 32px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.pres-slide--generic .pres-generic-image-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.pres-slide--generic .pres-generic-img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 4px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+/* Bullet List */
+.pres-bullet-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pres-bullet-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  color: var(--pres-text-secondary);
+  line-height: 1.5;
+}
+
+.pres-bullet-item__marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pres-accent);
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   TEMPLATE 5: Product Gallery
+   -------------------------------------------------------------------------- */
+.pres-slide--gallery .pres-slide__content {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.pres-slide--gallery .pres-gallery-header {
+  padding: 32px 48px 16px;
+}
+
+.pres-slide--gallery .pres-gallery-heading {
+  font-family: var(--pres-font-heading);
+  font-weight: var(--pres-heading-weight);
+  font-size: 30px;
+  line-height: 1.15;
+  color: var(--pres-text);
+  margin-bottom: 4px;
+}
+
+.pres-slide--gallery .pres-gallery-subheading {
+  font-size: 14px;
+  color: var(--pres-text-secondary);
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+
+.pres-slide--gallery .pres-gallery-underline {
+  width: 48px;
+  height: 3px;
+  background: var(--pres-accent);
+  border-radius: 2px;
+}
+
+.pres-gallery-grid {
+  flex: 1;
+  display: grid;
+  gap: 16px;
+  padding: 16px 48px 32px;
+  align-items: stretch;
+}
+
+.pres-gallery-grid--3col {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.pres-gallery-grid--2col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.pres-gallery-grid--1-2 {
+  grid-template-columns: 1.4fr 1fr 1fr;
+}
+
+.pres-gallery-item {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pres-gallery-image-wrap {
+  flex: 1;
+  background: var(--pres-bg-alt);
+  border-radius: 6px;
+  border: 1px solid var(--pres-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.pres-gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.pres-gallery-caption {
+  font-size: 12px;
+  color: var(--pres-text-secondary);
+  text-align: center;
+  padding: 8px 4px 0;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   TEMPLATE 6: Data & Graph
+   -------------------------------------------------------------------------- */
+.pres-slide--graph .pres-slide__content {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.pres-slide--graph .pres-graph-header {
+  padding: 28px 48px 14px;
+}
+
+.pres-slide--graph .pres-graph-heading {
+  font-family: var(--pres-font-heading);
+  font-weight: var(--pres-heading-weight);
+  font-size: 28px;
+  line-height: 1.15;
+  color: var(--pres-text);
+  margin-bottom: 4px;
+}
+
+.pres-slide--graph .pres-graph-subheading {
+  font-size: 14px;
+  color: var(--pres-text-secondary);
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+
+.pres-slide--graph .pres-graph-underline {
+  width: 48px;
+  height: 3px;
+  background: var(--pres-accent);
+  border-radius: 2px;
+}
+
+.pres-graph-body {
+  flex: 1;
+  display: flex;
+  padding: 8px 48px 12px;
+  gap: 24px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.pres-graph-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  position: relative;
+}
+
+.pres-graph-chart-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.pres-graph-chart-wrap svg {
+  max-width: 100%;
+  max-height: 100%;
+  color: var(--pres-text);
+}
+
+.pres-graph-xlabel {
+  font-size: 10px;
+  color: var(--pres-text-muted);
+  text-align: center;
+  margin-top: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pres-graph-ylabel {
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: rotate(-90deg) translateX(-50%);
+  transform-origin: left center;
+  font-size: 10px;
+  color: var(--pres-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.pres-graph-image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.pres-graph-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid var(--pres-border);
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.3));
+}
+
+.pres-graph-notes {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 8px 0 8px 24px;
+  border-left: 1px solid var(--pres-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pres-graph-notes-title {
+  font-family: var(--pres-font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pres-accent);
+}
+
+.pres-graph-notes .pres-bullet-list {
+  gap: 8px;
+}
+
+.pres-graph-notes .pres-bullet-item {
+  font-size: 12px;
+  line-height: 1.4;
+  gap: 8px;
+}
+
+.pres-graph-notes .pres-bullet-item__marker {
+  margin-top: 5px;
+}
+
+.pres-graph-footnote {
+  position: absolute;
+  bottom: 10px;
+  left: 48px;
+  right: 48px;
+  font-size: 10px;
+  color: var(--pres-text-muted);
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   Placeholder State (no image)
+   -------------------------------------------------------------------------- */
+.pres-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--pres-text-muted);
+  gap: 8px;
+  font-size: 12px;
+  opacity: 0.4;
+}
+
+/* --------------------------------------------------------------------------
+   Slide Animations (for slideshow mode)
+   -------------------------------------------------------------------------- */
+@keyframes pressFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pressSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pressSlideLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pressScaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pressAccentLine {
+  from { width: 0; }
+  to { width: 64px; }
+}
+
+/* Animated class — applied in slideshow mode */
+.pres-slide--animated .pres-logo {
+  animation: pressFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+}
+
+.pres-slide--animated .pres-title,
+.pres-slide--animated .pres-product-name,
+.pres-slide--animated .pres-spec-product-name,
+.pres-slide--animated .pres-generic-heading {
+  animation: pressSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+
+.pres-slide--animated .pres-subtitle,
+.pres-slide--animated .pres-tagline,
+.pres-slide--animated .pres-generic-subheading {
+  animation: pressSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.35s both;
+}
+
+.pres-slide--animated .pres-accent-line,
+.pres-slide--animated .pres-spec-underline,
+.pres-slide--animated .pres-generic-underline {
+  animation: pressAccentLine 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+}
+
+.pres-slide--animated .pres-brandline {
+  animation: pressFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both;
+}
+
+.pres-slide--animated .pres-category,
+.pres-slide--animated .pres-badge {
+  animation: pressFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+}
+
+.pres-slide--animated .pres-product-img,
+.pres-slide--animated .pres-spec-product-img,
+.pres-slide--animated .pres-generic-img {
+  animation: pressScaleIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+}
+
+.pres-slide--animated .pres-selling-point:nth-child(1) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both; }
+.pres-slide--animated .pres-selling-point:nth-child(2) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both; }
+.pres-slide--animated .pres-selling-point:nth-child(3) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both; }
+.pres-slide--animated .pres-selling-point:nth-child(4) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.7s both; }
+.pres-slide--animated .pres-selling-point:nth-child(5) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both; }
+
+.pres-slide--animated .pres-bullet-item:nth-child(1) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both; }
+.pres-slide--animated .pres-bullet-item:nth-child(2) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both; }
+.pres-slide--animated .pres-bullet-item:nth-child(3) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both; }
+.pres-slide--animated .pres-bullet-item:nth-child(4) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both; }
+.pres-slide--animated .pres-bullet-item:nth-child(5) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.7s both; }
+.pres-slide--animated .pres-bullet-item:nth-child(6) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both; }
+.pres-slide--animated .pres-bullet-item:nth-child(7) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.9s both; }
+.pres-slide--animated .pres-bullet-item:nth-child(8) { animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 1.0s both; }
+
+.pres-slide--animated .pres-spec-table tr:nth-child(1) { animation: pressFadeIn 0.4s ease 0.3s both; }
+.pres-slide--animated .pres-spec-table tr:nth-child(2) { animation: pressFadeIn 0.4s ease 0.38s both; }
+.pres-slide--animated .pres-spec-table tr:nth-child(3) { animation: pressFadeIn 0.4s ease 0.46s both; }
+.pres-slide--animated .pres-spec-table tr:nth-child(4) { animation: pressFadeIn 0.4s ease 0.54s both; }
+.pres-slide--animated .pres-spec-table tr:nth-child(5) { animation: pressFadeIn 0.4s ease 0.62s both; }
+.pres-slide--animated .pres-spec-table tr:nth-child(6) { animation: pressFadeIn 0.4s ease 0.70s both; }
+.pres-slide--animated .pres-spec-table tr:nth-child(7) { animation: pressFadeIn 0.4s ease 0.78s both; }
+.pres-slide--animated .pres-spec-table tr:nth-child(8) { animation: pressFadeIn 0.4s ease 0.86s both; }
+
+.pres-slide--animated .pres-spec-feature:nth-child(1) { animation: pressSlideLeft 0.4s ease 0.5s both; }
+.pres-slide--animated .pres-spec-feature:nth-child(2) { animation: pressSlideLeft 0.4s ease 0.58s both; }
+.pres-slide--animated .pres-spec-feature:nth-child(3) { animation: pressSlideLeft 0.4s ease 0.66s both; }
+.pres-slide--animated .pres-spec-feature:nth-child(4) { animation: pressSlideLeft 0.4s ease 0.74s both; }
+.pres-slide--animated .pres-spec-feature:nth-child(5) { animation: pressSlideLeft 0.4s ease 0.82s both; }
+.pres-slide--animated .pres-spec-feature:nth-child(6) { animation: pressSlideLeft 0.4s ease 0.90s both; }
+
+/* Corner animations */
+.pres-slide--animated .pres-corner {
+  animation: pressFadeIn 0.8s ease 0.1s both;
+}
+
+/* Gallery animations */
+.pres-slide--animated .pres-gallery-heading {
+  animation: pressSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+.pres-slide--animated .pres-gallery-underline {
+  animation: pressAccentLine 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.35s both;
+}
+.pres-slide--animated .pres-gallery-item:nth-child(1) { animation: pressScaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both; }
+.pres-slide--animated .pres-gallery-item:nth-child(2) { animation: pressScaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.45s both; }
+.pres-slide--animated .pres-gallery-item:nth-child(3) { animation: pressScaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both; }
+
+/* Graph/data animations */
+.pres-slide--animated .pres-graph-heading {
+  animation: pressSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+.pres-slide--animated .pres-graph-underline {
+  animation: pressAccentLine 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.35s both;
+}
+.pres-slide--animated .pres-graph-chart-wrap,
+.pres-slide--animated .pres-graph-image-wrap {
+  animation: pressScaleIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+}
+.pres-slide--animated .pres-graph-notes {
+  animation: pressSlideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .pres-slide--animated *,
+  .pres-slide--animated *::before,
+  .pres-slide--animated *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+}

@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" font-family="Inter, system-ui, sans-serif">
+  <rect width="1200" height="680" fill="#0A0A0A"/>
+
+  <text x="600" y="36" text-anchor="middle" font-size="16" font-weight="700" fill="#FFFFFF" font-family="Montserrat, sans-serif">Slide Templates</text>
+  <rect x="576" y="44" width="48" height="3" rx="1.5" fill="#E31837"/>
+
+  <!-- ===== TEMPLATE 1: Title Page ===== -->
+  <g transform="translate(30, 72)">
+    <text x="270" y="0" text-anchor="middle" font-size="11" font-weight="600" fill="#E31837" letter-spacing="1">TITLE PAGE</text>
+
+    <rect width="540" height="260" rx="4" fill="#0A0A0A" stroke="#2A2A2A" stroke-width="0.5"/>
+    <rect width="540" height="260" rx="4" fill="url(#tplGrad1)" opacity="0.2"/>
+
+    <!-- Corner accents -->
+    <line x1="14" y1="14" x2="38" y2="14" stroke="#E31837" stroke-width="1.5"/>
+    <line x1="14" y1="14" x2="14" y2="38" stroke="#E31837" stroke-width="1.5"/>
+    <line x1="526" y1="246" x2="502" y2="246" stroke="#E31837" stroke-width="1.5"/>
+    <line x1="526" y1="246" x2="526" y2="222" stroke="#E31837" stroke-width="1.5"/>
+
+    <!-- Title -->
+    <text x="270" y="110" text-anchor="middle" font-size="26" font-weight="800" fill="#FFFFFF" font-family="Montserrat, sans-serif">TRP Product Range 2026</text>
+    <rect x="238" y="120" width="64" height="3" rx="1.5" fill="#E31837"/>
+    <text x="270" y="146" text-anchor="middle" font-size="12" fill="#B0B0B0">Performance Braking &amp; Drivetrain Systems</text>
+    <text x="270" y="232" text-anchor="middle" font-size="8" fill="#E31837" font-weight="600" letter-spacing="2" font-family="Montserrat, sans-serif">ENGINEERED FOR SPEED</text>
+  </g>
+
+  <defs>
+    <linearGradient id="tplGrad1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E31837" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ===== TEMPLATE 2: Product Presentation ===== -->
+  <g transform="translate(630, 72)">
+    <text x="270" y="0" text-anchor="middle" font-size="11" font-weight="600" fill="#E31837" letter-spacing="1">PRODUCT PRESENTATION</text>
+
+    <rect width="540" height="260" rx="4" fill="#0A0A0A" stroke="#2A2A2A" stroke-width="0.5"/>
+    <!-- Accent bar -->
+    <rect width="540" height="3" rx="0" fill="#E31837"/>
+
+    <!-- Left: product info -->
+    <text x="32" y="38" font-size="8" font-weight="700" fill="#E31837" letter-spacing="1.5" font-family="Montserrat, sans-serif">DISC BRAKES / MTB</text>
+    <text x="32" y="68" font-size="22" font-weight="800" fill="#FFFFFF" font-family="Montserrat, sans-serif">TRP DH-R EVO</text>
+    <text x="32" y="88" font-size="10" fill="#B0B0B0">Race-Proven Stopping Power</text>
+
+    <!-- Selling points -->
+    <rect x="32" y="108" width="6" height="6" rx="0" fill="#E31837" transform="rotate(45 35 111)"/>
+    <text x="48" y="114" font-size="9" fill="#B0B0B0">4-piston forged caliper design</text>
+    <rect x="32" y="128" width="6" height="6" rx="0" fill="#E31837" transform="rotate(45 35 131)"/>
+    <text x="48" y="134" font-size="9" fill="#B0B0B0">Tool-free pad replacement</text>
+    <rect x="32" y="148" width="6" height="6" rx="0" fill="#E31837" transform="rotate(45 35 151)"/>
+    <text x="48" y="154" font-size="9" fill="#B0B0B0">DOT 5.1 fluid compatible</text>
+
+    <!-- Divider -->
+    <line x1="270" y1="40" x2="270" y2="220" stroke="#2A2A2A" stroke-width="1" opacity="0.5"/>
+
+    <!-- Right: product image area -->
+    <circle cx="400" cy="135" r="75" fill="#E31837" opacity="0.06"/>
+    <rect x="360" y="75" width="85" height="120" rx="8" fill="#1A1A1A"/>
+    <rect x="370" y="85" width="65" height="40" rx="4" fill="#333"/>
+    <rect x="375" y="135" width="55" height="20" rx="2" fill="#2A2A2A"/>
+    <text x="402" y="182" text-anchor="middle" font-size="8" fill="#555">Product Image</text>
+
+    <!-- Badge -->
+    <rect x="468" y="14" width="58" height="20" rx="3" fill="#E31837"/>
+    <text x="497" y="28" text-anchor="middle" font-size="8" fill="#FFFFFF" font-weight="700" letter-spacing="0.5">NEW 2026</text>
+  </g>
+
+  <!-- ===== TEMPLATE 3: Product Spec ===== -->
+  <g transform="translate(30, 380)">
+    <text x="270" y="0" text-anchor="middle" font-size="11" font-weight="600" fill="#E31837" letter-spacing="1">PRODUCT SPEC</text>
+
+    <rect width="540" height="260" rx="4" fill="#0A0A0A" stroke="#2A2A2A" stroke-width="0.5"/>
+    <!-- Accent bar -->
+    <rect width="540" height="3" fill="#E31837"/>
+
+    <!-- Header -->
+    <text x="32" y="36" font-size="18" font-weight="800" fill="#FFFFFF" font-family="Montserrat, sans-serif">TRP DH-R EVO</text>
+    <rect x="32" y="44" width="40" height="2.5" rx="1" fill="#E31837"/>
+
+    <!-- Spec table -->
+    <rect x="32" y="58" width="240" height="22" fill="#111111"/>
+    <text x="40" y="73" font-size="9" font-weight="600" fill="#FFFFFF">Weight</text>
+    <text x="160" y="73" font-size="9" fill="#B0B0B0">285g per caliper</text>
+
+    <rect x="32" y="80" width="240" height="22" fill="transparent"/>
+    <text x="40" y="95" font-size="9" font-weight="600" fill="#FFFFFF">Pistons</text>
+    <text x="160" y="95" font-size="9" fill="#B0B0B0">4-piston</text>
+
+    <rect x="32" y="102" width="240" height="22" fill="#111111"/>
+    <text x="40" y="117" font-size="9" font-weight="600" fill="#FFFFFF">Rotor Size</text>
+    <text x="160" y="117" font-size="9" fill="#B0B0B0">180mm / 203mm</text>
+
+    <rect x="32" y="124" width="240" height="22" fill="transparent"/>
+    <text x="40" y="139" font-size="9" font-weight="600" fill="#FFFFFF">Fluid Type</text>
+    <text x="160" y="139" font-size="9" fill="#B0B0B0">DOT 5.1</text>
+
+    <rect x="32" y="146" width="240" height="22" fill="#111111"/>
+    <text x="40" y="161" font-size="9" font-weight="600" fill="#FFFFFF">Mount</text>
+    <text x="160" y="161" font-size="9" fill="#B0B0B0">Post Mount / IS</text>
+
+    <!-- Key Features -->
+    <text x="32" y="192" font-size="8" font-weight="700" fill="#E31837" letter-spacing="1">KEY FEATURES</text>
+    <text x="48" y="210" font-size="9" fill="#B0B0B0">&#10003; CNC-machined caliper body</text>
+    <text x="48" y="226" font-size="9" fill="#B0B0B0">&#10003; Adjustable lever reach</text>
+    <text x="48" y="242" font-size="9" fill="#B0B0B0">&#10003; Heat-dissipating pad design</text>
+
+    <!-- Separator -->
+    <line x1="290" y1="65" x2="290" y2="240" stroke="#2A2A2A" opacity="0.5"/>
+
+    <!-- Product image area (right) -->
+    <rect x="320" y="80" width="180" height="140" rx="6" fill="#1A1A1A"/>
+    <rect x="345" y="100" width="130" height="70" rx="4" fill="#222"/>
+    <text x="410" y="200" text-anchor="middle" font-size="8" fill="#555">Product Image</text>
+  </g>
+
+  <!-- ===== TEMPLATE 4: Header + List ===== -->
+  <g transform="translate(630, 380)">
+    <text x="270" y="0" text-anchor="middle" font-size="11" font-weight="600" fill="#E31837" letter-spacing="1">HEADER + LIST</text>
+
+    <rect width="540" height="260" rx="4" fill="#0A0A0A" stroke="#2A2A2A" stroke-width="0.5"/>
+    <!-- Accent bar -->
+    <rect width="540" height="3" fill="#E31837"/>
+
+    <!-- Header -->
+    <text x="32" y="40" font-size="20" font-weight="800" fill="#FFFFFF" font-family="Montserrat, sans-serif">Why Choose TRP?</text>
+    <text x="32" y="58" font-size="10" fill="#B0B0B0">Industry-leading performance and reliability</text>
+    <rect x="32" y="66" width="40" height="2.5" rx="1" fill="#E31837"/>
+
+    <!-- Bullet list (left) -->
+    <circle cx="38" cy="94" r="3" fill="#E31837"/>
+    <text x="50" y="97" font-size="10" fill="#B0B0B0">35+ years of braking expertise</text>
+
+    <circle cx="38" cy="116" r="3" fill="#E31837"/>
+    <text x="50" y="119" font-size="10" fill="#B0B0B0">Used by World Cup DH teams</text>
+
+    <circle cx="38" cy="138" r="3" fill="#E31837"/>
+    <text x="50" y="141" font-size="10" fill="#B0B0B0">In-house R&amp;D and manufacturing</text>
+
+    <circle cx="38" cy="160" r="3" fill="#E31837"/>
+    <text x="50" y="163" font-size="10" fill="#B0B0B0">Extensive global dealer network</text>
+
+    <circle cx="38" cy="182" r="3" fill="#E31837"/>
+    <text x="50" y="185" font-size="10" fill="#B0B0B0">Premium materials: carbon, titanium, TT6</text>
+
+    <circle cx="38" cy="204" r="3" fill="#E31837"/>
+    <text x="50" y="207" font-size="10" fill="#B0B0B0">Complete ecosystem: brakes + drivetrain</text>
+
+    <!-- Image (right) -->
+    <rect x="310" y="82" width="200" height="160" rx="6" fill="#1A1A1A"/>
+    <rect x="330" y="102" width="160" height="90" rx="4" fill="#222"/>
+    <text x="410" y="220" text-anchor="middle" font-size="8" fill="#555">Optional Image</text>
+  </g>
+</svg>

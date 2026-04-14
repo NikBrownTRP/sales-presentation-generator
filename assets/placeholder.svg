@@ -1,0 +1,7 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <rect width="400" height="300" rx="8" fill="#1A1A1A"/>
+  <path d="M140 200l40-55 45 55H140z" fill="#2A2A2A"/>
+  <path d="M180 200l55-75 55 75H180z" fill="#333333"/>
+  <circle cx="150" cy="120" r="20" fill="#333333"/>
+  <text x="200" y="250" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#555555">Product Image</text>
+</svg>

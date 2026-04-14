@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" font-family="Inter, system-ui, sans-serif">
+  <!-- Background -->
+  <rect width="1200" height="700" fill="#0A0A0A"/>
+
+  <!-- Header bar -->
+  <rect width="1200" height="56" fill="#111111"/>
+  <line x1="0" y1="56" x2="1200" y2="56" stroke="#2A2A2A"/>
+
+  <!-- Header: brand -->
+  <rect x="16" y="16" width="22" height="15" rx="2" fill="none" stroke="#E31837" stroke-width="1.5"/>
+  <line x1="22" y1="35" x2="22" y2="40" stroke="#E31837" stroke-width="1.5"/>
+  <text x="46" y="34" font-size="14" font-weight="700" fill="#E31837" font-family="Montserrat, sans-serif">Presentation Generator</text>
+
+  <!-- Header: theme selector -->
+  <text x="600" y="34" font-size="10" fill="#A0A0A0" text-anchor="end" font-weight="500" letter-spacing="0.5">THEME</text>
+  <rect x="608" y="18" width="120" height="28" rx="4" fill="#1A1A1A" stroke="#2A2A2A"/>
+  <text x="620" y="36" font-size="12" fill="#FFFFFF">Tektro Dark</text>
+
+  <!-- Header: buttons -->
+  <rect x="745" y="18" width="60" height="28" rx="4" fill="transparent" stroke="none"/>
+  <text x="757" y="36" font-size="12" fill="#A0A0A0">Save</text>
+
+  <rect x="810" y="18" width="60" height="28" rx="4" fill="transparent"/>
+  <text x="822" y="36" font-size="12" fill="#A0A0A0">Load</text>
+
+  <rect x="880" y="18" width="75" height="28" rx="4" fill="#1A1A1A" stroke="#2A2A2A"/>
+  <text x="895" y="36" font-size="12" fill="#FFFFFF">Preview</text>
+
+  <rect x="965" y="18" width="95" height="28" rx="4" fill="transparent" stroke="#2A2A2A"/>
+  <text x="978" y="36" font-size="12" fill="#FFFFFF">Export HTML</text>
+
+  <rect x="1070" y="18" width="110" height="28" rx="4" fill="#E31837"/>
+  <text x="1092" y="36" font-size="12" fill="#FFFFFF" font-weight="600">Export PDF</text>
+
+  <!-- Sidebar -->
+  <rect x="0" y="56" width="280" height="644" fill="#111111"/>
+  <line x1="280" y1="56" x2="280" y2="700" stroke="#2A2A2A"/>
+
+  <!-- Sidebar: header -->
+  <text x="20" y="86" font-size="11" font-weight="700" fill="#A0A0A0" letter-spacing="1">SLIDES</text>
+  <rect x="170" y="72" width="95" height="26" rx="4" fill="#E31837"/>
+  <text x="182" y="89" font-size="11" fill="#FFFFFF" font-weight="600">+ Add Slide</text>
+  <line x1="14" y1="100" x2="266" y2="100" stroke="#2A2A2A"/>
+
+  <!-- Sidebar: Slide 1 (active) -->
+  <rect x="12" y="110" width="256" height="60" rx="8" fill="#1A1A1A" stroke="#E31837" stroke-width="1"/>
+  <rect x="12" y="110" width="3" height="60" rx="1" fill="#E31837"/>
+  <!-- Thumbnail -->
+  <rect x="24" y="118" width="72" height="42" rx="3" fill="#0A0A0A" stroke="#2A2A2A" stroke-width="0.5"/>
+  <rect x="40" y="130" width="40" height="4" rx="1" fill="#E31837" opacity="0.8"/>
+  <rect x="44" y="138" width="32" height="2" rx="1" fill="#666"/>
+  <rect x="48" y="144" width="20" height="1.5" rx="0.75" fill="#444"/>
+  <!-- Info -->
+  <text x="106" y="134" font-size="9" fill="#666" font-weight="600" letter-spacing="0.5">SLIDE 1</text>
+  <text x="106" y="150" font-size="12" fill="#FFFFFF" font-weight="500">TRP Product Range 2026</text>
+
+  <!-- Sidebar: Slide 2 -->
+  <rect x="12" y="178" width="256" height="60" rx="8" fill="transparent" stroke="transparent"/>
+  <rect x="24" y="186" width="72" height="42" rx="3" fill="#0A0A0A" stroke="#2A2A2A" stroke-width="0.5"/>
+  <rect x="28" y="196" width="28" height="3" rx="1" fill="#E31837" opacity="0.6"/>
+  <rect x="28" y="203" width="26" height="1.5" rx="0.75" fill="#444"/>
+  <circle cx="74" cy="207" r="10" fill="#1A1A1A"/>
+  <text x="106" y="202" font-size="9" fill="#666" font-weight="600" letter-spacing="0.5">SLIDE 2</text>
+  <text x="106" y="218" font-size="12" fill="#FFFFFF" font-weight="500">TRP DH-R EVO</text>
+
+  <!-- Sidebar: Slide 3 -->
+  <rect x="12" y="246" width="256" height="60" rx="8" fill="transparent"/>
+  <rect x="24" y="254" width="72" height="42" rx="3" fill="#0A0A0A" stroke="#2A2A2A" stroke-width="0.5"/>
+  <rect x="28" y="260" width="30" height="2.5" rx="1" fill="#E31837" opacity="0.6"/>
+  <rect x="28" y="267" width="28" height="1.5" rx="0.75" fill="#444"/>
+  <rect x="28" y="272" width="28" height="1.5" rx="0.75" fill="#333"/>
+  <rect x="28" y="277" width="28" height="1.5" rx="0.75" fill="#444"/>
+  <text x="106" y="270" font-size="9" fill="#666" font-weight="600" letter-spacing="0.5">SLIDE 3</text>
+  <text x="106" y="286" font-size="12" fill="#FFFFFF" font-weight="500">TRP DH-R EVO — Specs</text>
+
+  <!-- Sidebar: Slide 4 -->
+  <rect x="12" y="314" width="256" height="60" rx="8" fill="transparent"/>
+  <rect x="24" y="322" width="72" height="42" rx="3" fill="#0A0A0A" stroke="#2A2A2A" stroke-width="0.5"/>
+  <rect x="28" y="328" width="26" height="2.5" rx="1" fill="#E31837" opacity="0.6"/>
+  <rect x="28" y="335" width="24" height="1.5" rx="0.75" fill="#444"/>
+  <rect x="28" y="340" width="24" height="1.5" rx="0.75" fill="#444"/>
+  <rect x="28" y="345" width="24" height="1.5" rx="0.75" fill="#444"/>
+  <text x="106" y="338" font-size="9" fill="#666" font-weight="600" letter-spacing="0.5">SLIDE 4</text>
+  <text x="106" y="354" font-size="12" fill="#FFFFFF" font-weight="500">Why Choose TRP?</text>
+
+  <!-- Sidebar: bottom button -->
+  <rect x="14" y="650" width="252" height="32" rx="4" fill="transparent" stroke="none"/>
+  <text x="140" y="670" text-anchor="middle" font-size="12" fill="#A0A0A0">Preview All Slides</text>
+
+  <!-- Main: Live Preview area -->
+  <rect x="296" y="64" width="888" height="16" fill="#111111"/>
+  <text x="310" y="76" font-size="10" font-weight="600" fill="#E31837" letter-spacing="0.8">LIVE PREVIEW</text>
+  <text x="1170" y="76" font-size="10" fill="#666" text-anchor="end">Slide 1 of 4</text>
+  <line x1="280" y1="82" x2="1200" y2="82" stroke="#2A2A2A"/>
+
+  <!-- Preview: Rendered title slide -->
+  <g transform="translate(414, 100)">
+    <rect width="572" height="322" rx="4" fill="#0A0A0A"/>
+    <rect width="572" height="322" rx="4" fill="url(#previewGrad)" opacity="0.3"/>
+    <!-- Corner accents -->
+    <line x1="16" y1="16" x2="44" y2="16" stroke="#E31837" stroke-width="1.5"/>
+    <line x1="16" y1="16" x2="16" y2="44" stroke="#E31837" stroke-width="1.5"/>
+    <line x1="556" y1="306" x2="528" y2="306" stroke="#E31837" stroke-width="1.5"/>
+    <line x1="556" y1="306" x2="556" y2="278" stroke="#E31837" stroke-width="1.5"/>
+    <!-- Title text -->
+    <text x="286" y="140" text-anchor="middle" font-size="30" font-weight="800" fill="#FFFFFF" font-family="Montserrat, sans-serif">TRP Product Range 2026</text>
+    <!-- Accent line -->
+    <rect x="254" y="152" width="64" height="3" rx="1.5" fill="#E31837"/>
+    <!-- Subtitle -->
+    <text x="286" y="180" text-anchor="middle" font-size="13" fill="#B0B0B0">Performance Braking &amp; Drivetrain Systems</text>
+    <!-- Brand line -->
+    <text x="286" y="290" text-anchor="middle" font-size="8" fill="#E31837" font-weight="600" letter-spacing="2" font-family="Montserrat, sans-serif">ENGINEERED FOR SPEED</text>
+  </g>
+
+  <defs>
+    <linearGradient id="previewGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E31837" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shadow under preview -->
+  <rect x="414" y="420" width="572" height="6" rx="3" fill="#000" opacity="0.3"/>
+
+  <!-- Editor section -->
+  <rect x="280" y="436" width="920" height="18" fill="#111111"/>
+  <text x="310" y="450" font-size="10" font-weight="600" fill="#E31837" letter-spacing="0.8">SLIDE EDITOR</text>
+  <text x="1170" y="450" font-size="10" fill="#A0A0A0" text-anchor="end">Title Page</text>
+  <line x1="280" y1="456" x2="1200" y2="456" stroke="#2A2A2A"/>
+
+  <!-- Editor form fields -->
+  <text x="310" y="480" font-size="10" font-weight="600" fill="#A0A0A0" letter-spacing="0.5">TITLE <tspan fill="#E31837">*</tspan></text>
+  <rect x="310" y="488" width="860" height="34" rx="4" fill="#111111" stroke="#2A2A2A"/>
+  <text x="322" y="510" font-size="13" fill="#FFFFFF">TRP Product Range 2026</text>
+
+  <text x="310" y="542" font-size="10" font-weight="600" fill="#A0A0A0" letter-spacing="0.5">SUBTITLE</text>
+  <rect x="310" y="550" width="860" height="34" rx="4" fill="#111111" stroke="#2A2A2A"/>
+  <text x="322" y="572" font-size="13" fill="#FFFFFF">Performance Braking &amp; Drivetrain Systems</text>
+
+  <text x="310" y="604" font-size="10" font-weight="600" fill="#A0A0A0" letter-spacing="0.5">BRAND LINE</text>
+  <rect x="310" y="612" width="860" height="34" rx="4" fill="#111111" stroke="#2A2A2A"/>
+  <text x="322" y="634" font-size="13" fill="#FFFFFF">Engineered for Speed</text>
+
+  <text x="310" y="666" font-size="10" font-weight="600" fill="#A0A0A0" letter-spacing="0.5">LOGO IMAGE</text>
+  <rect x="310" y="674" width="200" height="20" rx="4" fill="transparent" stroke="#2A2A2A" stroke-dasharray="4 3"/>
+  <text x="370" y="688" font-size="10" fill="#666" text-anchor="middle">Click or drag image</text>
+</svg>
