@@ -111,6 +111,35 @@
     autoSave();
   }
 
+  function changeSlideTemplate(slideId, newTemplateId) {
+    var slide = state.slides.find(function (s) { return s.id === slideId; });
+    if (!slide) return;
+    if (slide.templateId === newTemplateId) return; // no-op
+
+    var oldTemplateId = slide.templateId;
+    var newData = window.SlideTemplates.remapSlideData(oldTemplateId, newTemplateId, slide.data || {});
+
+    // Prefill brand logo if the target template has a logo field and it
+    // didn't carry one over (keeps parity with addSlide's behaviour).
+    var hasLogoField = (window.SlideTemplates[newTemplateId].fields || []).some(function (f) { return f.key === 'logo'; });
+    if (hasLogoField && !newData.logo) {
+      newData.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+    }
+    // Same for brandLine on title slides.
+    var hasBrandLineField = (window.SlideTemplates[newTemplateId].fields || []).some(function (f) { return f.key === 'brandLine'; });
+    if (hasBrandLineField && !newData.brandLine) {
+      newData.brandLine = slide.theme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+    }
+
+    slide.templateId = newTemplateId;
+    slide.data = newData;
+
+    renderSidebar();
+    renderEditor();
+    updatePreview();
+    autoSave();
+  }
+
   function deleteSlide(slideId) {
     var idx = slideIndex(slideId);
     if (idx === -1) return;
@@ -259,8 +288,9 @@
 
       html += '</div>'; // /slide-item__top
 
-      // Bottom row: duplicate, hide, delete — horizontal, right-aligned
+      // Bottom row: change-template, duplicate, hide, delete — horizontal, right-aligned
       html += '<div class="slide-item__actions slide-item__actions--bottom">';
+      html += '<button class="slide-item__action" data-action="change-template" data-slide-id="' + slide.id + '" title="Change template"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></button>';
       html += '<button class="slide-item__action" data-action="duplicate" data-slide-id="' + slide.id + '" title="Duplicate slide"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>';
       html += '<button class="slide-item__action' + (isHidden ? ' slide-item__action--active' : '') + '" data-action="toggle-hide" data-slide-id="' + slide.id + '" title="' + (isHidden ? 'Show slide' : 'Hide slide') + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + (isHidden ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/>' : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>') + '</svg></button>';
       html += '<button class="slide-item__action slide-item__action--delete" data-action="delete" data-slide-id="' + slide.id + '" title="Delete slide"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"/></svg></button>';
@@ -303,6 +333,7 @@
         var action = btn.dataset.action;
         if (action === 'move-up') moveSlide(slideId, -1);
         else if (action === 'move-down') moveSlide(slideId, 1);
+        else if (action === 'change-template') openTemplateChangeModal(slideId);
         else if (action === 'duplicate') duplicateSlide(slideId);
         else if (action === 'toggle-hide') toggleHideSlide(slideId);
         else if (action === 'delete') {
@@ -1320,28 +1351,63 @@
      Modal: Template picker
      ----------------------------------------------------------------------- */
   var modalTheme = 'trp-dark';
+  // Mode: 'add' (default) creates a new slide; 'change' swaps the template
+  // on an existing slide identified by modalSlideId.
+  var modalMode = 'add';
+  var modalSlideId = null;
 
   function openTemplateModal() {
+    modalMode = 'add';
+    modalSlideId = null;
     modalTheme = state.lastTheme || 'trp-dark';
+    renderTemplateGrid();
+    openModal(dom.modalAddSlide);
+  }
+
+  function openTemplateChangeModal(slideId) {
+    var slide = state.slides.find(function (s) { return s.id === slideId; });
+    if (!slide) return;
+    modalMode = 'change';
+    modalSlideId = slideId;
+    // Lock the theme to the slide's existing theme — swapping templates
+    // shouldn't also silently change the theme.
+    modalTheme = slide.theme || state.lastTheme || 'trp-dark';
     renderTemplateGrid();
     openModal(dom.modalAddSlide);
   }
 
   function renderTemplateGrid() {
     var templates = window.SlideTemplates.getOrderedList();
+    var currentTemplateId = null;
+    if (modalMode === 'change' && modalSlideId) {
+      var curSlide = state.slides.find(function (s) { return s.id === modalSlideId; });
+      if (curSlide) currentTemplateId = curSlide.templateId;
+    }
 
-    // Theme picker
-    var html = '<div class="template-theme-picker">';
-    html += '<button class="template-theme-btn' + (modalTheme === 'trp-dark' ? ' template-theme-btn--active' : '') + '" data-pick-theme="trp-dark">TRP Racing</button>';
-    html += '<button class="template-theme-btn' + (modalTheme === 'tektro-light' ? ' template-theme-btn--active' : '') + '" data-pick-theme="tektro-light">Tektro</button>';
-    html += '</div>';
+    var html = '';
+
+    if (modalMode === 'change') {
+      html += '<div class="template-grid__mode-banner">Pick a new template for this slide. Content is mapped to matching fields where possible; anything that can\u2019t be mapped is kept in the background and restored if you switch back.</div>';
+    }
+
+    // Theme picker — hidden in change mode (theme is locked to the slide)
+    if (modalMode === 'add') {
+      html += '<div class="template-theme-picker">';
+      html += '<button class="template-theme-btn' + (modalTheme === 'trp-dark' ? ' template-theme-btn--active' : '') + '" data-pick-theme="trp-dark">TRP Racing</button>';
+      html += '<button class="template-theme-btn' + (modalTheme === 'tektro-light' ? ' template-theme-btn--active' : '') + '" data-pick-theme="tektro-light">Tektro</button>';
+      html += '</div>';
+    }
 
     // Template cards with live previews
     html += '<div class="template-grid__cards">';
     templates.forEach(function (t) {
+      var isCurrent = t.id === currentTemplateId;
       var previewData = window.SlideTemplates.getDefaults(t.id);
       var previewHtml = t.render(previewData);
-      html += '<div class="template-card" data-template-id="' + t.id + '">';
+      html += '<div class="template-card' + (isCurrent ? ' template-card--current' : '') + '" data-template-id="' + t.id + '">';
+      if (isCurrent) {
+        html += '<div class="template-card__badge">Current</div>';
+      }
       html += '<div class="template-card__preview" data-theme="' + modalTheme + '">';
       html += '<div class="template-card__preview-inner">' + previewHtml + '</div>';
       html += '</div>';
@@ -1377,7 +1443,17 @@
     // Template card clicks
     dom.templateGrid.querySelectorAll('.template-card').forEach(function (card) {
       card.addEventListener('click', function () {
-        addSlide(card.dataset.templateId, modalTheme);
+        var pickedId = card.dataset.templateId;
+        if (modalMode === 'change') {
+          if (pickedId === currentTemplateId) {
+            // Clicking the current template is a no-op; just close.
+            closeModal(dom.modalAddSlide);
+            return;
+          }
+          changeSlideTemplate(modalSlideId, pickedId);
+        } else {
+          addSlide(pickedId, modalTheme);
+        }
         closeModal(dom.modalAddSlide);
       });
     });

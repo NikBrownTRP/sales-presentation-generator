@@ -171,11 +171,11 @@
       icon: '<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="50" rx="3" fill="#111"/><rect x="20" y="16" width="40" height="4" rx="1" fill="#E31837"/><rect x="26" y="24" width="28" height="2" rx="1" fill="#666"/><rect x="32" y="30" width="16" height="1.5" rx=".75" fill="#444"/></svg>',
 
       fields: [
-        { key: 'title', type: 'text', label: 'Title', placeholder: 'e.g., TRP Product Range 2026', required: true },
-        { key: 'subtitle', type: 'text', label: 'Subtitle', placeholder: 'e.g., Performance Braking & Drivetrain Systems' },
-        { key: 'brandLine', type: 'text', label: 'Brand Line', placeholder: 'e.g., Engineered for Speed' },
-        { key: 'logo', type: 'image', label: 'Logo Image' },
-        { key: 'backgroundImage', type: 'image', label: 'Background Image' },
+        { key: 'title', role: 'title', type: 'text', label: 'Title', placeholder: 'e.g., TRP Product Range 2026', required: true },
+        { key: 'subtitle', role: 'subtitle', type: 'text', label: 'Subtitle', placeholder: 'e.g., Performance Braking & Drivetrain Systems' },
+        { key: 'brandLine', role: 'tagline', type: 'text', label: 'Brand Line', placeholder: 'e.g., Engineered for Speed' },
+        { key: 'logo', role: 'logo', type: 'image', label: 'Logo Image' },
+        { key: 'backgroundImage', role: 'hero-image', type: 'image', label: 'Background Image' },
         {
           key: 'overlayOpacity', type: 'select', label: 'Background Overlay', defaultValue: '0.7',
           options: [
@@ -245,13 +245,13 @@
       icon: '<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="50" rx="3" fill="#111"/><rect x="6" y="10" width="24" height="3" rx="1" fill="#E31837"/><rect x="6" y="16" width="30" height="2" rx="1" fill="#666"/><rect x="6" y="22" width="26" height="1.5" rx=".75" fill="#444"/><rect x="6" y="27" width="26" height="1.5" rx=".75" fill="#444"/><circle cx="56" cy="25" r="14" fill="#1A1A1A"/><rect x="50" y="18" width="12" height="14" rx="2" fill="#333"/></svg>',
 
       fields: [
-        { key: 'productName', type: 'text', label: 'Product Name', placeholder: 'e.g., TRP DH-R EVO', required: true },
-        { key: 'tagline', type: 'text', label: 'Tagline', placeholder: 'e.g., Race-Proven Stopping Power' },
-        { key: 'category', type: 'text', label: 'Category', placeholder: 'e.g., Disc Brakes / MTB' },
-        { key: 'productImage', type: 'image', label: 'Product Image' },
-        { key: 'sellingPoints', type: 'list', label: 'Key Selling Points', placeholder: 'Add a selling point...', maxItems: 5 },
-        { key: 'badgeText', type: 'text', label: 'Badge Text', placeholder: 'e.g., NEW 2026' },
-        { key: 'logo', type: 'image', label: 'Logo' }
+        { key: 'productName', role: 'title', type: 'text', label: 'Product Name', placeholder: 'e.g., TRP DH-R EVO', required: true },
+        { key: 'tagline', role: 'subtitle', type: 'text', label: 'Tagline', placeholder: 'e.g., Race-Proven Stopping Power' },
+        { key: 'category', role: 'kicker', type: 'text', label: 'Category', placeholder: 'e.g., Disc Brakes / MTB' },
+        { key: 'productImage', role: 'hero-image', type: 'image', label: 'Product Image' },
+        { key: 'sellingPoints', role: 'list', type: 'list', label: 'Key Selling Points', placeholder: 'Add a selling point...', maxItems: 5 },
+        { key: 'badgeText', role: 'badge', type: 'text', label: 'Badge Text', placeholder: 'e.g., NEW 2026' },
+        { key: 'logo', role: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -323,12 +323,12 @@
       icon: '<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="50" rx="3" fill="#111"/><rect x="6" y="6" width="32" height="3" rx="1" fill="#E31837"/><rect x="6" y="13" width="30" height="1.5" rx=".75" fill="#444"/><rect x="6" y="17" width="30" height="1.5" rx=".75" fill="#333"/><rect x="6" y="21" width="30" height="1.5" rx=".75" fill="#444"/><rect x="6" y="25" width="30" height="1.5" rx=".75" fill="#333"/><rect x="6" y="29" width="30" height="1.5" rx=".75" fill="#444"/><rect x="46" y="14" width="26" height="22" rx="2" fill="#1A1A1A"/></svg>',
 
       fields: [
-        { key: 'productName', type: 'text', label: 'Product Name', placeholder: 'e.g., TRP DH-R EVO', required: true },
-        { key: 'productImage', type: 'image', label: 'Product Image' },
+        { key: 'productName', role: 'title', type: 'text', label: 'Product Name', placeholder: 'e.g., TRP DH-R EVO', required: true },
+        { key: 'productImage', role: 'hero-image', type: 'image', label: 'Product Image' },
         { key: 'specs', type: 'keyvalue', label: 'Specifications', keyPlaceholder: 'Spec name', valuePlaceholder: 'Value' },
-        { key: 'features', type: 'list', label: 'Key Features', placeholder: 'Add a feature...', maxItems: 6 },
-        { key: 'footnote', type: 'text', label: 'Footnote', placeholder: 'e.g., *Weight without rotors' },
-        { key: 'logo', type: 'image', label: 'Logo' }
+        { key: 'features', role: 'list', type: 'list', label: 'Key Features', placeholder: 'Add a feature...', maxItems: 6 },
+        { key: 'footnote', role: 'footnote', type: 'text', label: 'Footnote', placeholder: 'e.g., *Weight without rotors' },
+        { key: 'logo', role: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -413,10 +413,10 @@
       icon: '<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="50" rx="3" fill="#111"/><rect x="6" y="6" width="28" height="3" rx="1" fill="#E31837"/><rect x="6" y="14" width="30" height="1.5" rx=".75" fill="#666"/><rect x="6" y="19" width="30" height="1.5" rx=".75" fill="#444"/><rect x="6" y="24" width="30" height="1.5" rx=".75" fill="#444"/><rect x="6" y="29" width="30" height="1.5" rx=".75" fill="#444"/><rect x="6" y="34" width="30" height="1.5" rx=".75" fill="#444"/><rect x="44" y="10" width="30" height="30" rx="2" fill="#1A1A1A"/></svg>',
 
       fields: [
-        { key: 'heading', type: 'text', label: 'Heading', placeholder: 'e.g., Why Choose TRP?', required: true },
-        { key: 'subheading', type: 'text', label: 'Subheading', placeholder: 'e.g., Industry-leading performance and reliability' },
-        { key: 'items', type: 'list', label: 'List Items', placeholder: 'Add an item...', maxItems: 8 },
-        { key: 'image', type: 'image', label: 'Image (optional)' },
+        { key: 'heading', role: 'title', type: 'text', label: 'Heading', placeholder: 'e.g., Why Choose TRP?', required: true },
+        { key: 'subheading', role: 'subtitle', type: 'text', label: 'Subheading', placeholder: 'e.g., Industry-leading performance and reliability' },
+        { key: 'items', role: 'list', type: 'list', label: 'List Items', placeholder: 'Add an item...', maxItems: 8 },
+        { key: 'image', role: 'hero-image', type: 'image', label: 'Image (optional)' },
         {
           key: 'layout', type: 'select', label: 'Layout', defaultValue: 'text-left',
           options: [
@@ -426,7 +426,7 @@
             { value: 'text-center', label: 'Centered' }
           ]
         },
-        { key: 'logo', type: 'image', label: 'Logo' }
+        { key: 'logo', role: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -503,9 +503,9 @@
       icon: '<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="50" rx="3" fill="#111"/><rect x="6" y="6" width="28" height="3" rx="1" fill="#E31837"/><rect x="4" y="14" width="22" height="28" rx="2" fill="#1A1A1A" stroke="#333" stroke-width=".5"/><rect x="29" y="14" width="22" height="28" rx="2" fill="#1A1A1A" stroke="#333" stroke-width=".5"/><rect x="54" y="14" width="22" height="28" rx="2" fill="#1A1A1A" stroke="#333" stroke-width=".5"/></svg>',
 
       fields: [
-        { key: 'heading', type: 'text', label: 'Heading', placeholder: 'e.g., TRP DH-R EVO — Product Views', required: true },
-        { key: 'subheading', type: 'text', label: 'Subheading', placeholder: 'e.g., Designed for ultimate performance' },
-        { key: 'image1', type: 'image', label: 'Image 1 (left)' },
+        { key: 'heading', role: 'title', type: 'text', label: 'Heading', placeholder: 'e.g., TRP DH-R EVO — Product Views', required: true },
+        { key: 'subheading', role: 'subtitle', type: 'text', label: 'Subheading', placeholder: 'e.g., Designed for ultimate performance' },
+        { key: 'image1', role: 'hero-image', type: 'image', label: 'Image 1 (left)' },
         { key: 'caption1', type: 'text', label: 'Caption 1', placeholder: 'e.g., Front view' },
         { key: 'image2', type: 'image', label: 'Image 2 (center)' },
         { key: 'caption2', type: 'text', label: 'Caption 2', placeholder: 'e.g., Side profile' },
@@ -519,7 +519,7 @@
             { value: '2col', label: '2 Columns (no 3rd)' }
           ]
         },
-        { key: 'logo', type: 'image', label: 'Logo' }
+        { key: 'logo', role: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -586,8 +586,8 @@
       icon: '<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="50" rx="3" fill="#111"/><rect x="6" y="6" width="28" height="3" rx="1" fill="#E31837"/><rect x="12" y="36" width="8" height="7" fill="#E31837" opacity=".7"/><rect x="24" y="26" width="8" height="17" fill="#E31837" opacity=".8"/><rect x="36" y="18" width="8" height="25" fill="#E31837" opacity=".9"/><rect x="48" y="30" width="8" height="13" fill="#E31837" opacity=".75"/><rect x="60" y="22" width="8" height="21" fill="#E31837" opacity=".85"/></svg>',
 
       fields: [
-        { key: 'heading', type: 'text', label: 'Heading', placeholder: 'e.g., Sales Performance Q1-Q4', required: true },
-        { key: 'subheading', type: 'text', label: 'Subheading', placeholder: 'e.g., Year-over-year growth analysis' },
+        { key: 'heading', role: 'title', type: 'text', label: 'Heading', placeholder: 'e.g., Sales Performance Q1-Q4', required: true },
+        { key: 'subheading', role: 'subtitle', type: 'text', label: 'Subheading', placeholder: 'e.g., Year-over-year growth analysis' },
         {
           key: 'displayMode', type: 'select', label: 'Display Mode', defaultValue: 'bar',
           options: [
@@ -599,10 +599,10 @@
         { key: 'chartData', type: 'chartdata', label: 'Chart Data (label,value per line)', placeholder: 'Q1,120\nQ2,185\nQ3,210\nQ4,165' },
         { key: 'xAxisLabel', type: 'text', label: 'X-Axis Label', placeholder: 'e.g., Quarter' },
         { key: 'yAxisLabel', type: 'text', label: 'Y-Axis Label', placeholder: 'e.g., Units Sold' },
-        { key: 'chartImage', type: 'image', label: 'Image (for image mode)' },
-        { key: 'notes', type: 'list', label: 'Detail Notes', placeholder: 'Add a note...', maxItems: 8 },
-        { key: 'footnote', type: 'text', label: 'Footnote / Source', placeholder: 'e.g., Source: Internal sales data' },
-        { key: 'logo', type: 'image', label: 'Logo' }
+        { key: 'chartImage', role: 'hero-image', type: 'image', label: 'Image (for image mode)' },
+        { key: 'notes', role: 'list', type: 'list', label: 'Detail Notes', placeholder: 'Add a note...', maxItems: 8 },
+        { key: 'footnote', role: 'footnote', type: 'text', label: 'Footnote / Source', placeholder: 'e.g., Source: Internal sales data' },
+        { key: 'logo', role: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -710,9 +710,9 @@
       icon: '<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="50" rx="3" fill="#000"/><rect x="28" y="6" width="14" height="2" rx="1" fill="#E31837"/><rect x="20" y="11" width="30" height="3.5" rx="1" fill="#fff"/><circle cx="22" cy="32" r="11" fill="#1A1A1A"/><rect x="16" y="26" width="12" height="12" rx="2" fill="#333"/><rect x="58" y="22" width="14" height="2" rx="1" fill="#666"/><rect x="58" y="26" width="10" height="3" rx="1" fill="#E31837"/><rect x="58" y="31" width="14" height="1.5" rx="1" fill="#444"/></svg>',
 
       fields: [
-        { key: 'kicker', type: 'text', label: 'Kicker (small label)', placeholder: 'e.g., Cameras' },
-        { key: 'headline', type: 'text', label: 'Headline', placeholder: 'e.g., A big zoom forward.', required: true },
-        { key: 'productImage', type: 'image', label: 'Hero Image' },
+        { key: 'kicker', role: 'kicker', type: 'text', label: 'Kicker (small label)', placeholder: 'e.g., Cameras' },
+        { key: 'headline', role: 'title', type: 'text', label: 'Headline', placeholder: 'e.g., A big zoom forward.', required: true },
+        { key: 'productImage', role: 'hero-image', type: 'image', label: 'Hero Image' },
         {
           key: 'imageMode', type: 'select', label: 'Image Mode', defaultValue: 'contained',
           options: [
@@ -736,7 +736,7 @@
         { key: 'stat3Label', type: 'text', label: 'Stat 3 — small label', placeholder: '' },
         { key: 'stat3Value', type: 'text', label: 'Stat 3 — big value', placeholder: '' },
         { key: 'stat3Caption', type: 'text', label: 'Stat 3 — caption', placeholder: '' },
-        { key: 'logo', type: 'image', label: 'Logo' }
+        { key: 'logo', role: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
@@ -808,6 +808,147 @@
     return window.SlideTemplates._order.map(function (id) {
       return window.SlideTemplates[id];
     });
+  };
+
+  /**
+   * Remap slide data from one template to another, preserving as much
+   * content as possible.
+   *
+   * Strategy:
+   *   1. Same-name match wins: if oldData has a value under a key that
+   *      also exists in newTpl, it's carried over verbatim (e.g. 'logo',
+   *      'productImage', '{fieldKey}Bg' background-colour companions).
+   *   2. Role match: for each still-empty new field, find an old field
+   *      with the same `role` and copy its value.
+   *   3. Default: if nothing maps, use the template's defaultValue or
+   *      an empty appropriate-type value.
+   *
+   * Unused old values (couldn't be placed anywhere in the new template)
+   * are stashed under newData._orphans[oldTemplateId]. If the user later
+   * swaps BACK to that template, the orphans are automatically restored
+   * for any empty fields — so chart data, specs tables, etc. survive
+   * round-trips.
+   */
+  window.SlideTemplates.remapSlideData = function (oldTemplateId, newTemplateId, oldData) {
+    var oldTpl = window.SlideTemplates[oldTemplateId];
+    var newTpl = window.SlideTemplates[newTemplateId];
+    if (!newTpl) return oldData || {};
+
+    var newFields = newTpl.fields || [];
+    var oldFields = (oldTpl && oldTpl.fields) || [];
+    var newData = window.SlideTemplates.getDefaults(newTemplateId);
+
+    // Build a quick lookup: role -> array of old field keys (ordered).
+    var oldRoleMap = {};
+    oldFields.forEach(function (f) {
+      if (!f.role) return;
+      (oldRoleMap[f.role] = oldRoleMap[f.role] || []).push(f.key);
+    });
+    // Set of old keys we've already consumed, so we don't carry a value
+    // to more than one destination.
+    var consumed = {};
+
+    // Set of old keys that are the EXACT same key in the new template.
+    var newKeySet = {};
+    newFields.forEach(function (f) { newKeySet[f.key] = true; });
+
+    function hasValue(v) {
+      if (v === undefined || v === null || v === '') return false;
+      if (Array.isArray(v)) {
+        // list/keyvalue: non-empty if at least one entry has a value
+        return v.some(function (x) {
+          if (typeof x === 'string') return x.trim() !== '';
+          if (x && typeof x === 'object') return (x.key && x.key !== '') || (x.value && x.value !== '');
+          return false;
+        });
+      }
+      return true;
+    }
+
+    // Pass 1: same-name carry-overs. This covers logo, *Bg companions,
+    // matching image fields, etc.
+    Object.keys(oldData || {}).forEach(function (k) {
+      if (k === '_orphans') return;
+      if (!newKeySet[k]) return;
+      if (!hasValue(oldData[k])) return;
+      newData[k] = oldData[k];
+      consumed[k] = true;
+    });
+    // Also carry-over any *Bg companion for a key we just moved.
+    Object.keys(oldData || {}).forEach(function (k) {
+      if (!/Bg$/.test(k)) return;
+      var base = k.slice(0, -2);
+      if (newKeySet[base] && hasValue(oldData[k])) {
+        newData[k] = oldData[k];
+        consumed[k] = true;
+      }
+    });
+
+    // Pass 2: role-based match for new fields that didn't get same-name values.
+    newFields.forEach(function (nf) {
+      if (!nf.role) return;
+      if (hasValue(newData[nf.key])) return; // already filled by pass 1
+      var candidates = oldRoleMap[nf.role] || [];
+      for (var i = 0; i < candidates.length; i++) {
+        var oldKey = candidates[i];
+        if (consumed[oldKey]) continue;
+        if (!hasValue(oldData[oldKey])) continue;
+        newData[nf.key] = oldData[oldKey];
+        consumed[oldKey] = true;
+        // If the old key had a *Bg companion and the new key doesn't
+        // already have one, carry it under the new name.
+        var companion = oldData[oldKey + 'Bg'];
+        if (companion && !newData[nf.key + 'Bg']) {
+          newData[nf.key + 'Bg'] = companion;
+          consumed[oldKey + 'Bg'] = true;
+        }
+        break;
+      }
+    });
+
+    // Pass 3: build the new orphan payload.
+    var orphans = {};
+    // Existing orphans from prior template swaps carry forward.
+    var existingOrphans = (oldData && oldData._orphans) || {};
+    Object.keys(existingOrphans).forEach(function (tplId) {
+      orphans[tplId] = {};
+      Object.keys(existingOrphans[tplId]).forEach(function (k) {
+        orphans[tplId][k] = existingOrphans[tplId][k];
+      });
+    });
+    // New orphans: anything in oldData not consumed and not already an orphan key.
+    if (oldTemplateId && oldTemplateId !== newTemplateId) {
+      orphans[oldTemplateId] = orphans[oldTemplateId] || {};
+      Object.keys(oldData || {}).forEach(function (k) {
+        if (k === '_orphans') return;
+        if (consumed[k]) return;
+        if (!hasValue(oldData[k])) return;
+        orphans[oldTemplateId][k] = oldData[k];
+      });
+    }
+
+    // Pass 4: restore orphans from a previous visit to newTemplateId.
+    if (orphans[newTemplateId]) {
+      var restorable = orphans[newTemplateId];
+      Object.keys(restorable).forEach(function (k) {
+        if (!hasValue(newData[k])) {
+          newData[k] = restorable[k];
+        }
+      });
+      // After restoring, clear this template's orphans — they're now live
+      // values again, not in stasis.
+      delete orphans[newTemplateId];
+    }
+
+    // Attach orphans (if any survive).
+    var hasAnyOrphans = Object.keys(orphans).some(function (tplId) {
+      return Object.keys(orphans[tplId] || {}).length > 0;
+    });
+    if (hasAnyOrphans) {
+      newData._orphans = orphans;
+    }
+
+    return newData;
   };
 
   /**
