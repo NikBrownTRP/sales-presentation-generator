@@ -127,7 +127,9 @@
 
     var scaleX = vpW / SLIDE_W;
     var scaleY = vpH / SLIDE_H;
-    var scale = Math.min(scaleX, scaleY, 1.5); // Allow slight upscale
+    // No upper cap: on large monitors the slide now fills the available
+    // viewport instead of being capped at 1.5x and leaving a huge black border.
+    var scale = Math.min(scaleX, scaleY);
 
     var slideEls = stage.querySelectorAll('.slideshow-modal__slide');
     slideEls.forEach(function (el) {
