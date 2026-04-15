@@ -11,7 +11,18 @@
 
   function renderSlideLogo(data) {
     if (!data.logo) return '';
-    return '<img class="pres-slide-logo" src="' + data.logo + '" alt="">';
+    return '<img class="pres-slide-logo" src="' + data.logo + '" alt=""' + bgStyle(data, 'logo') + '>';
+  }
+
+  // Returns a style string for the image-container background color if the user
+  // picked one in the editor. The editor saves this as "{fieldKey}Bg".
+  // Usage: <div class="pres-..."' + bgStyle(data, 'productImage') + '>
+  function bgStyle(data, fieldKey) {
+    var c = data && data[fieldKey + 'Bg'];
+    if (!c) return '';
+    // Sanitize: only allow hex colors to avoid CSS injection via user input
+    if (!/^#[0-9a-fA-F]{3,8}$/.test(c)) return '';
+    return ' style="background-color:' + c + '"';
   }
 
   /* -----------------------------------------------------------------------
@@ -181,9 +192,9 @@
       },
 
       render: function (data) {
-        var bgStyle = '';
+        var bgImgStyle = '';
         if (data.backgroundImage) {
-          bgStyle = 'background-image: url(' + data.backgroundImage + ')';
+          bgImgStyle = 'background-image: url(' + data.backgroundImage + ')';
         }
         var overlayOpacity = data.overlayOpacity || '0.7';
 
@@ -191,7 +202,7 @@
 
         // Background
         if (data.backgroundImage) {
-          html += '<div class="pres-slide__bg" style="' + bgStyle + '"></div>';
+          html += '<div class="pres-slide__bg" style="' + bgImgStyle + '"></div>';
           html += '<div class="pres-slide__overlay" style="opacity: ' + overlayOpacity + '"></div>';
         }
 
@@ -203,7 +214,7 @@
         html += '<div class="pres-slide__content">';
 
         if (data.logo) {
-          html += '<img class="pres-logo" src="' + data.logo + '" alt="">';
+          html += '<img class="pres-logo" src="' + data.logo + '" alt=""' + bgStyle(data, 'logo') + '>';
         }
 
         html += '<h1 class="pres-title">' + escapeHtml(data.title || 'Presentation Title') + '</h1>';
@@ -281,7 +292,7 @@
         html += '<div class="pres-divider"></div>';
 
         // Right: product image
-        html += '<div class="pres-product-image-area">';
+        html += '<div class="pres-product-image-area"' + bgStyle(data, 'productImage') + '>';
 
         if (data.badgeText) {
           html += '<span class="pres-badge">' + escapeHtml(data.badgeText) + '</span>';
@@ -369,7 +380,7 @@
         html += '</div>'; // spec-left
 
         // Right: Product image
-        html += '<div class="pres-spec-right">';
+        html += '<div class="pres-spec-right"' + bgStyle(data, 'productImage') + '>';
         if (data.productImage) {
           html += '<img class="pres-spec-product-img" src="' + data.productImage + '" alt="' + escapeHtml(data.productName || '') + '">';
         } else {
@@ -464,7 +475,7 @@
           }
           html += '</div>';
 
-          html += '<div class="pres-generic-image-area">';
+          html += '<div class="pres-generic-image-area"' + bgStyle(data, 'image') + '>';
           if (data.image) {
             html += '<img class="pres-generic-img" src="' + data.image + '" alt="">';
           } else {
@@ -543,7 +554,7 @@
         for (var i = 0; i < count; i++) {
           var img = images[i];
           html += '<div class="pres-gallery-item">';
-          html += '<div class="pres-gallery-image-wrap">';
+          html += '<div class="pres-gallery-image-wrap"' + bgStyle(data, 'image' + (i + 1)) + '>';
           if (img.src) {
             html += '<img class="pres-gallery-img" src="' + img.src + '" alt="">';
           } else {
@@ -622,7 +633,7 @@
         if (mode === 'image') {
           // Centered image mode
           if (data.chartImage) {
-            html += '<div class="pres-graph-image-wrap">';
+            html += '<div class="pres-graph-image-wrap"' + bgStyle(data, 'chartImage') + '>';
             html += '<img class="pres-graph-img" src="' + data.chartImage + '" alt="">';
             html += '</div>';
           } else {

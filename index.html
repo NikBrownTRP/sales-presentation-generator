@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/builder.css?v=12">
-  <link rel="stylesheet" href="css/slides.css?v=12">
+  <link rel="stylesheet" href="css/builder.css?v=15">
+  <link rel="stylesheet" href="css/slides.css?v=15">
 
   <!-- Slides CSS embedded as JS string for reliable export (works on file:// URLs) -->
   <script id="slides-css-data">
@@ -223,7 +223,20 @@
             <div class="image-editor__zoom-value" id="img-zoom-value">fit</div>
           </div>
           <div class="image-editor__section">
-            <button class="image-editor__btn image-editor__btn--reset" id="img-reset">Reset</button>
+            <label class="image-editor__label">Background</label>
+            <div class="image-editor__bg-row">
+              <input type="color" class="image-editor__color-input" id="img-bg-color" value="#000000" title="Choose background color">
+              <button class="image-editor__btn" id="img-bg-pick" title="Pick color from image (click the image after pressing this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.09 3.36L16 6.27l-2.5 2.43.59 3.43L12 10.77 9.91 12.13l.59-3.43L8 6.27l2.91-.91L12 2z"/><path d="M12 14v8"/></svg>
+              </button>
+              <button class="image-editor__btn" id="img-bg-reset" title="Clear background (use slide default)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg>
+              </button>
+            </div>
+            <div class="image-editor__zoom-value" id="img-bg-status">default</div>
+          </div>
+          <div class="image-editor__section">
+            <button class="image-editor__btn image-editor__btn--reset" id="img-reset">Reset All</button>
           </div>
           <div class="image-editor__spacer"></div>
           <div class="image-editor__actions">
@@ -443,9 +456,9 @@
   </script>
 
   <!-- App modules -->
-  <script src="js/templates.js?v=12" defer></script>
-  <script src="js/preview.js?v=12" defer></script>
-  <script src="js/exporter.js?v=12" defer></script>
-  <script src="js/controller.js?v=12" defer></script>
+  <script src="js/templates.js?v=15" defer></script>
+  <script src="js/preview.js?v=15" defer></script>
+  <script src="js/exporter.js?v=15" defer></script>
+  <script src="js/controller.js?v=15" defer></script>
 </body>
 </html>

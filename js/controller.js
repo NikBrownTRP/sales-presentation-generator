@@ -734,6 +734,8 @@
     minZoom: 0.1,          // smallest allowed zoom (image can shrink below fit for padding)
     maxZoom: 4,            // how far user can zoom in
     pan: { x: 0, y: 0 },    // offset from centered, in OUTPUT coordinates
+    bgColor: null,          // null = use slide theme default; else hex "#RRGGBB"
+    pickingColor: false,    // true while user is in eyedropper mode
     dragging: false,
     dragStart: null,       // {mouseX, mouseY, panX, panY} at mousedown
     canvas: null,
@@ -840,10 +842,23 @@
     imgEditor.rotation = 0;
     imgEditor.ratio = getFieldDisplayRatio(fieldKey);
     imgEditor.dragging = false;
+    imgEditor.pickingColor = false;
+    // Load previously-saved bg color (if any) so the user sees their previous choice
+    imgEditor.bgColor = slide.data[fieldKey + 'Bg'] || null;
 
     // Update ratio label
     var infoEl = document.getElementById('img-ratio-info');
     if (infoEl) infoEl.textContent = formatRatio(imgEditor.ratio);
+
+    // Sync the color input + status label
+    var colorInput = document.getElementById('img-bg-color');
+    var bgStatus = document.getElementById('img-bg-status');
+    var themeBg = getEditorBackgroundColor(slideId);
+    if (colorInput) colorInput.value = imgEditor.bgColor || themeBg;
+    if (bgStatus) bgStatus.textContent = imgEditor.bgColor ? imgEditor.bgColor : 'default';
+    // Make sure eyedropper button is not stuck in active state
+    var pickBtn = document.getElementById('img-bg-pick');
+    if (pickBtn) pickBtn.classList.remove('image-editor__btn--picking');
 
     var modal = document.getElementById('modal-image-edit');
     imgEditor.canvas = document.getElementById('image-editor-canvas');
@@ -959,9 +974,9 @@
     var img = imgEditor.img;
     var ds = imgEditor.displayScale;
 
-    // Background fill represents what the slide will show around the image
-    // (e.g. black for TRP dark, white for Tektro light).
-    ctx.fillStyle = getEditorBackgroundColor(imgEditor.slideId);
+    // Background fill: user-picked color if set, else slide theme default.
+    // This represents the "letterbox"/padding area on the slide container.
+    ctx.fillStyle = imgEditor.bgColor || getEditorBackgroundColor(imgEditor.slideId);
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw the image at zoom + pan (centered + offset)
@@ -1003,6 +1018,27 @@
     newCanvas.style.cursor = 'grab';
 
     newCanvas.addEventListener('mousedown', function (e) {
+      // Eyedropper mode: sample the pixel under the cursor and use it as bg
+      if (imgEditor.pickingColor) {
+        var rect = newCanvas.getBoundingClientRect();
+        var x = Math.round(e.clientX - rect.left);
+        var y = Math.round(e.clientY - rect.top);
+        try {
+          var data = imgEditor.ctx.getImageData(x, y, 1, 1).data;
+          var hex = '#' + [data[0], data[1], data[2]].map(function (c) {
+            var s = c.toString(16); return s.length < 2 ? '0' + s : s;
+          }).join('');
+          setBgColor(hex);
+        } catch (err) {
+          console.error('Color sample failed:', err);
+        }
+        // Exit picking mode after one sample
+        imgEditor.pickingColor = false;
+        if (bgPickBtn) bgPickBtn.classList.remove('image-editor__btn--picking');
+        newCanvas.style.cursor = 'grab';
+        return;
+      }
+
       imgEditor.dragging = true;
       imgEditor.dragStart = {
         mouseX: e.clientX, mouseY: e.clientY,
@@ -1066,7 +1102,34 @@
       drawEditorCanvas();
     };
 
-    // Reset
+    // Background color controls
+    var bgColorInput = document.getElementById('img-bg-color');
+    var bgStatusEl = document.getElementById('img-bg-status');
+    var bgPickBtn = document.getElementById('img-bg-pick');
+    var bgResetBtn = document.getElementById('img-bg-reset');
+
+    function setBgColor(color) {
+      imgEditor.bgColor = color;
+      if (bgColorInput) bgColorInput.value = color || getEditorBackgroundColor(imgEditor.slideId);
+      if (bgStatusEl) bgStatusEl.textContent = color ? color.toUpperCase() : 'default';
+      drawEditorCanvas();
+    }
+
+    if (bgColorInput) {
+      bgColorInput.oninput = function (e) { setBgColor(e.target.value); };
+    }
+    if (bgResetBtn) {
+      bgResetBtn.onclick = function () { setBgColor(null); };
+    }
+    if (bgPickBtn) {
+      bgPickBtn.onclick = function () {
+        imgEditor.pickingColor = !imgEditor.pickingColor;
+        bgPickBtn.classList.toggle('image-editor__btn--picking', imgEditor.pickingColor);
+        newCanvas.style.cursor = imgEditor.pickingColor ? 'crosshair' : 'grab';
+      };
+    }
+
+    // Reset (rotation + pan + zoom; keeps bg color)
     document.getElementById('img-reset').onclick = function () {
       imgEditor.rotation = 0;
       setupEditorCanvas();
@@ -1105,9 +1168,17 @@
     out.height = imgEditor.outputH;
     var outCtx = out.getContext('2d');
 
-    // Fill background (matches slide theme) — for JPEG. For PNG, we leave transparent.
+    // Fill background:
+    //   - If user picked a specific bg color, bake it in (even for PNG, since the
+    //     user explicitly wanted this color). This guarantees the on-slide look
+    //     matches the preview regardless of container CSS.
+    //   - Else for JPEG, fill with the slide theme bg (JPEG can't do transparent).
+    //   - Else PNG stays transparent.
     var isPng = imgEditor.originalSrc.indexOf('data:image/png') === 0;
-    if (!isPng) {
+    if (imgEditor.bgColor) {
+      outCtx.fillStyle = imgEditor.bgColor;
+      outCtx.fillRect(0, 0, out.width, out.height);
+    } else if (!isPng) {
       outCtx.fillStyle = getEditorBackgroundColor(imgEditor.slideId);
       outCtx.fillRect(0, 0, out.width, out.height);
     }
@@ -1132,6 +1203,9 @@
 
     var dataUrl = isPng ? out.toDataURL('image/png') : out.toDataURL('image/jpeg', 0.92);
     updateSlideData(imgEditor.slideId, imgEditor.fieldKey, dataUrl);
+    // Persist the chosen bg color so (a) re-opening the editor shows the previous
+    // choice and (b) the slide template can paint the container background too.
+    updateSlideData(imgEditor.slideId, imgEditor.fieldKey + 'Bg', imgEditor.bgColor || '');
     renderEditor();
     debouncedThumbnailUpdate();
     closeModal(document.getElementById('modal-image-edit'));

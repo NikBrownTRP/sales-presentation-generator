@@ -1585,6 +1585,46 @@ body.builder-body {
   margin-top: 2px;
 }
 
+.image-editor__bg-row {
+  display: flex;
+  gap: 4px;
+  align-items: stretch;
+}
+
+.image-editor__color-input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 2px;
+  background: var(--builder-surface-alt);
+  border: 1px solid var(--builder-border);
+  border-radius: var(--builder-radius-sm);
+  cursor: pointer;
+}
+
+.image-editor__color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.image-editor__color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 2px;
+}
+.image-editor__color-input::-moz-color-swatch {
+  border: none;
+  border-radius: 2px;
+}
+
+.image-editor__bg-row .image-editor__btn {
+  flex: 0 0 34px;
+  padding: 6px;
+}
+
+.image-editor__btn--picking {
+  border-color: var(--builder-accent) !important;
+  background: rgba(227, 24, 55, 0.15) !important;
+  color: var(--builder-accent) !important;
+}
+
 .image-editor__spacer {
   flex: 1;
 }
