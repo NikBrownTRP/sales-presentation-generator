@@ -746,10 +746,41 @@ body.builder-body {
   display: flex;
   align-items: center;
   gap: 6px;
+  border-radius: var(--builder-radius-sm);
+  transition: opacity 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .form-list__item .form-input {
   flex: 1;
+}
+
+/* Drag handle on the left of each list item */
+.form-list__drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  flex-shrink: 0;
+  color: var(--builder-text-muted);
+  cursor: grab;
+  opacity: 0.5;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.form-list__item:hover .form-list__drag-handle {
+  opacity: 1;
+  color: var(--builder-text-secondary);
+}
+.form-list__drag-handle:active {
+  cursor: grabbing;
+}
+
+.form-list__item--dragging {
+  opacity: 0.4;
+}
+
+.form-list__item--drag-over {
+  background: var(--builder-surface-alt);
+  box-shadow: inset 0 2px 0 var(--builder-accent);
 }
 
 .form-list__remove {

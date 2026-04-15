@@ -475,6 +475,10 @@
     if (value) {
       html += '<div class="form-image-upload__preview">';
       html += '<img src="' + value + '" alt="">';
+      html += '<div class="form-image-upload__edit-overlay">';
+      html += '<button type="button" class="form-image-upload__edit-btn" data-edit-key="' + field.key + '">Edit</button>';
+      html += '<button type="button" class="form-image-upload__edit-btn" data-replace-key="' + field.key + '">Replace</button>';
+      html += '</div>';
       html += '<button type="button" class="form-image-upload__remove" data-key="' + field.key + '" title="Remove image">&times;</button>';
       html += '</div>';
     } else {
@@ -555,9 +559,10 @@
 
       zone.addEventListener('click', function (e) {
         if (e.target.closest('.form-image-upload__remove')) return;
-        if (e.target.closest('.form-image-upload__preview') && !e.target.closest('.form-image-upload__remove')) {
-          // Clicking on existing preview also opens file picker
-        }
+        if (e.target.closest('[data-edit-key]')) return; // handled separately
+        if (e.target.closest('[data-replace-key]')) return; // handled separately
+        if (e.target.closest('.form-image-upload__edit-overlay')) return;
+        if (e.target.closest('.form-image-upload__preview')) return; // don't open file picker on preview click
         triggerImageUpload(slide.id, fieldKey);
       });
 
@@ -585,6 +590,22 @@
         updateSlideData(slide.id, btn.dataset.key, '');
         renderEditor();
         debouncedThumbnailUpdate();
+      });
+    });
+
+    // Image edit buttons (open crop/rotate editor)
+    dom.editorForm.querySelectorAll('[data-edit-key]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openImageEditor(slide.id, btn.dataset.editKey);
+      });
+    });
+
+    // Image replace buttons (open file picker for new image)
+    dom.editorForm.querySelectorAll('[data-replace-key]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        triggerImageUpload(slide.id, btn.dataset.replaceKey);
       });
     });
 
@@ -691,6 +712,358 @@
       });
     };
     reader.readAsDataURL(file);
+  }
+
+  /* -----------------------------------------------------------------------
+     Image Editor (Crop & Rotate)
+     ----------------------------------------------------------------------- */
+  var imgEditor = {
+    slideId: null,
+    fieldKey: null,
+    originalSrc: '',
+    img: null,
+    rotation: 0,        // 0, 90, 180, 270
+    ratio: 'free',      // free, 16:9, 4:3, 1:1
+    crop: null,          // { x, y, w, h } in image-space coordinates
+    dragging: false,
+    dragStart: null,
+    canvas: null,
+    ctx: null,
+    scale: 1,            // display scale (image pixels → canvas pixels)
+    offsetX: 0,
+    offsetY: 0,
+    displayW: 0,
+    displayH: 0
+  };
+
+  function openImageEditor(slideId, fieldKey) {
+    var slide = state.slides.find(function (s) { return s.id === slideId; });
+    if (!slide || !slide.data[fieldKey]) return;
+
+    imgEditor.slideId = slideId;
+    imgEditor.fieldKey = fieldKey;
+    imgEditor.originalSrc = slide.data[fieldKey];
+    imgEditor.rotation = 0;
+    imgEditor.ratio = 'free';
+    imgEditor.crop = null;
+    imgEditor.dragging = false;
+
+    var modal = document.getElementById('modal-image-edit');
+    imgEditor.canvas = document.getElementById('image-editor-canvas');
+    imgEditor.ctx = imgEditor.canvas.getContext('2d');
+
+    // Load the image
+    imgEditor.img = new Image();
+    imgEditor.img.onload = function () {
+      setupEditorCanvas();
+      drawEditorCanvas();
+      openModal(modal);
+      bindImageEditorEvents();
+    };
+    imgEditor.img.src = imgEditor.originalSrc;
+
+    // Set active ratio button
+    document.querySelectorAll('.image-editor__ratio-btn').forEach(function (b) {
+      b.classList.toggle('image-editor__ratio-btn--active', b.dataset.ratio === 'free');
+    });
+  }
+
+  function getRotatedDimensions() {
+    var w = imgEditor.img.naturalWidth;
+    var h = imgEditor.img.naturalHeight;
+    if (imgEditor.rotation === 90 || imgEditor.rotation === 270) {
+      return { w: h, h: w };
+    }
+    return { w: w, h: h };
+  }
+
+  function setupEditorCanvas() {
+    var area = imgEditor.canvas.parentElement;
+    var areaW = area.clientWidth - 20;
+    var areaH = area.clientHeight - 20;
+
+    var dims = getRotatedDimensions();
+    var scale = Math.min(areaW / dims.w, areaH / dims.h, 1);
+    imgEditor.scale = scale;
+    imgEditor.displayW = Math.round(dims.w * scale);
+    imgEditor.displayH = Math.round(dims.h * scale);
+
+    imgEditor.canvas.width = imgEditor.displayW;
+    imgEditor.canvas.height = imgEditor.displayH;
+
+    imgEditor.offsetX = 0;
+    imgEditor.offsetY = 0;
+
+    // Reset crop to full image
+    imgEditor.crop = { x: 0, y: 0, w: dims.w, h: dims.h };
+  }
+
+  function drawEditorCanvas() {
+    var ctx = imgEditor.ctx;
+    var canvas = imgEditor.canvas;
+    var img = imgEditor.img;
+    var dims = getRotatedDimensions();
+    var s = imgEditor.scale;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw rotated image
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(imgEditor.rotation * Math.PI / 180);
+
+    var drawW, drawH;
+    if (imgEditor.rotation === 90 || imgEditor.rotation === 270) {
+      drawW = imgEditor.displayH;
+      drawH = imgEditor.displayW;
+    } else {
+      drawW = imgEditor.displayW;
+      drawH = imgEditor.displayH;
+    }
+    ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+    ctx.restore();
+
+    // Draw crop overlay (darken outside crop area)
+    if (imgEditor.crop) {
+      var cx = imgEditor.crop.x * s;
+      var cy = imgEditor.crop.y * s;
+      var cw = imgEditor.crop.w * s;
+      var ch = imgEditor.crop.h * s;
+
+      // Only draw overlay if crop differs from full image
+      if (Math.round(cw) < canvas.width - 2 || Math.round(ch) < canvas.height - 2) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+        // Top
+        ctx.fillRect(0, 0, canvas.width, cy);
+        // Bottom
+        ctx.fillRect(0, cy + ch, canvas.width, canvas.height - cy - ch);
+        // Left
+        ctx.fillRect(0, cy, cx, ch);
+        // Right
+        ctx.fillRect(cx + cw, cy, canvas.width - cx - cw, ch);
+
+        // Crop border
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(cx, cy, cw, ch);
+
+        // Rule of thirds lines
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 0.5;
+        for (var i = 1; i <= 2; i++) {
+          ctx.beginPath();
+          ctx.moveTo(cx + (cw * i / 3), cy);
+          ctx.lineTo(cx + (cw * i / 3), cy + ch);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx, cy + (ch * i / 3));
+          ctx.lineTo(cx + cw, cy + (ch * i / 3));
+          ctx.stroke();
+        }
+
+        // Corner handles
+        var hs = 8;
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2.5;
+        // Top-left
+        ctx.beginPath(); ctx.moveTo(cx, cy + hs); ctx.lineTo(cx, cy); ctx.lineTo(cx + hs, cy); ctx.stroke();
+        // Top-right
+        ctx.beginPath(); ctx.moveTo(cx + cw - hs, cy); ctx.lineTo(cx + cw, cy); ctx.lineTo(cx + cw, cy + hs); ctx.stroke();
+        // Bottom-left
+        ctx.beginPath(); ctx.moveTo(cx, cy + ch - hs); ctx.lineTo(cx, cy + ch); ctx.lineTo(cx + hs, cy + ch); ctx.stroke();
+        // Bottom-right
+        ctx.beginPath(); ctx.moveTo(cx + cw - hs, cy + ch); ctx.lineTo(cx + cw, cy + ch); ctx.lineTo(cx + cw, cy + ch - hs); ctx.stroke();
+      }
+    }
+  }
+
+  function constrainCropToRatio(startX, startY, endX, endY) {
+    var x = Math.min(startX, endX);
+    var y = Math.min(startY, endY);
+    var w = Math.abs(endX - startX);
+    var h = Math.abs(endY - startY);
+
+    if (imgEditor.ratio !== 'free') {
+      var parts = imgEditor.ratio.split(':');
+      var ratioW = parseInt(parts[0]);
+      var ratioH = parseInt(parts[1]);
+      var targetRatio = ratioW / ratioH;
+
+      if (w / h > targetRatio) {
+        w = h * targetRatio;
+      } else {
+        h = w / targetRatio;
+      }
+    }
+
+    // Clamp to image bounds
+    var dims = getRotatedDimensions();
+    x = Math.max(0, Math.min(x, dims.w - w));
+    y = Math.max(0, Math.min(y, dims.h - h));
+    w = Math.min(w, dims.w - x);
+    h = Math.min(h, dims.h - y);
+
+    return { x: x, y: y, w: w, h: h };
+  }
+
+  function canvasToImageCoords(canvasX, canvasY) {
+    return {
+      x: canvasX / imgEditor.scale,
+      y: canvasY / imgEditor.scale
+    };
+  }
+
+  function bindImageEditorEvents() {
+    var canvas = imgEditor.canvas;
+
+    // Remove old listeners by replacing canvas
+    var newCanvas = canvas.cloneNode(false);
+    canvas.parentNode.replaceChild(newCanvas, canvas);
+    imgEditor.canvas = newCanvas;
+    imgEditor.ctx = newCanvas.getContext('2d');
+    drawEditorCanvas();
+
+    newCanvas.addEventListener('mousedown', function (e) {
+      var rect = newCanvas.getBoundingClientRect();
+      var coords = canvasToImageCoords(e.clientX - rect.left, e.clientY - rect.top);
+      imgEditor.dragging = true;
+      imgEditor.dragStart = coords;
+    });
+
+    newCanvas.addEventListener('mousemove', function (e) {
+      if (!imgEditor.dragging) return;
+      var rect = newCanvas.getBoundingClientRect();
+      var coords = canvasToImageCoords(e.clientX - rect.left, e.clientY - rect.top);
+      imgEditor.crop = constrainCropToRatio(imgEditor.dragStart.x, imgEditor.dragStart.y, coords.x, coords.y);
+      drawEditorCanvas();
+    });
+
+    newCanvas.addEventListener('mouseup', function () {
+      imgEditor.dragging = false;
+      // If crop is too small, reset to full
+      if (imgEditor.crop && (imgEditor.crop.w < 10 || imgEditor.crop.h < 10)) {
+        var dims = getRotatedDimensions();
+        imgEditor.crop = { x: 0, y: 0, w: dims.w, h: dims.h };
+        drawEditorCanvas();
+      }
+    });
+
+    newCanvas.addEventListener('mouseleave', function () {
+      if (imgEditor.dragging) {
+        imgEditor.dragging = false;
+      }
+    });
+
+    // Rotate buttons
+    document.getElementById('img-rotate-left').onclick = function () {
+      imgEditor.rotation = (imgEditor.rotation + 270) % 360;
+      setupEditorCanvas();
+      drawEditorCanvas();
+    };
+    document.getElementById('img-rotate-right').onclick = function () {
+      imgEditor.rotation = (imgEditor.rotation + 90) % 360;
+      setupEditorCanvas();
+      drawEditorCanvas();
+    };
+
+    // Ratio buttons
+    document.querySelectorAll('.image-editor__ratio-btn').forEach(function (btn) {
+      btn.onclick = function () {
+        imgEditor.ratio = btn.dataset.ratio;
+        document.querySelectorAll('.image-editor__ratio-btn').forEach(function (b) {
+          b.classList.toggle('image-editor__ratio-btn--active', b.dataset.ratio === imgEditor.ratio);
+        });
+        // Reset crop
+        var dims = getRotatedDimensions();
+        imgEditor.crop = { x: 0, y: 0, w: dims.w, h: dims.h };
+        drawEditorCanvas();
+      };
+    });
+
+    // Reset
+    document.getElementById('img-reset').onclick = function () {
+      imgEditor.rotation = 0;
+      imgEditor.ratio = 'free';
+      document.querySelectorAll('.image-editor__ratio-btn').forEach(function (b) {
+        b.classList.toggle('image-editor__ratio-btn--active', b.dataset.ratio === 'free');
+      });
+      setupEditorCanvas();
+      drawEditorCanvas();
+    };
+
+    // Cancel
+    document.getElementById('img-cancel').onclick = function () {
+      closeModal(document.getElementById('modal-image-edit'));
+    };
+
+    // Apply
+    document.getElementById('img-apply').onclick = function () {
+      applyImageEdit();
+    };
+  }
+
+  function applyImageEdit() {
+    var img = imgEditor.img;
+    var crop = imgEditor.crop;
+    var rotation = imgEditor.rotation;
+    var dims = getRotatedDimensions();
+
+    // If no changes, just close
+    if (rotation === 0 && crop.x === 0 && crop.y === 0 && Math.abs(crop.w - dims.w) < 2 && Math.abs(crop.h - dims.h) < 2) {
+      closeModal(document.getElementById('modal-image-edit'));
+      return;
+    }
+
+    // Create output canvas at crop dimensions
+    var outW = Math.round(crop.w);
+    var outH = Math.round(crop.h);
+    var out = document.createElement('canvas');
+    out.width = outW;
+    out.height = outH;
+    var outCtx = out.getContext('2d');
+
+    // Draw rotated image, offset by crop position
+    outCtx.save();
+    outCtx.translate(outW / 2, outH / 2);
+
+    // We need to figure out where the crop maps to in the original (unrotated) image
+    // The crop coordinates are in rotated-image space
+    // We need to reverse-transform them to original image space
+    var origW = img.naturalWidth;
+    var origH = img.naturalHeight;
+
+    outCtx.rotate(rotation * Math.PI / 180);
+
+    var sx, sy;
+    if (rotation === 0) {
+      sx = -crop.x - crop.w / 2;
+      sy = -crop.y - crop.h / 2;
+      outCtx.drawImage(img, sx, sy);
+    } else if (rotation === 90) {
+      sx = crop.y - origH / 2 + crop.h / 2;
+      sy = -crop.x - crop.w / 2;
+      outCtx.drawImage(img, sx, sy);
+    } else if (rotation === 180) {
+      sx = crop.x - origW / 2 + crop.w / 2;
+      sy = crop.y - origH / 2 + crop.h / 2;
+      outCtx.drawImage(img, -sx - origW, -sy - origH);
+    } else if (rotation === 270) {
+      sx = -crop.y - crop.h / 2;
+      sy = crop.x - origW / 2 + crop.w / 2;
+      outCtx.drawImage(img, sx, sy);
+    }
+
+    outCtx.restore();
+
+    // Export as PNG if original was PNG, else JPEG
+    var isPng = imgEditor.originalSrc.indexOf('data:image/png') === 0;
+    var dataUrl = isPng ? out.toDataURL('image/png') : out.toDataURL('image/jpeg', 0.92);
+
+    // Save to slide data
+    updateSlideData(imgEditor.slideId, imgEditor.fieldKey, dataUrl);
+    renderEditor();
+    debouncedThumbnailUpdate();
+    closeModal(document.getElementById('modal-image-edit'));
   }
 
   /* -----------------------------------------------------------------------

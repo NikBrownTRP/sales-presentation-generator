@@ -355,6 +355,74 @@
     }
   }
 
+  // Drag-and-drop reordering for list-type form fields (Selling Points,
+  // Items, Features, Notes, etc.). Each item has data-list-row-key and
+  // data-list-row-index attributes. We move within the same list only.
+  function setupListDragDrop(slide) {
+    var rows = dom.editorForm.querySelectorAll('[data-list-row-key]');
+    var dragState = null; // { key, fromIdx }
+
+    rows.forEach(function (row) {
+      row.addEventListener('dragstart', function (e) {
+        // Only initiate drag from the handle (or if user pressed before clicking input)
+        // Browsers fire dragstart on the draggable element regardless of where they grabbed.
+        // We allow it broadly but skip if the target is the input being interacted with.
+        if (e.target.tagName === 'INPUT') {
+          // Don't start dragging when the user is selecting text inside the input
+          e.preventDefault();
+          return;
+        }
+        dragState = {
+          key: row.dataset.listRowKey,
+          fromIdx: parseInt(row.dataset.listRowIndex, 10)
+        };
+        row.classList.add('form-list__item--dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', dragState.key + ':' + dragState.fromIdx); } catch (err) {}
+      });
+
+      row.addEventListener('dragend', function () {
+        row.classList.remove('form-list__item--dragging');
+        clearListDragOver();
+        dragState = null;
+      });
+
+      row.addEventListener('dragover', function (e) {
+        if (!dragState || dragState.key !== row.dataset.listRowKey) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        clearListDragOver();
+        row.classList.add('form-list__item--drag-over');
+      });
+
+      row.addEventListener('dragleave', function () {
+        row.classList.remove('form-list__item--drag-over');
+      });
+
+      row.addEventListener('drop', function (e) {
+        if (!dragState || dragState.key !== row.dataset.listRowKey) return;
+        e.preventDefault();
+        clearListDragOver();
+        var toIdx = parseInt(row.dataset.listRowIndex, 10);
+        if (dragState.fromIdx === toIdx) { dragState = null; return; }
+
+        var key = dragState.key;
+        var items = (slide.data[key] || []).slice();
+        var moved = items.splice(dragState.fromIdx, 1)[0];
+        items.splice(toIdx, 0, moved);
+        updateSlideData(slide.id, key, items);
+        dragState = null;
+        renderEditor();
+      });
+    });
+
+    function clearListDragOver() {
+      dom.editorForm.querySelectorAll('.form-list__item--drag-over').forEach(function (el) {
+        el.classList.remove('form-list__item--drag-over');
+      });
+    }
+  }
+
   /* -----------------------------------------------------------------------
      Render: Editor form
      ----------------------------------------------------------------------- */
@@ -496,7 +564,11 @@
     var html = '<div class="form-list" data-key="' + field.key + '">';
 
     items.forEach(function (item, i) {
-      html += '<div class="form-list__item">';
+      html += '<div class="form-list__item" draggable="true" data-list-row-key="' + field.key + '" data-list-row-index="' + i + '">';
+      // Drag handle (also serves as drag affordance — input itself isn't draggable to allow text selection)
+      html += '<span class="form-list__drag-handle" title="Drag to reorder">';
+      html += '<svg width="10" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="4" r="2"/><circle cx="16" cy="4" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="20" r="2"/><circle cx="16" cy="20" r="2"/></svg>';
+      html += '</span>';
       html += '<input type="text" class="form-input" data-list-key="' + field.key + '" data-list-index="' + i + '" value="' + escAttr(item || '') + '" placeholder="' + escAttr(field.placeholder || '') + '">';
       html += '<button type="button" class="form-list__remove" data-list-remove="' + field.key + '" data-list-index="' + i + '" title="Remove">';
       html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
@@ -642,6 +714,9 @@
         renderEditor();
       });
     });
+
+    // List drag-and-drop reordering
+    setupListDragDrop(slide);
 
     // Key-value inputs
     dom.editorForm.querySelectorAll('[data-kv-key]').forEach(function (el) {
