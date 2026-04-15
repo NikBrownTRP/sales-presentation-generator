@@ -1525,6 +1525,26 @@ body.builder-body {
   background: rgba(227, 24, 55, 0.08);
 }
 
+.image-editor__ratio-info {
+  padding: 8px 10px;
+  background: var(--builder-surface-alt);
+  border: 1px solid var(--builder-border);
+  border-radius: var(--builder-radius-sm);
+  color: var(--builder-accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.image-editor__ratio-hint {
+  font-size: 10px;
+  color: var(--builder-text-muted);
+  text-align: center;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
 .image-editor__spacer {
   flex: 1;
 }

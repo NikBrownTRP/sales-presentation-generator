@@ -723,10 +723,12 @@
     originalSrc: '',
     img: null,
     rotation: 0,        // 0, 90, 180, 270
-    ratio: 'free',      // free, 16:9, 4:3, 1:1
+    ratio: 1,            // numeric target aspect ratio (width/height), derived from slide container
     crop: null,          // { x, y, w, h } in image-space coordinates
     dragging: false,
     dragStart: null,
+    dragMode: 'draw',    // 'draw' (new crop from empty area) or 'move' (existing crop)
+    moveOffset: null,    // {dx, dy} for move mode
     canvas: null,
     ctx: null,
     scale: 1,            // display scale (image pixels → canvas pixels)
@@ -736,6 +738,90 @@
     displayH: 0
   };
 
+  // Selectors for the container that constrains each image field on the slide.
+  // Used to determine the WYSIWYG crop aspect ratio. The crop ratio always
+  // matches the on-slide container so the cropped image fills exactly.
+  var FIELD_CONTAINER_SELECTOR = {
+    logo: '.pres-logo, .pres-slide-logo',
+    productImage: '.pres-product-image-area, .pres-spec-right',
+    image: '.pres-generic-image-area',
+    chartImage: '.pres-graph-image-wrap',
+    image1: '.pres-gallery-item:nth-child(1) .pres-gallery-image-wrap',
+    image2: '.pres-gallery-item:nth-child(2) .pres-gallery-image-wrap',
+    image3: '.pres-gallery-item:nth-child(3) .pres-gallery-image-wrap',
+    backgroundImage: '.pres-slide'
+  };
+
+  // Fallback ratios if the element isn't found in the preview DOM.
+  // Derived from slide template CSS (960x540 slide).
+  var FIELD_FALLBACK_RATIO = {
+    logo: 3.33,              // 200w × 60h on title, or 80w × 20h on other slides
+    productImage: 0.89,      // ~half slide (480×540)
+    image: 1.04,             // Header+List right column
+    chartImage: 2.5,         // wide chart area
+    image1: 0.73,            // gallery 3-col default
+    image2: 0.73,
+    image3: 0.73,
+    backgroundImage: 16 / 9
+  };
+
+  function getFieldDisplayRatio(fieldKey) {
+    var sel = FIELD_CONTAINER_SELECTOR[fieldKey];
+    var fallback = FIELD_FALLBACK_RATIO[fieldKey] || 1;
+    if (!sel) return fallback;
+
+    // For logos, always use the fallback — measuring the img element picks up
+    // the logo's natural aspect, not the on-slide bounding box (max-width/max-height).
+    if (fieldKey === 'logo') return fallback;
+
+    var previewEl = document.getElementById('preview-slide');
+    if (!previewEl) return fallback;
+
+    var el = previewEl.querySelector(sel);
+    if (!el) return fallback;
+
+    var rect = el.getBoundingClientRect();
+    if (rect.width < 5 || rect.height < 5) return fallback;
+
+    return rect.width / rect.height;
+  }
+
+  function formatRatio(r) {
+    // Present a human-friendly label like "16:9" or "1.33:1"
+    var common = [
+      { r: 16 / 9, label: '16:9' },
+      { r: 4 / 3, label: '4:3' },
+      { r: 3 / 2, label: '3:2' },
+      { r: 1, label: '1:1' },
+      { r: 2 / 3, label: '2:3' },
+      { r: 3 / 4, label: '3:4' },
+      { r: 9 / 16, label: '9:16' }
+    ];
+    for (var i = 0; i < common.length; i++) {
+      if (Math.abs(r - common[i].r) < 0.03) return common[i].label;
+    }
+    // Otherwise show decimal format
+    return r.toFixed(2) + ':1';
+  }
+
+  function getInitialCrop(imgW, imgH, targetRatio) {
+    // Largest crop that fits inside imgW×imgH while matching targetRatio, centered.
+    var cropW, cropH;
+    if (imgW / imgH > targetRatio) {
+      cropH = imgH;
+      cropW = imgH * targetRatio;
+    } else {
+      cropW = imgW;
+      cropH = imgW / targetRatio;
+    }
+    return {
+      x: Math.round((imgW - cropW) / 2),
+      y: Math.round((imgH - cropH) / 2),
+      w: Math.round(cropW),
+      h: Math.round(cropH)
+    };
+  }
+
   function openImageEditor(slideId, fieldKey) {
     var slide = state.slides.find(function (s) { return s.id === slideId; });
     if (!slide || !slide.data[fieldKey]) return;
@@ -744,9 +830,13 @@
     imgEditor.fieldKey = fieldKey;
     imgEditor.originalSrc = slide.data[fieldKey];
     imgEditor.rotation = 0;
-    imgEditor.ratio = 'free';
+    imgEditor.ratio = getFieldDisplayRatio(fieldKey);  // locked to slide container ratio
     imgEditor.crop = null;
     imgEditor.dragging = false;
+
+    // Update the read-only ratio label
+    var infoEl = document.getElementById('img-ratio-info');
+    if (infoEl) infoEl.textContent = formatRatio(imgEditor.ratio);
 
     var modal = document.getElementById('modal-image-edit');
     imgEditor.canvas = document.getElementById('image-editor-canvas');
@@ -761,11 +851,6 @@
       bindImageEditorEvents();
     };
     imgEditor.img.src = imgEditor.originalSrc;
-
-    // Set active ratio button
-    document.querySelectorAll('.image-editor__ratio-btn').forEach(function (b) {
-      b.classList.toggle('image-editor__ratio-btn--active', b.dataset.ratio === 'free');
-    });
   }
 
   function getRotatedDimensions() {
@@ -794,8 +879,8 @@
     imgEditor.offsetX = 0;
     imgEditor.offsetY = 0;
 
-    // Reset crop to full image
-    imgEditor.crop = { x: 0, y: 0, w: dims.w, h: dims.h };
+    // Initial crop: largest ratio-matching rectangle, centered
+    imgEditor.crop = getInitialCrop(dims.w, dims.h, imgEditor.ratio);
   }
 
   function drawEditorCanvas() {
@@ -877,33 +962,15 @@
     }
   }
 
-  function constrainCropToRatio(startX, startY, endX, endY) {
-    var x = Math.min(startX, endX);
-    var y = Math.min(startY, endY);
-    var w = Math.abs(endX - startX);
-    var h = Math.abs(endY - startY);
-
-    if (imgEditor.ratio !== 'free') {
-      var parts = imgEditor.ratio.split(':');
-      var ratioW = parseInt(parts[0]);
-      var ratioH = parseInt(parts[1]);
-      var targetRatio = ratioW / ratioH;
-
-      if (w / h > targetRatio) {
-        w = h * targetRatio;
-      } else {
-        h = w / targetRatio;
-      }
-    }
-
-    // Clamp to image bounds
+  // Clamp crop position so it stays within image bounds (assumes ratio-fixed size)
+  function clampCropPosition(crop) {
     var dims = getRotatedDimensions();
-    x = Math.max(0, Math.min(x, dims.w - w));
-    y = Math.max(0, Math.min(y, dims.h - h));
-    w = Math.min(w, dims.w - x);
-    h = Math.min(h, dims.h - y);
-
-    return { x: x, y: y, w: w, h: h };
+    return {
+      x: Math.max(0, Math.min(crop.x, dims.w - crop.w)),
+      y: Math.max(0, Math.min(crop.y, dims.h - crop.h)),
+      w: crop.w,
+      h: crop.h
+    };
   }
 
   function canvasToImageCoords(canvasX, canvasY) {
@@ -923,35 +990,62 @@
     imgEditor.ctx = newCanvas.getContext('2d');
     drawEditorCanvas();
 
+    // MOUSE DOWN: start dragging the crop rectangle
+    // If click is inside crop → move existing crop
+    // If click is outside crop → teleport crop center to click point, then allow moving
     newCanvas.addEventListener('mousedown', function (e) {
       var rect = newCanvas.getBoundingClientRect();
       var coords = canvasToImageCoords(e.clientX - rect.left, e.clientY - rect.top);
+      var crop = imgEditor.crop;
+      var inside = coords.x >= crop.x && coords.x <= crop.x + crop.w &&
+                   coords.y >= crop.y && coords.y <= crop.y + crop.h;
+
+      if (!inside) {
+        // Center crop on click point
+        imgEditor.crop = clampCropPosition({
+          x: coords.x - crop.w / 2,
+          y: coords.y - crop.h / 2,
+          w: crop.w, h: crop.h
+        });
+        drawEditorCanvas();
+      }
+
       imgEditor.dragging = true;
-      imgEditor.dragStart = coords;
+      imgEditor.moveOffset = {
+        dx: coords.x - imgEditor.crop.x,
+        dy: coords.y - imgEditor.crop.y
+      };
+      newCanvas.style.cursor = 'grabbing';
     });
 
     newCanvas.addEventListener('mousemove', function (e) {
-      if (!imgEditor.dragging) return;
       var rect = newCanvas.getBoundingClientRect();
       var coords = canvasToImageCoords(e.clientX - rect.left, e.clientY - rect.top);
-      imgEditor.crop = constrainCropToRatio(imgEditor.dragStart.x, imgEditor.dragStart.y, coords.x, coords.y);
-      drawEditorCanvas();
+
+      if (imgEditor.dragging) {
+        imgEditor.crop = clampCropPosition({
+          x: coords.x - imgEditor.moveOffset.dx,
+          y: coords.y - imgEditor.moveOffset.dy,
+          w: imgEditor.crop.w,
+          h: imgEditor.crop.h
+        });
+        drawEditorCanvas();
+      } else {
+        // Hover cursor hint
+        var crop = imgEditor.crop;
+        var inside = coords.x >= crop.x && coords.x <= crop.x + crop.w &&
+                     coords.y >= crop.y && coords.y <= crop.y + crop.h;
+        newCanvas.style.cursor = inside ? 'grab' : 'crosshair';
+      }
     });
 
     newCanvas.addEventListener('mouseup', function () {
       imgEditor.dragging = false;
-      // If crop is too small, reset to full
-      if (imgEditor.crop && (imgEditor.crop.w < 10 || imgEditor.crop.h < 10)) {
-        var dims = getRotatedDimensions();
-        imgEditor.crop = { x: 0, y: 0, w: dims.w, h: dims.h };
-        drawEditorCanvas();
-      }
+      newCanvas.style.cursor = 'grab';
     });
 
     newCanvas.addEventListener('mouseleave', function () {
-      if (imgEditor.dragging) {
-        imgEditor.dragging = false;
-      }
+      imgEditor.dragging = false;
     });
 
     // Rotate buttons
@@ -966,27 +1060,9 @@
       drawEditorCanvas();
     };
 
-    // Ratio buttons
-    document.querySelectorAll('.image-editor__ratio-btn').forEach(function (btn) {
-      btn.onclick = function () {
-        imgEditor.ratio = btn.dataset.ratio;
-        document.querySelectorAll('.image-editor__ratio-btn').forEach(function (b) {
-          b.classList.toggle('image-editor__ratio-btn--active', b.dataset.ratio === imgEditor.ratio);
-        });
-        // Reset crop
-        var dims = getRotatedDimensions();
-        imgEditor.crop = { x: 0, y: 0, w: dims.w, h: dims.h };
-        drawEditorCanvas();
-      };
-    });
-
-    // Reset
+    // Reset — clears rotation and re-centers the fixed-ratio crop
     document.getElementById('img-reset').onclick = function () {
       imgEditor.rotation = 0;
-      imgEditor.ratio = 'free';
-      document.querySelectorAll('.image-editor__ratio-btn').forEach(function (b) {
-        b.classList.toggle('image-editor__ratio-btn--active', b.dataset.ratio === 'free');
-      });
       setupEditorCanvas();
       drawEditorCanvas();
     };
@@ -1006,54 +1082,24 @@
     var img = imgEditor.img;
     var crop = imgEditor.crop;
     var rotation = imgEditor.rotation;
-    var dims = getRotatedDimensions();
+    var rotDims = getRotatedDimensions();
 
-    // If no changes, just close
-    if (rotation === 0 && crop.x === 0 && crop.y === 0 && Math.abs(crop.w - dims.w) < 2 && Math.abs(crop.h - dims.h) < 2) {
-      closeModal(document.getElementById('modal-image-edit'));
-      return;
-    }
+    // Step 1: Draw the rotated full image into an intermediate canvas so
+    // crop coordinates (which are in rotated-image space) map directly.
+    var rotCanvas = document.createElement('canvas');
+    rotCanvas.width = rotDims.w;
+    rotCanvas.height = rotDims.h;
+    var rotCtx = rotCanvas.getContext('2d');
+    rotCtx.translate(rotDims.w / 2, rotDims.h / 2);
+    rotCtx.rotate(rotation * Math.PI / 180);
+    rotCtx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
 
-    // Create output canvas at crop dimensions
-    var outW = Math.round(crop.w);
-    var outH = Math.round(crop.h);
+    // Step 2: Extract the crop region into the final output canvas
     var out = document.createElement('canvas');
-    out.width = outW;
-    out.height = outH;
+    out.width = Math.round(crop.w);
+    out.height = Math.round(crop.h);
     var outCtx = out.getContext('2d');
-
-    // Draw rotated image, offset by crop position
-    outCtx.save();
-    outCtx.translate(outW / 2, outH / 2);
-
-    // We need to figure out where the crop maps to in the original (unrotated) image
-    // The crop coordinates are in rotated-image space
-    // We need to reverse-transform them to original image space
-    var origW = img.naturalWidth;
-    var origH = img.naturalHeight;
-
-    outCtx.rotate(rotation * Math.PI / 180);
-
-    var sx, sy;
-    if (rotation === 0) {
-      sx = -crop.x - crop.w / 2;
-      sy = -crop.y - crop.h / 2;
-      outCtx.drawImage(img, sx, sy);
-    } else if (rotation === 90) {
-      sx = crop.y - origH / 2 + crop.h / 2;
-      sy = -crop.x - crop.w / 2;
-      outCtx.drawImage(img, sx, sy);
-    } else if (rotation === 180) {
-      sx = crop.x - origW / 2 + crop.w / 2;
-      sy = crop.y - origH / 2 + crop.h / 2;
-      outCtx.drawImage(img, -sx - origW, -sy - origH);
-    } else if (rotation === 270) {
-      sx = -crop.y - crop.h / 2;
-      sy = crop.x - origW / 2 + crop.w / 2;
-      outCtx.drawImage(img, sx, sy);
-    }
-
-    outCtx.restore();
+    outCtx.drawImage(rotCanvas, crop.x, crop.y, crop.w, crop.h, 0, 0, out.width, out.height);
 
     // Export as PNG if original was PNG, else JPEG
     var isPng = imgEditor.originalSrc.indexOf('data:image/png') === 0;
