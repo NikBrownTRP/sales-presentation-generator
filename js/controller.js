@@ -1580,13 +1580,13 @@
       e.target.value = '';
     });
 
-    // Header "Preview" button → start from currently selected slide
+    // Header "Preview" button → always start from first slide
     document.getElementById('btn-preview-all').addEventListener('click', function () {
-      openSlideshow(true);
-    });
-    // Sidebar "Preview All Slides" button → always start from first slide
-    document.getElementById('btn-preview-all-sidebar').addEventListener('click', function () {
       openSlideshow(false);
+    });
+    // Sidebar "Preview from here" button → start from currently selected slide
+    document.getElementById('btn-preview-all-sidebar').addEventListener('click', function () {
+      openSlideshow(true);
     });
 
     document.getElementById('btn-export-pdf').addEventListener('click', function () {
