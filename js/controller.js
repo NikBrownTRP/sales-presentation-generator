@@ -1212,16 +1212,26 @@
     cacheDom();
 
     // Try loading from localStorage
-    var saved = null;
-    if (window.ExportManager) {
-      saved = window.ExportManager.loadFromLocalStorage();
+    // Load saved state — IndexedDB (async) with localStorage fallback
+    function finalizeInitialState(saved) {
+      if (saved && saved.slides && saved.slides.length > 0) {
+        loadState(saved);
+      } else {
+        addSlide('title');
+      }
+      // Keep the title input in sync after load
+      if (dom.presTitle) {
+        dom.presTitle.value = state.meta.title || 'Untitled Presentation';
+      }
     }
 
-    if (saved && saved.slides && saved.slides.length > 0) {
-      loadState(saved);
+    if (window.ExportManager && window.ExportManager.loadFromLocalStorageAsync) {
+      window.ExportManager.loadFromLocalStorageAsync().then(finalizeInitialState).catch(function() {
+        finalizeInitialState(null);
+      });
     } else {
-      // Start with one title slide
-      addSlide('title');
+      var saved = window.ExportManager ? window.ExportManager.loadFromLocalStorage() : null;
+      finalizeInitialState(saved);
     }
 
     // --- Presentation title ---

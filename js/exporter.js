@@ -13,19 +13,103 @@
   /* -----------------------------------------------------------------------
      LocalStorage save / load
      ----------------------------------------------------------------------- */
-  function saveToLocalStorage(state) {
-    try {
-      var json = JSON.stringify({
-        slides: state.slides,
-        theme: state.theme,
-        meta: state.meta
-      });
-      localStorage.setItem(LS_KEY, json);
-    } catch (e) {
-      // quota exceeded — silently fail, user can use Save to File
-    }
+  /* -----------------------------------------------------------------------
+     IndexedDB-based autosave (unlimited practical capacity for large
+     presentations with many images). Falls back to localStorage if IDB
+     is unavailable.
+     ----------------------------------------------------------------------- */
+  var IDB_NAME = 'pres-generator';
+  var IDB_STORE = 'state';
+  var IDB_KEY = 'current';
+  var _dbPromise = null;
+
+  function openDB() {
+    if (_dbPromise) return _dbPromise;
+    _dbPromise = new Promise(function (resolve, reject) {
+      if (!window.indexedDB) { reject(new Error('no-idb')); return; }
+      var req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = function () {
+        req.result.createObjectStore(IDB_STORE);
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+    return _dbPromise;
   }
 
+  function idbSet(value) {
+    return openDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(IDB_STORE, 'readwrite');
+        tx.objectStore(IDB_STORE).put(value, IDB_KEY);
+        tx.oncomplete = function () { resolve(true); };
+        tx.onerror = function () { reject(tx.error); };
+        tx.onabort = function () { reject(tx.error || new Error('abort')); };
+      });
+    });
+  }
+
+  function idbGet() {
+    return openDB().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(IDB_STORE, 'readonly');
+        var req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+        req.onsuccess = function () { resolve(req.result || null); };
+        req.onerror = function () { reject(req.error); };
+      });
+    });
+  }
+
+  // Synchronous save — delegates to async IDB save, with localStorage fallback.
+  // Returns immediately; errors are logged but don't block.
+  function saveToLocalStorage(state) {
+    var snapshot = {
+      slides: state.slides,
+      theme: state.theme,
+      meta: state.meta,
+      _savedAt: Date.now()
+    };
+
+    // Try IndexedDB first — handles any realistic size
+    idbSet(snapshot).then(function () {
+      // Once IDB save succeeded, also clear the localStorage copy so
+      // we don't have two conflicting autosaves
+      try { localStorage.removeItem(LS_KEY); } catch (e) {}
+    }).catch(function (err) {
+      console.warn('IndexedDB autosave failed, falling back to localStorage:', err);
+      // Fallback: try localStorage (works for small presentations)
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify(snapshot));
+      } catch (e) {
+        try { localStorage.removeItem(LS_KEY); } catch (err2) {}
+      }
+    });
+
+    return { ok: true, async: true };
+  }
+
+  // Async load — checks IndexedDB first, then localStorage (for migration)
+  function loadFromLocalStorageAsync() {
+    return idbGet().then(function (data) {
+      if (data) return data;
+      // Fall back to localStorage (old autosaves)
+      try {
+        var raw = localStorage.getItem(LS_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return null;
+    }).catch(function () {
+      // IDB failed — try localStorage
+      try {
+        var raw = localStorage.getItem(LS_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return null;
+    });
+  }
+
+  // Sync wrapper for backward compat — returns null synchronously; callers
+  // should use loadFromLocalStorageAsync for IDB-backed loads
   function loadFromLocalStorage() {
     try {
       var raw = localStorage.getItem(LS_KEY);
@@ -459,6 +543,7 @@
   window.ExportManager = {
     saveToLocalStorage: saveToLocalStorage,
     loadFromLocalStorage: loadFromLocalStorage,
+    loadFromLocalStorageAsync: loadFromLocalStorageAsync,
     saveToFile: saveToFile,
     exportToPDF: exportToPDF,
     exportToHTML: exportToHTML
