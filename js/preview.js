@@ -63,12 +63,14 @@
     renderedSlides: []
   };
 
-  function openSlideshow(slides, theme) {
+  function openSlideshow(slides, theme, startIndex) {
     if (!slides || slides.length === 0) return;
+
+    var startAt = (typeof startIndex === 'number' && startIndex >= 0 && startIndex < slides.length) ? startIndex : 0;
 
     slideshowState.slides = slides;
     slideshowState.theme = theme;
-    slideshowState.currentIndex = 0;
+    slideshowState.currentIndex = startAt;
 
     var modal = document.getElementById('slideshow-modal');
     var stage = document.getElementById('slideshow-stage');
@@ -81,14 +83,18 @@
       var template = window.SlideTemplates[slide.templateId];
       if (!template) return;
 
-      var posClass = i === 0 ? 'slideshow-modal__slide--active' : 'slideshow-modal__slide--next';
+      var posClass;
+      if (i === startAt) posClass = 'slideshow-modal__slide--active';
+      else if (i < startAt) posClass = 'slideshow-modal__slide--prev';
+      else posClass = 'slideshow-modal__slide--next';
       html += '<div class="slideshow-modal__slide ' + posClass + '" data-slide-index="' + i + '">';
       html += '<div data-theme="' + (slide.theme || theme) + '" style="width:' + SLIDE_W + 'px;height:' + SLIDE_H + 'px;">';
-      html += template.render(slide.data);
-      // Add animation class to active slide
-      if (i === 0) {
-        html = html.replace('class="pres-slide ', 'class="pres-slide pres-slide--animated ');
+      var rendered = template.render(slide.data);
+      // Add animation class only to the starting active slide
+      if (i === startAt) {
+        rendered = rendered.replace('class="pres-slide ', 'class="pres-slide pres-slide--animated ');
       }
+      html += rendered;
       html += '</div>';
       html += '</div>';
     });
@@ -97,12 +103,12 @@
     // Render dots
     var dotsHtml = '';
     slides.forEach(function (s, i) {
-      dotsHtml += '<button class="slideshow-modal__dot' + (i === 0 ? ' slideshow-modal__dot--active' : '') + '" data-dot-index="' + i + '"></button>';
+      dotsHtml += '<button class="slideshow-modal__dot' + (i === startAt ? ' slideshow-modal__dot--active' : '') + '" data-dot-index="' + i + '"></button>';
     });
     dots.innerHTML = dotsHtml;
 
     // Update counter
-    counter.textContent = '1 / ' + slides.length;
+    counter.textContent = (startAt + 1) + ' / ' + slides.length;
 
     // Scale slides to fit viewport
     scaleSlideshowSlides(stage);

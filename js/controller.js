@@ -1392,13 +1392,25 @@
      ----------------------------------------------------------------------- */
   var slideshowIndex = 0;
 
-  function openSlideshow() {
+  // fromCurrent === true → start at the currently selected slide (skipping hidden);
+  // otherwise starts from the first visible slide.
+  function openSlideshow(fromCurrent) {
     var visibleSlides = state.slides.filter(function (s) { return !s.hidden; });
     if (visibleSlides.length === 0) return;
-    slideshowIndex = 0;
+
+    var startIndex = 0;
+    if (fromCurrent && state.activeSlideId) {
+      var idx = -1;
+      for (var i = 0; i < visibleSlides.length; i++) {
+        if (visibleSlides[i].id === state.activeSlideId) { idx = i; break; }
+      }
+      if (idx !== -1) startIndex = idx;
+      // Active slide may be hidden — fall through to startIndex 0 in that case
+    }
+    slideshowIndex = startIndex;
 
     if (window.PreviewRenderer) {
-      window.PreviewRenderer.openSlideshow(visibleSlides, state.theme);
+      window.PreviewRenderer.openSlideshow(visibleSlides, state.theme, startIndex);
     }
   }
 
@@ -1568,8 +1580,14 @@
       e.target.value = '';
     });
 
-    document.getElementById('btn-preview-all').addEventListener('click', openSlideshow);
-    document.getElementById('btn-preview-all-sidebar').addEventListener('click', openSlideshow);
+    // Header "Preview" button → start from currently selected slide
+    document.getElementById('btn-preview-all').addEventListener('click', function () {
+      openSlideshow(true);
+    });
+    // Sidebar "Preview All Slides" button → always start from first slide
+    document.getElementById('btn-preview-all-sidebar').addEventListener('click', function () {
+      openSlideshow(false);
+    });
 
     document.getElementById('btn-export-pdf').addEventListener('click', function () {
       if (state.slides.length === 0) {

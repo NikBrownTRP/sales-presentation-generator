@@ -190,7 +190,7 @@
     html += '<title>' + escapeHtml(title) + '</title>\n';
     html += '<link rel="preconnect" href="https://fonts.googleapis.com">\n';
     html += '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n';
-    html += '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">\n';
+    html += '<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Sora:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">\n';
     html += '<style>\n';
     html += '*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }\n';
     html += 'html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: "Inter", sans-serif; }\n';
@@ -239,25 +239,52 @@
   /* -----------------------------------------------------------------------
      Build inline CSS for the exported HTML slideshow
      ----------------------------------------------------------------------- */
-  function getSlidesCSSContent() {
-    // Grab slides.css from the link tag
-    var css = '';
+  var _cachedSlidesCSS = '';
+
+  function preloadSlidesCSS() {
+    // Fetch slides.css content via XHR for reliable export
+    // Try styleSheets API first, fall back to fetch
     try {
       var sheets = document.styleSheets;
       for (var i = 0; i < sheets.length; i++) {
         var href = sheets[i].href || '';
         if (href.indexOf('slides.css') !== -1) {
           var rules = sheets[i].cssRules || sheets[i].rules;
-          for (var j = 0; j < rules.length; j++) {
-            css += rules[j].cssText + '\n';
+          if (rules && rules.length > 0) {
+            var css = '';
+            for (var j = 0; j < rules.length; j++) {
+              css += rules[j].cssText + '\n';
+            }
+            _cachedSlidesCSS = css;
+            return;
           }
-          break;
         }
       }
     } catch (e) {
-      // CORS or security error — fall back to empty
+      // CORS — fall through to fetch
     }
-    return css;
+
+    // Fallback: fetch the file directly
+    var link = document.querySelector('link[href*="slides.css"]');
+    if (link) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', link.href, false); // synchronous
+      try {
+        xhr.send();
+        if (xhr.status === 200) {
+          _cachedSlidesCSS = xhr.responseText;
+        }
+      } catch (e) {
+        // final fallback — empty
+      }
+    }
+  }
+
+  function getSlidesCSSContent() {
+    if (!_cachedSlidesCSS) {
+      preloadSlidesCSS();
+    }
+    return _cachedSlidesCSS;
   }
 
   function getSlideshowCSS() {
@@ -268,11 +295,11 @@
       '.slideshow-controls { display: flex; gap: 8px; }',
       '.slideshow-btn { padding: 6px 14px; background: rgba(255,255,255,0.1); border: none; color: #fff; border-radius: 4px; cursor: pointer; font-size: 16px; transition: background 0.2s; }',
       '.slideshow-btn:hover { background: rgba(255,255,255,0.2); }',
-      '.slideshow-stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }',
-      '.slideshow-slide { position: absolute; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s ease; }',
-      '.slideshow-slide--active { transform: translateX(0); opacity: 1; }',
-      '.slideshow-slide--prev { transform: translateX(-110%); opacity: 0; }',
-      '.slideshow-slide--next { transform: translateX(110%); opacity: 0; pointer-events: none; }',
+      '.slideshow-stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }',
+      '.slideshow-slide { position: absolute; width: 960px; height: 540px; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s ease; overflow: hidden; }',
+      '.slideshow-slide--active { opacity: 1; }',
+      '.slideshow-slide--prev { opacity: 0; pointer-events: none; }',
+      '.slideshow-slide--next { opacity: 0; pointer-events: none; }',
       '.slideshow-dots { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100; }',
       '.slideshow-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); border: none; padding: 0; cursor: pointer; transition: all 0.2s; }',
       '.slideshow-dot--active { background: #E31837; transform: scale(1.3); }'
@@ -284,9 +311,9 @@
       'var current = 0, total = ' + total + ';',
       'function goTo(i) {',
       '  if (i < 0 || i >= total) return;',
-      '  var slides = document.querySelectorAll(".slideshow-slide");',
+      '  var elems = document.querySelectorAll(".slideshow-slide");',
       '  var dots = document.querySelectorAll(".slideshow-dot");',
-      '  slides.forEach(function(s, idx) {',
+      '  elems.forEach(function(s, idx) {',
       '    s.classList.remove("slideshow-slide--active","slideshow-slide--prev","slideshow-slide--next");',
       '    var ps = s.querySelector(".pres-slide");',
       '    if (ps) ps.classList.remove("pres-slide--animated");',
@@ -302,13 +329,13 @@
       'function next() { goTo(current + 1); }',
       'function prev() { goTo(current - 1); }',
       'function scaleSlides() {',
-      '  var vw = window.innerWidth - 80, vh = window.innerHeight - 80;',
+      '  var vw = window.innerWidth - 40, vh = window.innerHeight - 80;',
       '  var sw = 960, sh = 540;',
-      '  var scale = Math.min(vw/sw, vh/sh, 1.5);',
+      '  var scale = Math.min(vw/sw, vh/sh, 2);',
       '  document.querySelectorAll(".slideshow-slide").forEach(function(el) {',
-      '    el.style.width = sw + "px"; el.style.height = sh + "px";',
-      '    el.firstElementChild.style.transform = "scale(" + scale + ")";',
-      '    el.firstElementChild.style.transformOrigin = "center center";',
+      '    el.style.transform = el.classList.contains("slideshow-slide--prev") ? "translateX(-120%) scale(" + scale + ")" :',
+      '      el.classList.contains("slideshow-slide--next") ? "translateX(120%) scale(" + scale + ")" :',
+      '      "scale(" + scale + ")";',
       '  });',
       '}',
       'document.addEventListener("keydown", function(e) {',
@@ -390,5 +417,10 @@
     exportToPDF: exportToPDF,
     exportToHTML: exportToHTML
   };
+
+  // Preload slides CSS on DOMContentLoaded for reliable export
+  document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(preloadSlidesCSS, 500);
+  });
 
 })();
