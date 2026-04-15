@@ -1289,7 +1289,12 @@
     //     matches the preview regardless of container CSS.
     //   - Else for JPEG, fill with the slide theme bg (JPEG can't do transparent).
     //   - Else PNG stays transparent.
-    var isPng = imgEditor.originalSrc.indexOf('data:image/png') === 0;
+    // isPng must also cover relative-path sources (e.g. "assets/Logo TRP_w.png"
+    // used for default brand logos). If we treated those as JPEG, editing a
+    // transparent-background logo would bake the theme bg into it.
+    var src = imgEditor.originalSrc || '';
+    var isPng = src.indexOf('data:image/png') === 0 ||
+                (src.indexOf('data:') !== 0 && /\.png($|\?)/i.test(src));
     if (imgEditor.bgColor) {
       outCtx.fillStyle = imgEditor.bgColor;
       outCtx.fillRect(0, 0, out.width, out.height);
@@ -1605,6 +1610,10 @@
       if (window.ExportManager) window.ExportManager.saveToFile(state);
     });
 
+    // Theme the next PPTX import should be converted to. Set by the
+    // brand picker dialog (below) before the file input fires.
+    var pendingPptxTheme = 'trp-dark';
+
     document.getElementById('btn-load').addEventListener('click', function () {
       Dialog.choose('Load Presentation', 'Choose the file format to load:', [
         { label: 'JSON', style: 'primary', value: 'json' },
@@ -1619,11 +1628,25 @@
           dom.fileInputLoad.accept = '.html,.htm';
           dom.fileInputLoad.click();
         } else if (choice === 'pptx') {
-          dom.fileInputLoad.accept = '.pptx';
-          dom.fileInputLoad.click();
+          // PPTX has no brand embedded, so ask which template to convert to
+          // before opening the file picker.
+          Dialog.choose('Import as…', 'Which template should the imported slides use?', [
+            { label: 'TRP Racing', style: 'primary', value: 'trp-dark' },
+            { label: 'Tektro', style: 'secondary', value: 'tektro-light' },
+            { label: 'Cancel', style: 'ghost', value: null }
+          ]).then(function (themeChoice) {
+            if (!themeChoice) return;
+            pendingPptxTheme = themeChoice;
+            dom.fileInputLoad.accept = '.pptx';
+            dom.fileInputLoad.click();
+          });
         }
       });
     });
+
+    // Expose the chosen theme on the dom object so the file handler below
+    // can read it without closing over this scope.
+    dom._getPendingPptxTheme = function () { return pendingPptxTheme; };
 
     dom.fileInputLoad.addEventListener('change', function (e) {
       var file = e.target.files[0];
@@ -1637,8 +1660,9 @@
           return;
         }
         var pptxReader = new FileReader();
+        var chosenTheme = dom._getPendingPptxTheme ? dom._getPendingPptxTheme() : 'trp-dark';
         pptxReader.onload = function (ev) {
-          window.PptxImporter.parse(ev.target.result).then(function (parsed) {
+          window.PptxImporter.parse(ev.target.result, { theme: chosenTheme }).then(function (parsed) {
             if (parsed && parsed.slides && parsed.slides.length) {
               loadState(parsed);
               autoSave();

@@ -618,7 +618,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  /* Extra bottom padding balances the header above + clears the bottom
+     logo (bottom:12px, ~20px tall), so the picture reads as centered on
+     the whole slide instead of just the body area. */
+  padding: 16px 16px 90px;
   overflow: hidden;
 }
 
@@ -1068,9 +1071,14 @@
 }
 
 /* Image: scale-down with soft fade (counter to TRP's scale-in feel) */
+/* NOTE: Intentionally no `filter` in these keyframes. The base rules use
+   `filter: drop-shadow(...)` on product / spec / generic imgs; animating
+   the `filter` property here would override the drop-shadow (the last
+   animated frame wins), making the Tektro images look "flat" in the
+   slideshow + HTML export while still shadowed in the editor preview. */
 @keyframes tektroImageReveal {
-  0% { opacity: 0; transform: scale(1.04); filter: blur(10px); }
-  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+  0% { opacity: 0; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 /* Subtitle / tagline: slow rise */

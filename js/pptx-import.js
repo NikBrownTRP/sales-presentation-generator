@@ -212,12 +212,28 @@
   }
 
   /* -----------------------------------------------------------------------
+     Theme-specific brand defaults. Mirrors controller.js addSlide() so
+     imported slides show the correct logo + tagline for the chosen brand.
+     ----------------------------------------------------------------------- */
+  var THEME_DEFAULTS = {
+    'trp-dark': {
+      logo: 'assets/Logo TRP_w.png',
+      brandLine: 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward'
+    },
+    'tektro-light': {
+      logo: 'assets/Logo Tektro.png',
+      brandLine: 'Product Quality \u2014 Value Driven \u2014 Purpose Built'
+    }
+  };
+
+  /* -----------------------------------------------------------------------
      Build the final slide object for a given templateId.
      Always starts from SlideTemplates.getDefaults so new template fields
      added later don't break old imports.
      ----------------------------------------------------------------------- */
-  function buildSlide(templateId, extract, resizedImages) {
+  function buildSlide(templateId, extract, resizedImages, theme) {
     var data = window.SlideTemplates.getDefaults(templateId);
+    var brand = THEME_DEFAULTS[theme] || THEME_DEFAULTS['trp-dark'];
 
     if (templateId === 'title') {
       data.title = extract.title || extract.paragraphs[0] || 'Untitled';
@@ -249,17 +265,17 @@
 
     // Logo prefill — mirrors controller.js addSlide() behavior.
     if (data.hasOwnProperty('logo') && !data.logo) {
-      data.logo = 'assets/Logo TRP_w.png';
+      data.logo = brand.logo;
     }
     // brandLine prefill for title slides.
     if (data.hasOwnProperty('brandLine') && !data.brandLine) {
-      data.brandLine = 'Product Quality — Performance Driven — Innovation Forward';
+      data.brandLine = brand.brandLine;
     }
 
     return {
       id: uid(),
       templateId: templateId,
-      theme: 'trp-dark',
+      theme: theme || 'trp-dark',
       data: data
     };
   }
@@ -286,9 +302,12 @@
   }
 
   /* -----------------------------------------------------------------------
-     Main entry point.
+     Main entry point. `options.theme` selects the brand ("trp-dark" or
+     "tektro-light"); defaults to TRP for backwards compatibility.
      ----------------------------------------------------------------------- */
-  function parse(arrayBuffer) {
+  function parse(arrayBuffer, options) {
+    var theme = (options && options.theme) || 'trp-dark';
+    if (!THEME_DEFAULTS[theme]) theme = 'trp-dark';
     if (typeof window.JSZip === 'undefined') {
       return Promise.reject(new Error('JSZip library not loaded.'));
     }
@@ -399,12 +418,12 @@
               return Promise.all(pending).then(function () {
                 var finalSlides = slides.map(function (box) {
                   var resized = box._resized.filter(function (v) { return v && v.dataUrl; });
-                  return buildSlide(box._ex._templateId, box._ex, resized);
+                  return buildSlide(box._ex._templateId, box._ex, resized, theme);
                 });
 
                 return {
                   slides: finalSlides,
-                  theme: 'trp-dark',
+                  theme: theme,
                   meta: { title: deckTitle, updatedAt: null }
                 };
               });

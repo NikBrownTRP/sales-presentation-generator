@@ -252,21 +252,95 @@
      Standalone HTML Export (with embedded state for re-import)
      ----------------------------------------------------------------------- */
   function exportToHTML(state) {
-    // Try preloaded CSS first (instant), then fetch as fallback
-    var css = getSlidesCSSContent();
-    if (css) {
-      buildAndDownloadHTML(state, css);
-      return;
+    // Step 1: Inline any relative-path images (e.g. default brand logos
+    // like "assets/Logo TRP_w.png") as data URLs. Without this, a fresh
+    // import or a never-edited slide has an unresolvable relative path
+    // in the standalone HTML, so the logo shows up broken. Editing a
+    // logo once ran it through the image editor's canvas → data URL,
+    // which is why edited logos always exported fine.
+    inlineRelativeImages(state).then(function (stateInlined) {
+      // Step 2: Load slide CSS (preloaded or fetched) and build HTML.
+      var css = getSlidesCSSContent();
+      if (css) {
+        buildAndDownloadHTML(stateInlined, css);
+        return;
+      }
+      var link = document.querySelector('link[href*="slides.css"]');
+      var cssUrl = link ? link.href : 'css/slides.css';
+      fetch(cssUrl, { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (cssContent) {
+        buildAndDownloadHTML(stateInlined, cssContent);
+      }).catch(function () {
+        if (window.Dialog) Dialog.alert('Export Error', 'Could not load slide styles for export. Please refresh the page and try again.', 'error');
+        else alert('Error: Could not load slide styles for export.');
+      });
+    }).catch(function (err) {
+      console.error('Image inlining failed:', err);
+      if (window.Dialog) Dialog.alert('Export Error', 'Could not embed all images for export. Please try again.', 'error');
+    });
+  }
+
+  /* -----------------------------------------------------------------------
+     Returns a shallow-cloned state whose slide.data image fields are all
+     data URLs. Relative paths are fetched + base64-encoded; data URLs are
+     left alone. Never mutates the caller's state.
+     ----------------------------------------------------------------------- */
+  function inlineRelativeImages(state) {
+    var cache = {};  // path -> Promise<dataUrl>
+
+    function toDataUrl(path) {
+      if (cache[path]) return cache[path];
+      cache[path] = fetch(path).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status + ' for ' + path);
+        return r.blob();
+      }).then(function (blob) {
+        return new Promise(function (resolve, reject) {
+          var fr = new FileReader();
+          fr.onload = function () { resolve(fr.result); };
+          fr.onerror = function () { reject(fr.error); };
+          fr.readAsDataURL(blob);
+        });
+      }).catch(function (err) {
+        // If a specific asset can't be fetched, fall back to the original
+        // path so at least the rest of the export still works.
+        console.warn('Could not inline image:', path, err);
+        return path;
+      });
+      return cache[path];
     }
 
-    // Async fallback: fetch slides.css directly
-    var link = document.querySelector('link[href*="slides.css"]');
-    var cssUrl = link ? link.href : 'css/slides.css';
-    fetch(cssUrl, { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (cssContent) {
-      buildAndDownloadHTML(state, cssContent);
-    }).catch(function () {
-      if (window.Dialog) Dialog.alert('Export Error', 'Could not load slide styles for export. Please refresh the page and try again.', 'error');
-      else alert('Error: Could not load slide styles for export.');
+    var pending = [];
+    var newSlides = state.slides.map(function (slide) {
+      var tpl = window.SlideTemplates[slide.templateId];
+      if (!tpl || !tpl.fields) return slide;
+      var newData = {};
+      for (var k in slide.data) {
+        if (Object.prototype.hasOwnProperty.call(slide.data, k)) newData[k] = slide.data[k];
+      }
+      tpl.fields.forEach(function (f) {
+        if (f.type !== 'image') return;
+        var val = newData[f.key];
+        if (!val || typeof val !== 'string') return;
+        if (val.indexOf('data:') === 0) return; // already inlined
+        // Relative (or absolute http/https) URL — inline it.
+        pending.push(toDataUrl(val).then(function (dataUrl) {
+          newData[f.key] = dataUrl;
+        }));
+      });
+      return {
+        id: slide.id,
+        templateId: slide.templateId,
+        theme: slide.theme,
+        hidden: slide.hidden,
+        data: newData
+      };
+    });
+
+    return Promise.all(pending).then(function () {
+      return {
+        slides: newSlides,
+        theme: state.theme,
+        meta: state.meta
+      };
     });
   }
 
