@@ -698,13 +698,111 @@
 
         return html;
       }
+    },
+
+    /* ====================================================================
+       SPOTLIGHT — Apple-keynote-style emotional product highlight
+       ==================================================================== */
+    spotlight: {
+      id: 'spotlight',
+      name: 'Spotlight',
+      description: 'Emotional, product-focused highlight slide with hero image and stat callouts.',
+      icon: '<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="50" rx="3" fill="#000"/><rect x="28" y="6" width="14" height="2" rx="1" fill="#E31837"/><rect x="20" y="11" width="30" height="3.5" rx="1" fill="#fff"/><circle cx="22" cy="32" r="11" fill="#1A1A1A"/><rect x="16" y="26" width="12" height="12" rx="2" fill="#333"/><rect x="58" y="22" width="14" height="2" rx="1" fill="#666"/><rect x="58" y="26" width="10" height="3" rx="1" fill="#E31837"/><rect x="58" y="31" width="14" height="1.5" rx="1" fill="#444"/></svg>',
+
+      fields: [
+        { key: 'kicker', type: 'text', label: 'Kicker (small label)', placeholder: 'e.g., Cameras' },
+        { key: 'headline', type: 'text', label: 'Headline', placeholder: 'e.g., A big zoom forward.', required: true },
+        { key: 'productImage', type: 'image', label: 'Hero Image' },
+        {
+          key: 'imageMode', type: 'select', label: 'Image Mode', defaultValue: 'contained',
+          options: [
+            { value: 'contained', label: 'Contained (fits inside)' },
+            { value: 'bleed', label: 'Bleed (oversized, edge-cropped)' }
+          ]
+        },
+        {
+          key: 'layoutMode', type: 'select', label: 'Layout', defaultValue: 'image-left',
+          options: [
+            { value: 'image-left', label: 'Image left, stats right' },
+            { value: 'image-right', label: 'Image right, stats left' }
+          ]
+        },
+        { key: 'stat1Label', type: 'text', label: 'Stat 1 — small label', placeholder: 'e.g., Up to' },
+        { key: 'stat1Value', type: 'text', label: 'Stat 1 — big value', placeholder: 'e.g., 8x' },
+        { key: 'stat1Caption', type: 'text', label: 'Stat 1 — caption', placeholder: 'e.g., optical-quality zoom' },
+        { key: 'stat2Label', type: 'text', label: 'Stat 2 — small label', placeholder: 'e.g., All' },
+        { key: 'stat2Value', type: 'text', label: 'Stat 2 — big value', placeholder: 'e.g., 48MP' },
+        { key: 'stat2Caption', type: 'text', label: 'Stat 2 — caption', placeholder: 'e.g., rear cameras' },
+        { key: 'stat3Label', type: 'text', label: 'Stat 3 — small label', placeholder: '' },
+        { key: 'stat3Value', type: 'text', label: 'Stat 3 — big value', placeholder: '' },
+        { key: 'stat3Caption', type: 'text', label: 'Stat 3 — caption', placeholder: '' },
+        { key: 'logo', type: 'image', label: 'Logo' }
+      ],
+
+      getTitle: function (data) {
+        return data.headline || 'Spotlight';
+      },
+
+      render: function (data) {
+        var imageMode = data.imageMode || 'contained';
+        var layoutMode = data.layoutMode || 'image-left';
+
+        // Collect filled stats (need at least a value to render)
+        var stats = [];
+        for (var i = 1; i <= 3; i++) {
+          if (data['stat' + i + 'Value']) {
+            stats.push({
+              label: data['stat' + i + 'Label'] || '',
+              value: data['stat' + i + 'Value'],
+              caption: data['stat' + i + 'Caption'] || ''
+            });
+          }
+        }
+
+        var html = '<div class="pres-slide pres-slide--spotlight pres-slide--spotlight--' + layoutMode + '">';
+        html += '<div class="pres-spotlight__head">';
+        if (data.kicker) {
+          html += '<div class="pres-spotlight__kicker">' + escapeHtml(data.kicker) + '</div>';
+        }
+        html += '<h2 class="pres-spotlight__headline">' + escapeHtml(data.headline || 'Headline') + '</h2>';
+        html += '</div>';
+
+        html += '<div class="pres-spotlight__body">';
+
+        // Image area
+        html += '<div class="pres-spotlight__image pres-spotlight__image--' + imageMode + '"' + bgStyle(data, 'productImage') + '>';
+        if (data.productImage) {
+          html += '<img src="' + data.productImage + '" alt="' + escapeHtml(data.headline || '') + '">';
+        } else {
+          html += '<div class="pres-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Hero Image</span></div>';
+        }
+        html += '</div>';
+
+        // Stats column
+        if (stats.length > 0) {
+          html += '<div class="pres-spotlight__stats">';
+          stats.forEach(function (s) {
+            html += '<div class="pres-spotlight__stat">';
+            if (s.label) html += '<div class="pres-spotlight__stat-label">' + escapeHtml(s.label) + '</div>';
+            html += '<div class="pres-spotlight__stat-value">' + escapeHtml(s.value) + '</div>';
+            if (s.caption) html += '<div class="pres-spotlight__stat-caption">' + escapeHtml(s.caption) + '</div>';
+            html += '</div>';
+          });
+          html += '</div>';
+        }
+
+        html += '</div>'; // body
+        html += renderSlideLogo(data);
+        html += '</div>'; // slide
+        return html;
+      }
     }
   };
 
   /**
    * Get ordered template list for UI display
    */
-  window.SlideTemplates._order = ['title', 'product', 'gallery', 'spec', 'generic', 'graph'];
+  window.SlideTemplates._order = ['title', 'product', 'gallery', 'spec', 'generic', 'graph', 'spotlight'];
 
   window.SlideTemplates.getOrderedList = function () {
     return window.SlideTemplates._order.map(function (id) {

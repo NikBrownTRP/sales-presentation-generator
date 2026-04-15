@@ -1275,3 +1275,162 @@
     animation-delay: 0ms !important;
   }
 }
+
+/* ============================================================================
+   SPOTLIGHT SLIDE — Apple-keynote-style emotional highlight
+   Always dark background; accent color set per theme via --pres-spotlight-accent.
+   ============================================================================ */
+
+/* Per-theme accent color (TRP red, Tektro yellow) */
+[data-theme="trp-dark"] {
+  --pres-spotlight-accent: #de2a2a;
+}
+[data-theme="tektro-light"] {
+  --pres-spotlight-accent: #FFDF00;
+}
+
+.pres-slide--spotlight {
+  background: #000000;
+  color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  padding: 36px 56px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Removes the corner brackets from the spotlight slide for a cleaner canvas */
+.pres-slide--spotlight::before,
+.pres-slide--spotlight::after {
+  display: none;
+}
+
+.pres-spotlight__head {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.pres-spotlight__kicker {
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pres-spotlight-accent, #de2a2a);
+  letter-spacing: 1.5px;
+  text-transform: none;
+  margin-bottom: 6px;
+}
+
+.pres-spotlight__headline {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 56px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -1px;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.pres-spotlight__body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: end;
+  margin-top: 18px;
+  min-height: 0;
+}
+
+.pres-slide--spotlight--image-right .pres-spotlight__body {
+  grid-template-columns: 280px 1fr;
+}
+
+.pres-slide--spotlight--image-right .pres-spotlight__image {
+  order: 2;
+}
+
+.pres-slide--spotlight--image-right .pres-spotlight__stats {
+  order: 1;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.pres-spotlight__image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.pres-spotlight__image img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Bleed mode: enlarge the image and let it crop against the slide edge */
+.pres-spotlight__image--bleed {
+  overflow: visible;
+  height: calc(100% + 28px);          /* extend below the body grid baseline */
+  margin-bottom: -28px;
+}
+.pres-spotlight__image--bleed img {
+  max-width: 115%;
+  max-height: 115%;
+  width: 115%;
+  height: auto;
+  object-fit: cover;
+  transform: translateX(-4%);
+}
+
+.pres-spotlight__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  align-items: flex-end;
+  text-align: right;
+  padding-bottom: 8px;
+}
+
+.pres-spotlight__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pres-spotlight__stat-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.pres-spotlight__stat-value {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--pres-spotlight-accent, #de2a2a);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.pres-spotlight__stat-caption {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 240px;
+}
+
+.pres-slide--spotlight .pres-placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
