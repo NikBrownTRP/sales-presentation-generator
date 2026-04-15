@@ -1090,22 +1090,27 @@ body.builder-body {
 
 .slideshow-modal__slide {
   position: absolute;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.45s ease-out,
+              filter 0.45s ease-out;
 }
 
 .slideshow-modal__slide--active {
   transform: translateX(0);
   opacity: 1;
+  filter: blur(0);
 }
 
 .slideshow-modal__slide--prev {
-  transform: translateX(-110%);
+  transform: translateX(-80px);
   opacity: 0;
+  filter: blur(10px);
 }
 
 .slideshow-modal__slide--next {
-  transform: translateX(110%);
+  transform: translateX(80px);
   opacity: 0;
+  filter: blur(10px);
 }
 
 .slideshow-modal__nav {

@@ -61,7 +61,7 @@
         var barH = (d.value / maxVal) * chartH;
         var x = padL + gap * i + (gap - barW) / 2;
         var y = padT + chartH - barH;
-        svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" fill="' + accentColor + '" rx="2" opacity="0.85">';
+        svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" style="fill:var(--pres-chart-color, ' + accentColor + ')" rx="2" opacity="0.85">';
         svg += '<animate attributeName="height" from="0" to="' + barH + '" dur="0.5s" fill="freeze"/>';
         svg += '<animate attributeName="y" from="' + (padT + chartH) + '" to="' + y + '" dur="0.5s" fill="freeze"/>';
         svg += '</rect>';
@@ -114,15 +114,15 @@
 
       // Line
       var pathD = points.map(function (p, i) { return (i === 0 ? 'M' : 'L') + p.x + ',' + p.y; }).join(' ');
-      svg += '<path d="' + pathD + '" fill="none" stroke="' + accentColor + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>';
+      svg += '<path d="' + pathD + '" fill="none" style="stroke:var(--pres-chart-color, ' + accentColor + ')" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>';
 
       // Area fill
       var areaD = pathD + ' L' + points[points.length - 1].x + ',' + (padT + chartH) + ' L' + points[0].x + ',' + (padT + chartH) + ' Z';
-      svg += '<path d="' + areaD + '" fill="' + accentColor + '" opacity="0.08"/>';
+      svg += '<path d="' + areaD + '" style="fill:var(--pres-chart-color, ' + accentColor + ')" opacity="0.08"/>';
 
       // Dots
       points.forEach(function (p) {
-        svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="4" fill="' + accentColor + '" stroke="currentColor" stroke-opacity="0.3" stroke-width="1"/>';
+        svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="4" style="fill:var(--pres-chart-color, ' + accentColor + ')" stroke="currentColor" stroke-opacity="0.3" stroke-width="1"/>';
         svg += '<text x="' + p.x + '" y="' + (p.y - 10) + '" text-anchor="middle" font-size="9" font-weight="600" fill="currentColor" opacity="0.7">' + p.value + '</text>';
       });
 
@@ -631,9 +631,10 @@
         } else {
           // Chart mode
           var chartRows = ChartRenderer.parseCSV(data.chartData);
-          var accentColor = 'var(--pres-accent, #E31837)';
-          // We need a concrete color for SVG — read from theme or default
-          var concreteAccent = '#E31837';
+          // Charts use var(--pres-chart-color) via inline style on SVG elements.
+          // The fallback below is only used if CSS variables aren't supported.
+          // TRP: #6a8da6 (accent-light blue-grey) | Tektro: #3B3B3B (charcoal)
+          var concreteAccent = '#6a8da6';
 
           html += '<div class="pres-graph-chart-wrap">';
           if (chartRows.length > 0) {
