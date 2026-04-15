@@ -1311,23 +1311,23 @@
 }
 
 .pres-spotlight__kicker {
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--pres-font-body);
   font-size: 14px;
   font-weight: 600;
   color: var(--pres-spotlight-accent, #de2a2a);
   letter-spacing: 1.5px;
-  text-transform: none;
   margin-bottom: 6px;
 }
 
 .pres-spotlight__headline {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--pres-font-heading);
   font-size: 56px;
-  font-weight: 800;
+  font-weight: var(--pres-heading-weight, 800);
   color: #FFFFFF;
-  letter-spacing: -1px;
+  letter-spacing: var(--pres-heading-tracking, -1px);
   line-height: 1.05;
   margin: 0;
+  text-transform: var(--pres-heading-transform, none);
 }
 
 .pres-spotlight__body {
@@ -1372,19 +1372,39 @@
   object-fit: contain;
 }
 
-/* Bleed mode: enlarge the image and let it crop against the slide edge */
+/* Bleed mode: image extends ONLY toward outer edges (left + bottom for
+   image-left layout; right + bottom for image-right). Never encroaches
+   on the stats column, so stats text always stays in-slide. The slide's
+   overflow:hidden then clips the image at the slide boundary for the
+   visual "bleeds past the edge" effect. */
 .pres-spotlight__image--bleed {
   overflow: visible;
-  height: calc(100% + 28px);          /* extend below the body grid baseline */
+  height: calc(100% + 28px);            /* extend into slide's bottom padding */
   margin-bottom: -28px;
 }
 .pres-spotlight__image--bleed img {
-  max-width: 115%;
-  max-height: 115%;
-  width: 115%;
-  height: auto;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
   object-fit: cover;
-  transform: translateX(-4%);
+}
+.pres-slide--spotlight--image-left .pres-spotlight__image--bleed {
+  /* 56px padding + 48px past slide edge = visible bleed; the slide's
+     overflow:hidden clips the past-edge portion. */
+  margin-left: -104px;
+  width: calc(100% + 104px);
+}
+.pres-slide--spotlight--image-left .pres-spotlight__image--bleed img {
+  object-position: left bottom;
+}
+.pres-slide--spotlight--image-right .pres-spotlight__image--bleed {
+  margin-right: -104px;
+  width: calc(100% + 104px);
+}
+.pres-slide--spotlight--image-right .pres-spotlight__image--bleed img {
+  object-position: right bottom;
 }
 
 .pres-spotlight__stats {
@@ -1394,32 +1414,42 @@
   align-items: flex-end;
   text-align: right;
   padding-bottom: 8px;
+  min-width: 0;                         /* allow children to shrink/wrap */
+  overflow: hidden;                     /* hard-stop any stat text at column edge */
 }
 
 .pres-spotlight__stat {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  max-width: 100%;
 }
 
 .pres-spotlight__stat-label {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--pres-font-body);
   font-size: 14px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.6);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pres-spotlight__stat-value {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--pres-font-heading);
   font-size: 48px;
-  font-weight: 800;
+  font-weight: var(--pres-heading-weight, 800);
   color: var(--pres-spotlight-accent, #de2a2a);
   line-height: 1;
-  letter-spacing: -1px;
+  letter-spacing: var(--pres-heading-tracking, -1px);
+  text-transform: var(--pres-heading-transform, none);
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .pres-spotlight__stat-caption {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--pres-font-body);
   font-size: 13px;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.6);
@@ -1433,4 +1463,78 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
+}
+
+/* ===================================================================
+   SPOTLIGHT — animations (Apple-keynote-style reveal choreography)
+   Fires only when .pres-slide--animated is present (slideshow mode).
+   =================================================================== */
+@keyframes spotlightKickerRise {
+  from { opacity: 0; transform: translateY(8px); letter-spacing: 3px; }
+  to   { opacity: 1; transform: translateY(0);   letter-spacing: 1.5px; }
+}
+
+@keyframes spotlightHeadlineReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes spotlightImageZoomSettle {
+  from { opacity: 0; transform: scale(1.08); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+@keyframes spotlightImageBleedIn {
+  from { opacity: 0; transform: translateY(20px) scale(1.04); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@keyframes spotlightStatRise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Apply regardless of theme — both TRP and Tektro benefit from the same
+   Apple-style reveal choreography. Theme-specific keyframes stay reserved
+   for the other slide templates so this one keeps its distinctive feel. */
+.pres-slide--spotlight.pres-slide--animated .pres-spotlight__kicker {
+  animation: spotlightKickerRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.pres-slide--spotlight.pres-slide--animated .pres-spotlight__headline {
+  animation: spotlightHeadlineReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+
+.pres-slide--spotlight.pres-slide--animated .pres-spotlight__image--contained {
+  animation: spotlightImageZoomSettle 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+  transform-origin: center center;
+}
+
+.pres-slide--spotlight.pres-slide--animated .pres-spotlight__image--bleed {
+  animation: spotlightImageBleedIn 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+  transform-origin: center bottom;
+}
+
+/* Stat callouts stagger in after the headline lands */
+.pres-slide--spotlight.pres-slide--animated .pres-spotlight__stat:nth-child(1) {
+  animation: spotlightStatRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.70s both;
+}
+.pres-slide--spotlight.pres-slide--animated .pres-spotlight__stat:nth-child(2) {
+  animation: spotlightStatRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.88s both;
+}
+.pres-slide--spotlight.pres-slide--animated .pres-spotlight__stat:nth-child(3) {
+  animation: spotlightStatRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 1.06s both;
+}
+
+/* Logo fades in last */
+.pres-slide--spotlight.pres-slide--animated .pres-slide-logo {
+  animation: pressFadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1.2s both;
 }
