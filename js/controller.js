@@ -717,25 +717,27 @@
   /* -----------------------------------------------------------------------
      Image Editor (Crop & Rotate)
      ----------------------------------------------------------------------- */
+  // New model: the output rectangle is a fixed-ratio viewport. The source image
+  // is positioned (pan) and scaled (zoom) inside that viewport. Areas outside
+  // the image within the viewport become the background of the final image.
   var imgEditor = {
     slideId: null,
     fieldKey: null,
     originalSrc: '',
     img: null,
-    rotation: 0,        // 0, 90, 180, 270
-    ratio: 1,            // numeric target aspect ratio (width/height), derived from slide container
-    crop: null,          // { x, y, w, h } in image-space coordinates
+    rotation: 0,          // 0, 90, 180, 270
+    ratio: 1,              // output aspect ratio (width/height) — from slide container
+    outputW: 0,            // output canvas width in pixels (high-res)
+    outputH: 0,            // output canvas height in pixels
+    zoom: 1,               // current zoom (1.0 = image drawn at natural pixel size)
+    fitZoom: 1,            // smallest zoom where whole image fits inside output (contain)
+    maxZoom: 4,            // how far user can zoom in
+    pan: { x: 0, y: 0 },    // offset from centered, in OUTPUT coordinates
     dragging: false,
-    dragStart: null,
-    dragMode: 'draw',    // 'draw' (new crop from empty area) or 'move' (existing crop)
-    moveOffset: null,    // {dx, dy} for move mode
+    dragStart: null,       // {mouseX, mouseY, panX, panY} at mousedown
     canvas: null,
     ctx: null,
-    scale: 1,            // display scale (image pixels → canvas pixels)
-    offsetX: 0,
-    offsetY: 0,
-    displayW: 0,
-    displayH: 0
+    displayScale: 1        // editor-display scale: OUTPUT coords → canvas pixels
   };
 
   // Selectors for the container that constrains each image field on the slide.
@@ -804,22 +806,27 @@
     return r.toFixed(2) + ':1';
   }
 
-  function getInitialCrop(imgW, imgH, targetRatio) {
-    // Largest crop that fits inside imgW×imgH while matching targetRatio, centered.
-    var cropW, cropH;
-    if (imgW / imgH > targetRatio) {
-      cropH = imgH;
-      cropW = imgH * targetRatio;
+  // Compute high-quality output dimensions given source image size + target ratio.
+  // Output is at least 1920px on its longest dimension, or larger if source is bigger.
+  function computeOutputDims(imgW, imgH, ratio) {
+    var base = Math.max(1920, imgW, imgH);
+    var outW, outH;
+    if (ratio >= 1) {
+      outW = base;
+      outH = Math.round(base / ratio);
     } else {
-      cropW = imgW;
-      cropH = imgW / targetRatio;
+      outH = base;
+      outW = Math.round(base * ratio);
     }
-    return {
-      x: Math.round((imgW - cropW) / 2),
-      y: Math.round((imgH - cropH) / 2),
-      w: Math.round(cropW),
-      h: Math.round(cropH)
-    };
+    return { w: outW, h: outH };
+  }
+
+  // Background color to paint behind the image (matches slide theme).
+  // This only affects JPEG output; PNG exports use transparent.
+  function getEditorBackgroundColor(slideId) {
+    var slide = state.slides.find(function (s) { return s.id === slideId; });
+    if (!slide) return '#000000';
+    return slide.theme === 'tektro-light' ? '#FFFFFF' : '#000000';
   }
 
   function openImageEditor(slideId, fieldKey) {
@@ -830,11 +837,10 @@
     imgEditor.fieldKey = fieldKey;
     imgEditor.originalSrc = slide.data[fieldKey];
     imgEditor.rotation = 0;
-    imgEditor.ratio = getFieldDisplayRatio(fieldKey);  // locked to slide container ratio
-    imgEditor.crop = null;
+    imgEditor.ratio = getFieldDisplayRatio(fieldKey);
     imgEditor.dragging = false;
 
-    // Update the read-only ratio label
+    // Update ratio label
     var infoEl = document.getElementById('img-ratio-info');
     if (infoEl) infoEl.textContent = formatRatio(imgEditor.ratio);
 
@@ -842,7 +848,6 @@
     imgEditor.canvas = document.getElementById('image-editor-canvas');
     imgEditor.ctx = imgEditor.canvas.getContext('2d');
 
-    // Load the image
     imgEditor.img = new Image();
     imgEditor.img.onload = function () {
       setupEditorCanvas();
@@ -867,176 +872,140 @@
     var areaW = area.clientWidth - 20;
     var areaH = area.clientHeight - 20;
 
-    var dims = getRotatedDimensions();
-    var scale = Math.min(areaW / dims.w, areaH / dims.h, 1);
-    imgEditor.scale = scale;
-    imgEditor.displayW = Math.round(dims.w * scale);
-    imgEditor.displayH = Math.round(dims.h * scale);
+    // Compute output canvas size (high-res, pixel space)
+    var imgDims = getRotatedDimensions();
+    var outDims = computeOutputDims(imgDims.w, imgDims.h, imgEditor.ratio);
+    imgEditor.outputW = outDims.w;
+    imgEditor.outputH = outDims.h;
 
-    imgEditor.canvas.width = imgEditor.displayW;
-    imgEditor.canvas.height = imgEditor.displayH;
+    // Compute "fit" zoom: the largest zoom where the whole image fits inside output
+    // (image covers the output if zoom >= this, but we want image visible entirely
+    // at start, so use min which is "contain")
+    imgEditor.fitZoom = Math.min(outDims.w / imgDims.w, outDims.h / imgDims.h);
+    // Initial zoom = fit (image fits entirely, possibly with letterboxing)
+    imgEditor.zoom = imgEditor.fitZoom;
+    imgEditor.maxZoom = Math.max(3, imgEditor.fitZoom * 3);
+    imgEditor.pan = { x: 0, y: 0 };
 
-    imgEditor.offsetX = 0;
-    imgEditor.offsetY = 0;
+    // Editor display scale: output coords → canvas pixels
+    imgEditor.displayScale = Math.min(areaW / outDims.w, areaH / outDims.h, 1);
+    imgEditor.canvas.width = Math.round(outDims.w * imgEditor.displayScale);
+    imgEditor.canvas.height = Math.round(outDims.h * imgEditor.displayScale);
 
-    // Initial crop: largest ratio-matching rectangle, centered
-    imgEditor.crop = getInitialCrop(dims.w, dims.h, imgEditor.ratio);
+    // Update zoom slider position
+    syncZoomSlider();
+  }
+
+  function syncZoomSlider() {
+    var slider = document.getElementById('img-zoom-slider');
+    var valEl = document.getElementById('img-zoom-value');
+    if (!slider) return;
+    // Map zoom [fitZoom, maxZoom] → slider [0, 100]
+    var range = imgEditor.maxZoom - imgEditor.fitZoom;
+    var frac = range > 0 ? (imgEditor.zoom - imgEditor.fitZoom) / range : 0;
+    slider.value = Math.round(Math.max(0, Math.min(1, frac)) * 100);
+    if (valEl) {
+      // Show zoom as "fit", "100%", etc. — 100% means image at natural size in output
+      if (Math.abs(imgEditor.zoom - imgEditor.fitZoom) < 0.001) {
+        valEl.textContent = 'fit';
+      } else {
+        valEl.textContent = Math.round(imgEditor.zoom * 100) + '%';
+      }
+    }
+  }
+
+  function clampPan() {
+    // Prevent panning the image entirely out of the output rect.
+    // Allow image edges to reach the output rect edges, but no further.
+    var imgDims = getRotatedDimensions();
+    var drawW = imgDims.w * imgEditor.zoom;
+    var drawH = imgDims.h * imgEditor.zoom;
+
+    // Pan range: image center can move within |(drawDim - outDim)| / 2
+    // When image is smaller than output, keep image anywhere inside output
+    //   (pan can range so image edge just touches output edge)
+    var maxPanX, maxPanY;
+    if (drawW >= imgEditor.outputW) {
+      maxPanX = (drawW - imgEditor.outputW) / 2;
+    } else {
+      maxPanX = (imgEditor.outputW - drawW) / 2;
+    }
+    if (drawH >= imgEditor.outputH) {
+      maxPanY = (drawH - imgEditor.outputH) / 2;
+    } else {
+      maxPanY = (imgEditor.outputH - drawH) / 2;
+    }
+    imgEditor.pan.x = Math.max(-maxPanX, Math.min(maxPanX, imgEditor.pan.x));
+    imgEditor.pan.y = Math.max(-maxPanY, Math.min(maxPanY, imgEditor.pan.y));
   }
 
   function drawEditorCanvas() {
     var ctx = imgEditor.ctx;
     var canvas = imgEditor.canvas;
     var img = imgEditor.img;
-    var dims = getRotatedDimensions();
-    var s = imgEditor.scale;
+    var ds = imgEditor.displayScale;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Background fill represents what the slide will show around the image
+    // (e.g. black for TRP dark, white for Tektro light).
+    ctx.fillStyle = getEditorBackgroundColor(imgEditor.slideId);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw rotated image
+    // Draw the image at zoom + pan (centered + offset)
+    var imgDims = getRotatedDimensions();
+    var drawW = imgDims.w * imgEditor.zoom * ds;
+    var drawH = imgDims.h * imgEditor.zoom * ds;
+    var cx = canvas.width / 2 + imgEditor.pan.x * ds;
+    var cy = canvas.height / 2 + imgEditor.pan.y * ds;
+
     ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.translate(cx, cy);
     ctx.rotate(imgEditor.rotation * Math.PI / 180);
-
-    var drawW, drawH;
+    // After rotation, swap draw dims for 90/270 so the image's natural
+    // pixel order is drawn correctly before the canvas transform applies.
+    var rw, rh;
     if (imgEditor.rotation === 90 || imgEditor.rotation === 270) {
-      drawW = imgEditor.displayH;
-      drawH = imgEditor.displayW;
+      rw = drawH; rh = drawW;
     } else {
-      drawW = imgEditor.displayW;
-      drawH = imgEditor.displayH;
+      rw = drawW; rh = drawH;
     }
-    ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+    ctx.drawImage(img, -rw / 2, -rh / 2, rw, rh);
     ctx.restore();
 
-    // Draw crop overlay (darken outside crop area)
-    if (imgEditor.crop) {
-      var cx = imgEditor.crop.x * s;
-      var cy = imgEditor.crop.y * s;
-      var cw = imgEditor.crop.w * s;
-      var ch = imgEditor.crop.h * s;
-
-      // Only draw overlay if crop differs from full image
-      if (Math.round(cw) < canvas.width - 2 || Math.round(ch) < canvas.height - 2) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
-        // Top
-        ctx.fillRect(0, 0, canvas.width, cy);
-        // Bottom
-        ctx.fillRect(0, cy + ch, canvas.width, canvas.height - cy - ch);
-        // Left
-        ctx.fillRect(0, cy, cx, ch);
-        // Right
-        ctx.fillRect(cx + cw, cy, canvas.width - cx - cw, ch);
-
-        // Crop border
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(cx, cy, cw, ch);
-
-        // Rule of thirds lines
-        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-        ctx.lineWidth = 0.5;
-        for (var i = 1; i <= 2; i++) {
-          ctx.beginPath();
-          ctx.moveTo(cx + (cw * i / 3), cy);
-          ctx.lineTo(cx + (cw * i / 3), cy + ch);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(cx, cy + (ch * i / 3));
-          ctx.lineTo(cx + cw, cy + (ch * i / 3));
-          ctx.stroke();
-        }
-
-        // Corner handles
-        var hs = 8;
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2.5;
-        // Top-left
-        ctx.beginPath(); ctx.moveTo(cx, cy + hs); ctx.lineTo(cx, cy); ctx.lineTo(cx + hs, cy); ctx.stroke();
-        // Top-right
-        ctx.beginPath(); ctx.moveTo(cx + cw - hs, cy); ctx.lineTo(cx + cw, cy); ctx.lineTo(cx + cw, cy + hs); ctx.stroke();
-        // Bottom-left
-        ctx.beginPath(); ctx.moveTo(cx, cy + ch - hs); ctx.lineTo(cx, cy + ch); ctx.lineTo(cx + hs, cy + ch); ctx.stroke();
-        // Bottom-right
-        ctx.beginPath(); ctx.moveTo(cx + cw - hs, cy + ch); ctx.lineTo(cx + cw, cy + ch); ctx.lineTo(cx + cw, cy + ch - hs); ctx.stroke();
-      }
-    }
-  }
-
-  // Clamp crop position so it stays within image bounds (assumes ratio-fixed size)
-  function clampCropPosition(crop) {
-    var dims = getRotatedDimensions();
-    return {
-      x: Math.max(0, Math.min(crop.x, dims.w - crop.w)),
-      y: Math.max(0, Math.min(crop.y, dims.h - crop.h)),
-      w: crop.w,
-      h: crop.h
-    };
-  }
-
-  function canvasToImageCoords(canvasX, canvasY) {
-    return {
-      x: canvasX / imgEditor.scale,
-      y: canvasY / imgEditor.scale
-    };
+    // Output-rect border (thin line so the user sees where the slide frame is)
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0.5, 0.5, canvas.width - 1, canvas.height - 1);
   }
 
   function bindImageEditorEvents() {
     var canvas = imgEditor.canvas;
-
-    // Remove old listeners by replacing canvas
     var newCanvas = canvas.cloneNode(false);
     canvas.parentNode.replaceChild(newCanvas, canvas);
     imgEditor.canvas = newCanvas;
     imgEditor.ctx = newCanvas.getContext('2d');
     drawEditorCanvas();
 
-    // MOUSE DOWN: start dragging the crop rectangle
-    // If click is inside crop → move existing crop
-    // If click is outside crop → teleport crop center to click point, then allow moving
+    // Drag = pan the image within the output rect
+    newCanvas.style.cursor = 'grab';
+
     newCanvas.addEventListener('mousedown', function (e) {
-      var rect = newCanvas.getBoundingClientRect();
-      var coords = canvasToImageCoords(e.clientX - rect.left, e.clientY - rect.top);
-      var crop = imgEditor.crop;
-      var inside = coords.x >= crop.x && coords.x <= crop.x + crop.w &&
-                   coords.y >= crop.y && coords.y <= crop.y + crop.h;
-
-      if (!inside) {
-        // Center crop on click point
-        imgEditor.crop = clampCropPosition({
-          x: coords.x - crop.w / 2,
-          y: coords.y - crop.h / 2,
-          w: crop.w, h: crop.h
-        });
-        drawEditorCanvas();
-      }
-
       imgEditor.dragging = true;
-      imgEditor.moveOffset = {
-        dx: coords.x - imgEditor.crop.x,
-        dy: coords.y - imgEditor.crop.y
+      imgEditor.dragStart = {
+        mouseX: e.clientX, mouseY: e.clientY,
+        panX: imgEditor.pan.x, panY: imgEditor.pan.y
       };
       newCanvas.style.cursor = 'grabbing';
     });
 
     newCanvas.addEventListener('mousemove', function (e) {
-      var rect = newCanvas.getBoundingClientRect();
-      var coords = canvasToImageCoords(e.clientX - rect.left, e.clientY - rect.top);
-
-      if (imgEditor.dragging) {
-        imgEditor.crop = clampCropPosition({
-          x: coords.x - imgEditor.moveOffset.dx,
-          y: coords.y - imgEditor.moveOffset.dy,
-          w: imgEditor.crop.w,
-          h: imgEditor.crop.h
-        });
-        drawEditorCanvas();
-      } else {
-        // Hover cursor hint
-        var crop = imgEditor.crop;
-        var inside = coords.x >= crop.x && coords.x <= crop.x + crop.w &&
-                     coords.y >= crop.y && coords.y <= crop.y + crop.h;
-        newCanvas.style.cursor = inside ? 'grab' : 'crosshair';
-      }
+      if (!imgEditor.dragging) return;
+      var ds = imgEditor.displayScale;
+      var dx = (e.clientX - imgEditor.dragStart.mouseX) / ds;
+      var dy = (e.clientY - imgEditor.dragStart.mouseY) / ds;
+      imgEditor.pan.x = imgEditor.dragStart.panX + dx;
+      imgEditor.pan.y = imgEditor.dragStart.panY + dy;
+      clampPan();
+      drawEditorCanvas();
     });
 
     newCanvas.addEventListener('mouseup', function () {
@@ -1046,7 +1015,31 @@
 
     newCanvas.addEventListener('mouseleave', function () {
       imgEditor.dragging = false;
+      newCanvas.style.cursor = 'grab';
     });
+
+    // Mousewheel zoom, centered on cursor position
+    newCanvas.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      var delta = -e.deltaY;
+      var factor = delta > 0 ? 1.08 : 1 / 1.08;
+      setZoom(imgEditor.zoom * factor);
+    }, { passive: false });
+
+    // Zoom buttons
+    document.getElementById('img-zoom-in').onclick = function () {
+      setZoom(imgEditor.zoom * 1.2);
+    };
+    document.getElementById('img-zoom-out').onclick = function () {
+      setZoom(imgEditor.zoom / 1.2);
+    };
+
+    // Zoom slider
+    document.getElementById('img-zoom-slider').oninput = function (e) {
+      var frac = parseInt(e.target.value, 10) / 100;
+      var newZoom = imgEditor.fitZoom + frac * (imgEditor.maxZoom - imgEditor.fitZoom);
+      setZoom(newZoom, true); // skip slider sync to avoid feedback loop
+    };
 
     // Rotate buttons
     document.getElementById('img-rotate-left').onclick = function () {
@@ -1060,52 +1053,76 @@
       drawEditorCanvas();
     };
 
-    // Reset — clears rotation and re-centers the fixed-ratio crop
+    // Reset
     document.getElementById('img-reset').onclick = function () {
       imgEditor.rotation = 0;
       setupEditorCanvas();
       drawEditorCanvas();
     };
 
-    // Cancel
+    // Cancel / Apply
     document.getElementById('img-cancel').onclick = function () {
       closeModal(document.getElementById('modal-image-edit'));
     };
-
-    // Apply
     document.getElementById('img-apply').onclick = function () {
       applyImageEdit();
     };
   }
 
+  function setZoom(newZoom, skipSliderSync) {
+    imgEditor.zoom = Math.max(imgEditor.fitZoom, Math.min(imgEditor.maxZoom, newZoom));
+    clampPan();
+    drawEditorCanvas();
+    if (!skipSliderSync) syncZoomSlider();
+    else {
+      // Update value label even when slider is being dragged
+      var valEl = document.getElementById('img-zoom-value');
+      if (valEl) {
+        if (Math.abs(imgEditor.zoom - imgEditor.fitZoom) < 0.001) {
+          valEl.textContent = 'fit';
+        } else {
+          valEl.textContent = Math.round(imgEditor.zoom * 100) + '%';
+        }
+      }
+    }
+  }
+
   function applyImageEdit() {
     var img = imgEditor.img;
-    var crop = imgEditor.crop;
-    var rotation = imgEditor.rotation;
-    var rotDims = getRotatedDimensions();
+    var imgDims = getRotatedDimensions();
 
-    // Step 1: Draw the rotated full image into an intermediate canvas so
-    // crop coordinates (which are in rotated-image space) map directly.
-    var rotCanvas = document.createElement('canvas');
-    rotCanvas.width = rotDims.w;
-    rotCanvas.height = rotDims.h;
-    var rotCtx = rotCanvas.getContext('2d');
-    rotCtx.translate(rotDims.w / 2, rotDims.h / 2);
-    rotCtx.rotate(rotation * Math.PI / 180);
-    rotCtx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
-
-    // Step 2: Extract the crop region into the final output canvas
+    // Output canvas at high-res
     var out = document.createElement('canvas');
-    out.width = Math.round(crop.w);
-    out.height = Math.round(crop.h);
+    out.width = imgEditor.outputW;
+    out.height = imgEditor.outputH;
     var outCtx = out.getContext('2d');
-    outCtx.drawImage(rotCanvas, crop.x, crop.y, crop.w, crop.h, 0, 0, out.width, out.height);
 
-    // Export as PNG if original was PNG, else JPEG
+    // Fill background (matches slide theme) — for JPEG. For PNG, we leave transparent.
     var isPng = imgEditor.originalSrc.indexOf('data:image/png') === 0;
-    var dataUrl = isPng ? out.toDataURL('image/png') : out.toDataURL('image/jpeg', 0.92);
+    if (!isPng) {
+      outCtx.fillStyle = getEditorBackgroundColor(imgEditor.slideId);
+      outCtx.fillRect(0, 0, out.width, out.height);
+    }
 
-    // Save to slide data
+    // Draw the rotated image at zoom + pan, centered
+    var drawW = imgDims.w * imgEditor.zoom;
+    var drawH = imgDims.h * imgEditor.zoom;
+    var cx = out.width / 2 + imgEditor.pan.x;
+    var cy = out.height / 2 + imgEditor.pan.y;
+
+    outCtx.save();
+    outCtx.translate(cx, cy);
+    outCtx.rotate(imgEditor.rotation * Math.PI / 180);
+    var rw, rh;
+    if (imgEditor.rotation === 90 || imgEditor.rotation === 270) {
+      rw = drawH; rh = drawW;
+    } else {
+      rw = drawW; rh = drawH;
+    }
+    outCtx.drawImage(img, -rw / 2, -rh / 2, rw, rh);
+    outCtx.restore();
+
+    var dataUrl = isPng ? out.toDataURL('image/png') : out.toDataURL('image/jpeg', 0.92);
     updateSlideData(imgEditor.slideId, imgEditor.fieldKey, dataUrl);
     renderEditor();
     debouncedThumbnailUpdate();
