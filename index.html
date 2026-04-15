@@ -259,7 +259,7 @@
   </div>
 
   <!-- Hidden file input for loading -->
-  <input type="file" id="file-input-load" accept=".json" style="display:none">
+  <input type="file" id="file-input-load" accept=".json,.pptx" style="display:none">
   <input type="file" id="file-input-image" accept="image/*" style="display:none">
 
   <!-- ===== SCRIPTS ===== -->
@@ -455,10 +455,14 @@
   })();
   </script>
 
+  <!-- Vendored libs (offline-capable) -->
+  <script src="vendor/jszip.min.js" defer></script>
+
   <!-- App modules -->
   <script src="js/templates.js?v=25" defer></script>
   <script src="js/preview.js?v=25" defer></script>
   <script src="js/exporter.js?v=25" defer></script>
+  <script src="js/pptx-import.js?v=1" defer></script>
   <script src="js/controller.js?v=25" defer></script>
 </body>
 </html>

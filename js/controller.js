@@ -1609,6 +1609,7 @@
       Dialog.choose('Load Presentation', 'Choose the file format to load:', [
         { label: 'JSON Project File', style: 'primary', value: 'json' },
         { label: 'HTML Presentation', style: 'secondary', value: 'html' },
+        { label: 'PowerPoint File (.pptx)', style: 'secondary', value: 'pptx' },
         { label: 'Cancel', style: 'ghost', value: null }
       ]).then(function (choice) {
         if (choice === 'json') {
@@ -1617,6 +1618,9 @@
         } else if (choice === 'html') {
           dom.fileInputLoad.accept = '.html,.htm';
           dom.fileInputLoad.click();
+        } else if (choice === 'pptx') {
+          dom.fileInputLoad.accept = '.pptx';
+          dom.fileInputLoad.click();
         }
       });
     });
@@ -1624,6 +1628,31 @@
     dom.fileInputLoad.addEventListener('change', function (e) {
       var file = e.target.files[0];
       if (!file) return;
+
+      // PPTX is binary — needs ArrayBuffer + the async importer module.
+      if (file.name.toLowerCase().endsWith('.pptx')) {
+        if (!window.PptxImporter) {
+          Dialog.alert('Importer Unavailable', 'PPTX importer did not load. Please reload the app.', 'error');
+          e.target.value = '';
+          return;
+        }
+        var pptxReader = new FileReader();
+        pptxReader.onload = function (ev) {
+          window.PptxImporter.parse(ev.target.result).then(function (parsed) {
+            if (parsed && parsed.slides && parsed.slides.length) {
+              loadState(parsed);
+              autoSave();
+            } else {
+              Dialog.alert('Nothing to Import', 'No slides were found in this PowerPoint file.', 'warning');
+            }
+          }).catch(function (err) {
+            Dialog.alert('Invalid File', 'Could not read this PowerPoint file: ' + (err && err.message ? err.message : err), 'error');
+          });
+        };
+        pptxReader.readAsArrayBuffer(file);
+        e.target.value = '';
+        return;
+      }
 
       var reader = new FileReader();
       reader.onload = function (ev) {
