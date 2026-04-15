@@ -1284,14 +1284,22 @@
 /* Per-theme accent color (TRP red, Tektro yellow) */
 [data-theme="trp-dark"] {
   --pres-spotlight-accent: #de2a2a;
+  --pres-spotlight-bg: #000000;
+  --pres-spotlight-fg: #FFFFFF;
+  --pres-spotlight-fg-muted: rgba(255, 255, 255, 0.6);
+  --pres-spotlight-value-color: var(--pres-spotlight-accent);
 }
 [data-theme="tektro-light"] {
-  --pres-spotlight-accent: #FFDF00;
+  --pres-spotlight-accent: #FFDF00;    /* kept for small accent touches only */
+  --pres-spotlight-bg: #FFFFFF;
+  --pres-spotlight-fg: #000000;
+  --pres-spotlight-fg-muted: rgba(0, 0, 0, 0.55);
+  --pres-spotlight-value-color: #000000; /* conservative: value in black, not yellow */
 }
 
 .pres-slide--spotlight {
-  background: #000000;
-  color: #FFFFFF;
+  background: var(--pres-spotlight-bg, #000000);
+  color: var(--pres-spotlight-fg, #FFFFFF);
   display: flex;
   flex-direction: column;
   padding: 36px 56px 28px;
@@ -1323,7 +1331,7 @@
   font-family: var(--pres-font-heading);
   font-size: 56px;
   font-weight: var(--pres-heading-weight, 800);
-  color: #FFFFFF;
+  color: var(--pres-spotlight-fg, #FFFFFF);
   letter-spacing: var(--pres-heading-tracking, -1px);
   line-height: 1.05;
   margin: 0;
@@ -1333,7 +1341,7 @@
 .pres-spotlight__body {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 280px;
+  grid-template-columns: 1fr 340px;
   gap: 24px;
   align-items: end;
   margin-top: 18px;
@@ -1341,7 +1349,7 @@
 }
 
 .pres-slide--spotlight--image-right .pres-spotlight__body {
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 340px 1fr;
 }
 
 .pres-slide--spotlight--image-right .pres-spotlight__image {
@@ -1410,7 +1418,7 @@
 .pres-spotlight__stats {
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 20px;                            /* tight enough that 3 stats fit vertically */
   align-items: flex-end;
   text-align: right;
   padding-bottom: 8px;
@@ -1429,7 +1437,7 @@
   font-family: var(--pres-font-body);
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--pres-spotlight-fg-muted, rgba(255, 255, 255, 0.6));
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1438,31 +1446,46 @@
 
 .pres-spotlight__stat-value {
   font-family: var(--pres-font-heading);
-  font-size: 48px;
+  font-size: 44px;
   font-weight: var(--pres-heading-weight, 800);
-  color: var(--pres-spotlight-accent, #de2a2a);
+  color: var(--pres-spotlight-value-color, var(--pres-spotlight-accent, #de2a2a));
   line-height: 1;
   letter-spacing: var(--pres-heading-tracking, -1px);
   text-transform: var(--pres-heading-transform, none);
   max-width: 100%;
-  overflow: hidden;
+  word-break: break-word;               /* long values wrap instead of overflow */
+  overflow-wrap: break-word;
 }
 
 .pres-spotlight__stat-caption {
   font-family: var(--pres-font-body);
   font-size: 13px;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--pres-spotlight-fg-muted, rgba(255, 255, 255, 0.6));
   max-width: 240px;
 }
 
 .pres-slide--spotlight .pres-placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: color-mix(in srgb, var(--pres-spotlight-fg, #fff) 30%, transparent);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   font-size: 12px;
+}
+
+/* Tektro-light spotlight: tiny yellow accent mark under the kicker so the
+   brand colour is still present without fighting readability on white. */
+[data-theme="tektro-light"] .pres-slide--spotlight .pres-spotlight__kicker {
+  color: var(--pres-spotlight-fg, #000);
+}
+[data-theme="tektro-light"] .pres-slide--spotlight .pres-spotlight__kicker::after {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: #FFDF00;
+  margin: 8px auto 0;
 }
 
 /* ===================================================================
