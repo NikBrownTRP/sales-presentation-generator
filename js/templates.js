@@ -600,7 +600,7 @@
         { key: 'xAxisLabel', type: 'text', label: 'X-Axis Label', placeholder: 'e.g., Quarter' },
         { key: 'yAxisLabel', type: 'text', label: 'Y-Axis Label', placeholder: 'e.g., Units Sold' },
         { key: 'chartImage', type: 'image', label: 'Image (for image mode)' },
-        { key: 'notes', type: 'list', label: 'Detail Notes', placeholder: 'Add a note...', maxItems: 4 },
+        { key: 'notes', type: 'list', label: 'Detail Notes', placeholder: 'Add a note...', maxItems: 8 },
         { key: 'footnote', type: 'text', label: 'Footnote / Source', placeholder: 'e.g., Source: Internal sales data' },
         { key: 'logo', type: 'image', label: 'Logo' }
       ],
