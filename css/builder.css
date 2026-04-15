@@ -329,8 +329,8 @@ body.builder-body {
 
 .slide-item {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
   padding: 8px;
   border-radius: var(--builder-radius);
   cursor: pointer;
@@ -338,6 +338,12 @@ body.builder-body {
   border: 1px solid transparent;
   margin-bottom: 4px;
   position: relative;
+}
+
+.slide-item__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .slide-item:hover {
@@ -431,14 +437,28 @@ body.builder-body {
 
 .slide-item__actions {
   display: flex;
-  flex-direction: column;
   gap: 2px;
   opacity: 0;
   transition: opacity var(--builder-transition);
   flex-shrink: 0;
 }
 
-.slide-item:hover .slide-item__actions {
+/* Side column: move-up / move-down, stacked vertically next to the thumbnail */
+.slide-item__actions--side {
+  flex-direction: column;
+}
+
+/* Bottom row: duplicate / hide / delete, horizontal + right-aligned.
+   Always present so the item height is stable; buttons fade in on hover. */
+.slide-item__actions--bottom {
+  flex-direction: row;
+  justify-content: flex-end;
+  padding-top: 4px;
+  border-top: 1px solid var(--builder-border);
+}
+
+.slide-item:hover .slide-item__actions,
+.slide-item--active .slide-item__actions {
   opacity: 1;
 }
 
