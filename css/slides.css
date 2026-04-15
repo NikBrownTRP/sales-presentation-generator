@@ -1380,39 +1380,48 @@
   object-fit: contain;
 }
 
-/* Bleed mode: image extends ONLY toward outer edges (left + bottom for
-   image-left layout; right + bottom for image-right). Never encroaches
-   on the stats column, so stats text always stays in-slide. The slide's
-   overflow:hidden then clips the image at the slide boundary for the
-   visual "bleeds past the edge" effect. */
+/* Bleed mode: the image container keeps its normal cell-sized footprint
+   in the grid — so stats, headline, and kicker are NEVER affected by
+   image-mode. The bleed effect is achieved entirely through an absolutely
+   positioned <img> child that extends past the container in the outer
+   direction (left for image-left layout, right for image-right) and past
+   the bottom into the slide's padding. Slide-level overflow:hidden clips
+   the past-edge portion for the Apple-style "crops at edge" look. */
 .pres-spotlight__image--bleed {
   overflow: visible;
-  height: calc(100% + 28px);            /* extend into slide's bottom padding */
-  margin-bottom: -28px;
+  /* container stays 100% × 100% of its grid cell; no margin/width hacks */
 }
 .pres-spotlight__image--bleed img {
   display: block;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: -28px;                        /* bleed into slide's 28px bottom padding */
   max-width: none;
   max-height: none;
+  width: auto;
+  height: auto;
   object-fit: cover;
 }
-.pres-slide--spotlight--image-left .pres-spotlight__image--bleed {
-  /* 56px padding + 48px past slide edge = visible bleed; the slide's
-     overflow:hidden clips the past-edge portion. */
-  margin-left: -104px;
-  width: calc(100% + 104px);
-}
 .pres-slide--spotlight--image-left .pres-spotlight__image--bleed img {
+  left: -104px;                         /* 56px slide padding + 48px past-edge */
+  right: 0;
+  width: calc(100% + 104px);
+  height: calc(100% + 28px);
   object-position: left bottom;
 }
-.pres-slide--spotlight--image-right .pres-spotlight__image--bleed {
-  margin-right: -104px;
-  width: calc(100% + 104px);
-}
 .pres-slide--spotlight--image-right .pres-spotlight__image--bleed img {
+  left: 0;
+  right: -104px;
+  width: calc(100% + 104px);
+  height: calc(100% + 28px);
   object-position: right bottom;
+}
+
+/* Placeholder (no image uploaded yet) also needs to visualise the bleed
+   footprint so the user sees where their image will sit. */
+.pres-spotlight__image--bleed .pres-placeholder {
+  position: absolute;
+  inset: 0;
 }
 
 .pres-spotlight__stats {
