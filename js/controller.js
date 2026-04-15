@@ -1607,9 +1607,9 @@
 
     document.getElementById('btn-load').addEventListener('click', function () {
       Dialog.choose('Load Presentation', 'Choose the file format to load:', [
-        { label: 'JSON Project File', style: 'primary', value: 'json' },
-        { label: 'HTML Presentation', style: 'secondary', value: 'html' },
-        { label: 'PowerPoint File (.pptx)', style: 'secondary', value: 'pptx' },
+        { label: 'JSON', style: 'primary', value: 'json' },
+        { label: 'HTML', style: 'secondary', value: 'html' },
+        { label: 'PowerPoint', style: 'secondary', value: 'pptx' },
         { label: 'Cancel', style: 'ghost', value: null }
       ]).then(function (choice) {
         if (choice === 'json') {

@@ -42,7 +42,7 @@ When creating a new slide, the following are automatically prefilled (editable):
 
 ## Slide Templates
 
-Six templates cover common sales presentation needs.
+Seven templates cover common sales presentation needs.
 
 | Template | Purpose | Key Fields |
 |----------|---------|------------|
@@ -51,9 +51,12 @@ Six templates cover common sales presentation needs.
 | **Product Gallery** | Multi-image showcase | Heading, up to 3 images with captions, layout options |
 | **Product Spec** | Technical details | Product name, specs table, features list, image |
 | **Header + List** | Flexible content slide | Heading, bullet list, optional image, layout choice |
-| **Data & Graph** | Charts and data visuals | Bar chart, XY line plot, or image + detail notes |
+| **Data & Graph** | Charts and data visuals | Bar chart, XY line plot, or image + up to 8 detail notes |
+| **Spotlight** | Apple-keynote-style highlight | Headline, tagline, full-bleed image, stat grid |
 
 The **Add Slide** modal shows live themed previews of each template. Select TRP Racing or Tektro at the top to preview both brand styles before adding.
+
+You can also **change a slide's template later** without losing content -- compatible fields (heading, image, bullets) carry over to the new template.
 
 ---
 
@@ -69,17 +72,32 @@ The **Add Slide** modal shows live themed previews of each template. Select TRP 
 
 ### Content Editing
 - Text inputs for titles, subtitles, taglines
-- **Dynamic list builder** -- add/remove bullet points
+- **Dynamic list builder** -- add/remove bullet points, drag-and-drop to reorder
 - **Spec table editor** -- add/remove key-value rows
 - **Image upload** with drag-and-drop (PNG transparency preserved, images compressed client-side)
+- **WYSIWYG image editor** -- crop is ratio-locked to the slide container, with zoom + pan, below-fit zoom-out for padded layouts, and a background color picker (solid color, eyedropper, or reset)
 - **Brand logo** on every slide type (auto-prefilled, removable, replaceable)
 - Layout selector for flexible templates
 
 ### Save & Load
-- **Auto-saves** to `localStorage` every 2 seconds
+- **Auto-saves** to IndexedDB (unlimited capacity) with localStorage fallback, restored automatically on refresh
 - **New Presentation** button with save warning
 - **Save as JSON** -- download the full project as a `.json` file (file picker dialog)
-- **Load** -- choose between JSON project file or HTML presentation to re-import
+- **Load** -- JSON project file, previously exported HTML, **or a `.pptx` PowerPoint file**
+
+### PPTX Import
+
+Bring an existing PowerPoint deck straight into the builder -- no copy-pasting.
+
+- Click **Load > PowerPoint** and pick a `.pptx` file
+- Text, images, and slide order are extracted **in the browser** (via vendored JSZip, offline-capable)
+- Each slide is mapped to the best-fit template automatically:
+  - First slide with a title -> **Title Page**
+  - Slides with 3+ images -> **Product Gallery**
+  - Everything else -> **Header + List**
+- Images are downscaled to the builder's normal size budget and embedded as base64
+- Use the built-in template switcher afterward if a slide needs a different layout (e.g. promote a generic slide to **Spotlight**)
+- Speaker notes, charts, SmartArt, and embedded video are ignored; animations and PowerPoint layout are replaced by the selected brand theme -- this is an intentional re-skin, not a 1:1 clone
 
 ### Export
 - **Export HTML** -- self-contained slideshow file with:
@@ -92,8 +110,10 @@ The **Add Slide** modal shows live themed previews of each template. Select TRP 
 - Hidden slides are automatically excluded from all exports
 
 ### Presentation Mode
-- **Fullscreen slideshow** with animated transitions
+- **Fullscreen slideshow** with brand-specific animated transitions (TRP Racing and Tektro each have their own reveal choreography)
+- **Preview from current slide** -- the sidebar "Preview from here" button starts the slideshow at the selected slide instead of slide 1
 - Navigate with arrow keys, spacebar, dot indicators, or on-screen buttons
+- Slideshow fills the full viewport on large displays (no black letterboxing beyond what the 16:9 ratio requires)
 - **F key** or fullscreen button to enter/exit fullscreen
 - Press **Escape** to close
 
@@ -140,10 +160,18 @@ Click **Preview** to see the full slideshow with animations.
 ## Re-editing an Exported Presentation
 
 1. Click **Load** in the header
-2. Choose **HTML Presentation**
+2. Choose **HTML**
 3. Select the `.html` file you previously exported
 4. The builder restores all slides, content, images, and theme settings
 5. Make edits and export again
+
+## Importing a PowerPoint Deck
+
+1. Click **Load** in the header
+2. Choose **PowerPoint**
+3. Select any `.pptx` file
+4. Text and images are extracted in the browser; each slide is auto-mapped to a builder template
+5. Review the imported deck, switch templates if needed, refine content, and export
 
 ---
 
@@ -165,10 +193,13 @@ sales-presentation-generator/
     builder.css           # Builder UI styles, dialogs, modals
     slides.css            # Slide themes, template styles, animations
   js/
-    templates.js          # 6 slide template definitions (fields + render)
-    app.js                # Main controller (state, CRUD, forms, events)
+    templates.js          # 7 slide template definitions (fields + render)
+    controller.js         # Main controller (state, CRUD, forms, events)
     preview.js            # Live preview + fullscreen slideshow
     exporter.js           # Save/load + PDF/HTML export
+    pptx-import.js        # In-browser PowerPoint (.pptx) extractor + template heuristics
+  vendor/
+    jszip.min.js          # JSZip 3.10.1 (vendored for offline pptx unzipping)
   assets/
     Logo TRP_w.png        # TRP logo (white, for dark slides)
     Logo Tektro.png       # Tektro logo (for light slides)
@@ -190,6 +221,9 @@ This ensures the HTML export includes the latest slide styles (required because 
 - **Google Fonts** -- Oswald (TRP headings), Manrope (Tektro headings), Inter (body)
 - **html2canvas** v1.4.1 -- renders slides to canvas for PDF
 - **jsPDF** v2.5.1 -- assembles PDF from canvas images
+
+### Vendored Dependencies (offline-capable)
+- **JSZip** v3.10.1 (`vendor/jszip.min.js`) -- unzips `.pptx` files in the browser. Vendored rather than loaded from CDN so PPTX import works offline.
 
 ### Browser Support
 Chrome, Firefox, Safari, Edge (latest). Uses CSS custom properties, CSS Grid, Promises, Fetch API, FileReader API, and optionally the File System Access API for save dialogs.
