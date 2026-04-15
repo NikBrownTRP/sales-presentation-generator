@@ -730,7 +730,8 @@
     outputW: 0,            // output canvas width in pixels (high-res)
     outputH: 0,            // output canvas height in pixels
     zoom: 1,               // current zoom (1.0 = image drawn at natural pixel size)
-    fitZoom: 1,            // smallest zoom where whole image fits inside output (contain)
+    fitZoom: 1,            // zoom at which the whole image fits inside the output (contain)
+    minZoom: 0.1,          // smallest allowed zoom (image can shrink below fit for padding)
     maxZoom: 4,            // how far user can zoom in
     pan: { x: 0, y: 0 },    // offset from centered, in OUTPUT coordinates
     dragging: false,
@@ -882,9 +883,11 @@
     // (image covers the output if zoom >= this, but we want image visible entirely
     // at start, so use min which is "contain")
     imgEditor.fitZoom = Math.min(outDims.w / imgDims.w, outDims.h / imgDims.h);
-    // Initial zoom = fit (image fits entirely, possibly with letterboxing)
+    // Allow user to zoom below fit down to 25% of fit (adds padding around image).
+    imgEditor.minZoom = imgEditor.fitZoom * 0.25;
+    imgEditor.maxZoom = imgEditor.fitZoom * 4;
+    // Initial zoom = fit (image fits entirely, with any letterbox from ratio mismatch).
     imgEditor.zoom = imgEditor.fitZoom;
-    imgEditor.maxZoom = Math.max(3, imgEditor.fitZoom * 3);
     imgEditor.pan = { x: 0, y: 0 };
 
     // Editor display scale: output coords → canvas pixels
@@ -896,22 +899,33 @@
     syncZoomSlider();
   }
 
+  // Log-scale mapping between zoom and slider [0..100] so "fit" sits near the
+  // middle (equal visual distance to zoom-out-to-min and zoom-in-to-max).
+  function zoomToSliderValue(zoom) {
+    var logMin = Math.log(imgEditor.minZoom);
+    var logMax = Math.log(imgEditor.maxZoom);
+    var logZ = Math.log(Math.max(imgEditor.minZoom, Math.min(imgEditor.maxZoom, zoom)));
+    return Math.round(((logZ - logMin) / (logMax - logMin)) * 100);
+  }
+
+  function sliderValueToZoom(val) {
+    var logMin = Math.log(imgEditor.minZoom);
+    var logMax = Math.log(imgEditor.maxZoom);
+    return Math.exp(logMin + (val / 100) * (logMax - logMin));
+  }
+
+  function formatZoomLabel() {
+    var fit = imgEditor.fitZoom;
+    if (Math.abs(imgEditor.zoom - fit) / fit < 0.02) return 'fit';
+    // Show as percentage of fit so "200%" = 2× fit, "50%" = half of fit.
+    return Math.round(imgEditor.zoom / fit * 100) + '%';
+  }
+
   function syncZoomSlider() {
     var slider = document.getElementById('img-zoom-slider');
     var valEl = document.getElementById('img-zoom-value');
-    if (!slider) return;
-    // Map zoom [fitZoom, maxZoom] → slider [0, 100]
-    var range = imgEditor.maxZoom - imgEditor.fitZoom;
-    var frac = range > 0 ? (imgEditor.zoom - imgEditor.fitZoom) / range : 0;
-    slider.value = Math.round(Math.max(0, Math.min(1, frac)) * 100);
-    if (valEl) {
-      // Show zoom as "fit", "100%", etc. — 100% means image at natural size in output
-      if (Math.abs(imgEditor.zoom - imgEditor.fitZoom) < 0.001) {
-        valEl.textContent = 'fit';
-      } else {
-        valEl.textContent = Math.round(imgEditor.zoom * 100) + '%';
-      }
-    }
+    if (slider) slider.value = zoomToSliderValue(imgEditor.zoom);
+    if (valEl) valEl.textContent = formatZoomLabel();
   }
 
   function clampPan() {
@@ -1034,10 +1048,9 @@
       setZoom(imgEditor.zoom / 1.2);
     };
 
-    // Zoom slider
+    // Zoom slider (log-scale)
     document.getElementById('img-zoom-slider').oninput = function (e) {
-      var frac = parseInt(e.target.value, 10) / 100;
-      var newZoom = imgEditor.fitZoom + frac * (imgEditor.maxZoom - imgEditor.fitZoom);
+      var newZoom = sliderValueToZoom(parseInt(e.target.value, 10));
       setZoom(newZoom, true); // skip slider sync to avoid feedback loop
     };
 
@@ -1070,20 +1083,15 @@
   }
 
   function setZoom(newZoom, skipSliderSync) {
-    imgEditor.zoom = Math.max(imgEditor.fitZoom, Math.min(imgEditor.maxZoom, newZoom));
+    imgEditor.zoom = Math.max(imgEditor.minZoom, Math.min(imgEditor.maxZoom, newZoom));
     clampPan();
     drawEditorCanvas();
-    if (!skipSliderSync) syncZoomSlider();
-    else {
-      // Update value label even when slider is being dragged
+    if (!skipSliderSync) {
+      syncZoomSlider();
+    } else {
+      // Slider value is driving this change — just update the text label
       var valEl = document.getElementById('img-zoom-value');
-      if (valEl) {
-        if (Math.abs(imgEditor.zoom - imgEditor.fitZoom) < 0.001) {
-          valEl.textContent = 'fit';
-        } else {
-          valEl.textContent = Math.round(imgEditor.zoom * 100) + '%';
-        }
-      }
+      if (valEl) valEl.textContent = formatZoomLabel();
     }
   }
 
