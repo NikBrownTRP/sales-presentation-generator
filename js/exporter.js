@@ -624,7 +624,12 @@
     loadFromLocalStorageAsync: loadFromLocalStorageAsync,
     saveToFile: saveToFile,
     exportToPDF: exportToPDF,
-    exportToHTML: exportToHTML
+    exportToHTML: exportToHTML,
+    // Exposed so the inline HTML-export override in index.html can reuse
+    // the same image-inlining logic — otherwise relative-path logos
+    // ("assets/Logo TRP_w.png") never become data URLs and disappear
+    // from standalone HTML exports.
+    inlineRelativeImages: inlineRelativeImages
   };
 
 })();

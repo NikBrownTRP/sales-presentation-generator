@@ -695,11 +695,16 @@
       });
     });
 
-    // Image remove buttons
+    // Image remove buttons — also drop the companion "Original" source
+    // and any saved edit state so the next upload starts clean.
     dom.editorForm.querySelectorAll('.form-image-upload__remove').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        updateSlideData(slide.id, btn.dataset.key, '');
+        var key = btn.dataset.key;
+        updateSlideData(slide.id, key, '');
+        updateSlideData(slide.id, key + 'Original', '');
+        updateSlideData(slide.id, key + 'Edit', '');
+        updateSlideData(slide.id, key + 'Bg', '');
         renderEditor();
         debouncedThumbnailUpdate();
       });
@@ -820,8 +825,24 @@
       if (fieldKey === 'logo') { maxW = 400; maxH = 200; }
       else if (fieldKey === 'productImage' || fieldKey === 'image') { maxW = 1200; maxH = 900; }
 
-      resizeImage(e.target.result, maxW, maxH, 0.85).then(function (resized) {
-        updateSlideData(slideId, fieldKey, resized);
+      // Keep a higher-resolution copy of the ORIGINAL upload so re-editing
+      // (crop, rotate, pan, zoom) stays lossless — each edit applies to
+      // the pristine source, not to the already-cropped display version.
+      // Without this, cropping in → out discards pixels permanently and
+      // forces the user to re-upload to recover them.
+      var origMaxW = Math.max(maxW * 2, 2400);
+      var origMaxH = Math.max(maxH * 2, 1800);
+
+      Promise.all([
+        resizeImage(e.target.result, maxW, maxH, 0.85),
+        resizeImage(e.target.result, origMaxW, origMaxH, 0.92)
+      ]).then(function (pair) {
+        var display = pair[0];
+        var original = pair[1];
+        updateSlideData(slideId, fieldKey, display);
+        updateSlideData(slideId, fieldKey + 'Original', original);
+        // Fresh upload — clear any stored edit state from a previous image.
+        updateSlideData(slideId, fieldKey + 'Edit', '');
         renderEditor();
         debouncedThumbnailUpdate();
       });
@@ -953,13 +974,29 @@
 
     imgEditor.slideId = slideId;
     imgEditor.fieldKey = fieldKey;
-    imgEditor.originalSrc = slide.data[fieldKey];
-    imgEditor.rotation = 0;
+    // Prefer the stored pristine upload (set by handleImageFile) so
+    // repeated crop/rotate sessions stay lossless. Fall back to the
+    // display image when there is no stored original (legacy slides,
+    // imports, default brand assets).
+    imgEditor.originalSrc = slide.data[fieldKey + 'Original'] || slide.data[fieldKey];
     imgEditor.ratio = getFieldDisplayRatio(fieldKey);
     imgEditor.dragging = false;
     imgEditor.pickingColor = false;
     // Load previously-saved bg color (if any) so the user sees their previous choice
     imgEditor.bgColor = slide.data[fieldKey + 'Bg'] || null;
+    // Restore previous edit state (rotation / pan / zoom) if saved — so
+    // re-opening the editor shows the same framing the user had, but
+    // applied on top of the original.
+    var savedEdit = slide.data[fieldKey + 'Edit'];
+    if (savedEdit && typeof savedEdit === 'object') {
+      imgEditor.rotation = (typeof savedEdit.rotation === 'number') ? savedEdit.rotation : 0;
+      imgEditor._restorePan = savedEdit.pan && typeof savedEdit.pan.x === 'number' ? savedEdit.pan : null;
+      imgEditor._restoreZoom = (typeof savedEdit.zoom === 'number') ? savedEdit.zoom : null;
+    } else {
+      imgEditor.rotation = 0;
+      imgEditor._restorePan = null;
+      imgEditor._restoreZoom = null;
+    }
 
     // Update ratio label
     var infoEl = document.getElementById('img-ratio-info');
@@ -1019,6 +1056,19 @@
     // Initial zoom = fit (image fits entirely, with any letterbox from ratio mismatch).
     imgEditor.zoom = imgEditor.fitZoom;
     imgEditor.pan = { x: 0, y: 0 };
+
+    // Restore previous edit state (saved from a prior apply), if any.
+    // Zoom values stored from a previous session are in the SAME units
+    // as `imgEditor.zoom` (multiplier of natural pixel size), so they
+    // translate directly across re-opens even if the output canvas size
+    // was different — we just clamp into the current min/max range.
+    if (imgEditor._restoreZoom != null) {
+      imgEditor.zoom = Math.max(imgEditor.minZoom, Math.min(imgEditor.maxZoom, imgEditor._restoreZoom));
+    }
+    if (imgEditor._restorePan) {
+      imgEditor.pan = { x: imgEditor._restorePan.x, y: imgEditor._restorePan.y };
+      if (typeof clampPan === 'function') clampPan();
+    }
 
     // Editor display scale: output coords → canvas pixels
     imgEditor.displayScale = Math.min(areaW / outDims.w, areaH / outDims.h, 1);
@@ -1326,6 +1376,21 @@
     // Persist the chosen bg color so (a) re-opening the editor shows the previous
     // choice and (b) the slide template can paint the container background too.
     updateSlideData(imgEditor.slideId, imgEditor.fieldKey + 'Bg', imgEditor.bgColor || '');
+    // Persist the edit framing (rotation / pan / zoom) so re-opening the
+    // editor starts from where the user left off, while still applying
+    // to the pristine original — no accumulated quality loss across edits.
+    updateSlideData(imgEditor.slideId, imgEditor.fieldKey + 'Edit', {
+      rotation: imgEditor.rotation,
+      pan: { x: imgEditor.pan.x, y: imgEditor.pan.y },
+      zoom: imgEditor.zoom
+    });
+    // If the slide never stored an Original (legacy / imported / default
+    // brand asset), preserve the pre-edit source AS the original so the
+    // NEXT edit is also lossless. `src` is what we actually drew from.
+    var slide = state.slides.find(function (s) { return s.id === imgEditor.slideId; });
+    if (slide && !slide.data[imgEditor.fieldKey + 'Original']) {
+      updateSlideData(imgEditor.slideId, imgEditor.fieldKey + 'Original', src);
+    }
     renderEditor();
     debouncedThumbnailUpdate();
     closeModal(document.getElementById('modal-image-edit'));
@@ -1630,8 +1695,11 @@
         } else if (choice === 'pptx') {
           // PPTX has no brand embedded, so ask which template to convert to
           // before opening the file picker.
+          // Both brand buttons use the same (secondary) style so neither
+          // reads as the preferred default — the user should make a
+          // deliberate pick.
           Dialog.choose('Import as…', 'Which template should the imported slides use?', [
-            { label: 'TRP Racing', style: 'primary', value: 'trp-dark' },
+            { label: 'TRP Racing', style: 'secondary', value: 'trp-dark' },
             { label: 'Tektro', style: 'secondary', value: 'tektro-light' },
             { label: 'Cancel', style: 'ghost', value: null }
           ]).then(function (themeChoice) {
