@@ -580,6 +580,7 @@
       case 'chartdata':
         html += '<textarea class="form-textarea form-textarea--mono" data-key="' + field.key + '" placeholder="' + escAttr(field.placeholder || '') + '" rows="6">' + window.escapeHtml(value || '') + '</textarea>';
         html += '<div class="form-hint">Enter one data point per line as <strong>label,value</strong> (e.g., Q1,120). For XY plots, labels are X-values.</div>';
+        html += '<div class="form-hint">Add <code>,highlight</code> to a row to accent that bar in the secondary color (e.g., <code>Q2,185,highlight</code>).</div>';
         break;
     }
 

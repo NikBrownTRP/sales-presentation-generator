@@ -34,7 +34,7 @@
   var ChartRenderer = {
 
     parseCSV: function (raw) {
-      // Accepts "label,value" lines or just "value" lines
+      // Accepts "label,value[,highlight]" lines or just "value" lines
       var rows = [];
       if (!raw) return rows;
       raw.split('\n').forEach(function (line) {
@@ -42,10 +42,14 @@
         if (!line) return;
         var parts = line.split(',');
         if (parts.length >= 2) {
-          rows.push({ label: parts[0].trim(), value: parseFloat(parts[1]) || 0 });
+          rows.push({
+            label: parts[0].trim(),
+            value: parseFloat(parts[1]) || 0,
+            highlight: parts.length >= 3 && parts[2].trim().toLowerCase() === 'highlight'
+          });
         } else {
           var v = parseFloat(parts[0]);
-          if (!isNaN(v)) rows.push({ label: '', value: v });
+          if (!isNaN(v)) rows.push({ label: '', value: v, highlight: false });
         }
       });
       return rows;
@@ -75,7 +79,10 @@
         var barH = (d.value / maxVal) * chartH;
         var x = padL + gap * i + (gap - barW) / 2;
         var y = padT + chartH - barH;
-        svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" style="fill:var(--pres-chart-color, ' + accentColor + ')" rx="2" opacity="0.85">';
+        var fillStyle = d.highlight
+          ? 'fill:var(--pres-accent-secondary, ' + accentColor + ')'
+          : 'fill:var(--pres-chart-color, ' + accentColor + ')';
+        svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" style="' + fillStyle + '" rx="2" opacity="0.85">';
         svg += '<animate attributeName="height" from="0" to="' + barH + '" dur="0.5s" fill="freeze"/>';
         svg += '<animate attributeName="y" from="' + (padT + chartH) + '" to="' + y + '" dur="0.5s" fill="freeze"/>';
         svg += '</rect>';

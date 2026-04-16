@@ -679,6 +679,15 @@ body.builder-body {
   color: var(--builder-text-secondary);
 }
 
+.form-hint code {
+  background: var(--builder-surface-alt);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-family: monospace;
+  font-size: 10px;
+  color: var(--builder-text-secondary);
+}
+
 .form-textarea--mono {
   font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
   font-size: 13px;
