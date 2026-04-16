@@ -80,7 +80,7 @@
         var x = padL + gap * i + (gap - barW) / 2;
         var y = padT + chartH - barH;
         var fillStyle = d.highlight
-          ? 'fill:var(--pres-accent-secondary, ' + accentColor + ')'
+          ? 'fill:var(--pres-accent-secondary, #de2a2a)'
           : 'fill:var(--pres-chart-color, ' + accentColor + ')';
         svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" style="' + fillStyle + '" rx="2" opacity="0.85">';
         svg += '<animate attributeName="height" from="0" to="' + barH + '" dur="0.5s" fill="freeze"/>';
