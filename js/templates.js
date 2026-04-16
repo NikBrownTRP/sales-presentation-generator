@@ -14,9 +14,12 @@
     return '<img class="pres-slide-logo" src="' + data.logo + '" alt=""' + bgStyle(data, 'logo') + '>';
   }
 
-  // Returns a style string for the image-container background color if the user
+  // Returns a style string for an element's background color if the user
   // picked one in the editor. The editor saves this as "{fieldKey}Bg".
-  // Usage: <div class="pres-..."' + bgStyle(data, 'productImage') + '>
+  // NOTE: Only use on tightly-sized elements (e.g. logo <img> tags).
+  // Do NOT apply to large container divs — the bg color is already baked
+  // into the image output itself (letterbox fill in applyImageEdit), so
+  // applying it to the container would flood the entire container area.
   function bgStyle(data, fieldKey) {
     var c = data && data[fieldKey + 'Bg'];
     if (!c) return '';
@@ -292,7 +295,7 @@
         html += '<div class="pres-divider"></div>';
 
         // Right: product image
-        html += '<div class="pres-product-image-area"' + bgStyle(data, 'productImage') + '>';
+        html += '<div class="pres-product-image-area">';
 
         if (data.badgeText) {
           html += '<span class="pres-badge">' + escapeHtml(data.badgeText) + '</span>';
@@ -380,7 +383,7 @@
         html += '</div>'; // spec-left
 
         // Right: Product image
-        html += '<div class="pres-spec-right"' + bgStyle(data, 'productImage') + '>';
+        html += '<div class="pres-spec-right">';
         if (data.productImage) {
           html += '<img class="pres-spec-product-img" src="' + data.productImage + '" alt="' + escapeHtml(data.productName || '') + '">';
         } else {
@@ -475,7 +478,7 @@
           }
           html += '</div>';
 
-          html += '<div class="pres-generic-image-area"' + bgStyle(data, 'image') + '>';
+          html += '<div class="pres-generic-image-area">';
           if (data.image) {
             html += '<img class="pres-generic-img" src="' + data.image + '" alt="">';
           } else {
@@ -554,7 +557,7 @@
         for (var i = 0; i < count; i++) {
           var img = images[i];
           html += '<div class="pres-gallery-item">';
-          html += '<div class="pres-gallery-image-wrap"' + bgStyle(data, 'image' + (i + 1)) + '>';
+          html += '<div class="pres-gallery-image-wrap">';
           if (img.src) {
             html += '<img class="pres-gallery-img" src="' + img.src + '" alt="">';
           } else {
@@ -633,7 +636,7 @@
         if (mode === 'image') {
           // Centered image mode
           if (data.chartImage) {
-            html += '<div class="pres-graph-image-wrap"' + bgStyle(data, 'chartImage') + '>';
+            html += '<div class="pres-graph-image-wrap">';
             html += '<img class="pres-graph-img" src="' + data.chartImage + '" alt="">';
             html += '</div>';
           } else {
@@ -770,7 +773,7 @@
         html += '<div class="pres-spotlight__body">';
 
         // Image area
-        html += '<div class="pres-spotlight__image pres-spotlight__image--' + imageMode + '"' + bgStyle(data, 'productImage') + '>';
+        html += '<div class="pres-spotlight__image pres-spotlight__image--' + imageMode + '">';
         if (data.productImage) {
           html += '<img src="' + data.productImage + '" alt="' + escapeHtml(data.headline || '') + '">';
         } else {
