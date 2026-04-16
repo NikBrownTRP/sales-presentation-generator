@@ -1329,6 +1329,21 @@
   overflow: hidden;
 }
 
+.pres-slide--spotlight .pres-slide__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.pres-slide--spotlight .pres-slide__overlay {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 1;
+}
+
 /* Removes the corner brackets from the spotlight slide for a cleaner canvas */
 .pres-slide--spotlight::before,
 .pres-slide--spotlight::after {
@@ -1338,6 +1353,8 @@
 .pres-spotlight__head {
   text-align: center;
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .pres-spotlight__kicker {
@@ -1360,101 +1377,24 @@
   text-transform: var(--pres-heading-transform, none);
 }
 
-.pres-spotlight__body {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
-  align-items: end;
-  margin-top: 18px;
-  min-height: 0;
-}
-
-.pres-slide--spotlight--image-right .pres-spotlight__body {
-  grid-template-columns: 340px 1fr;
-}
-
-.pres-slide--spotlight--image-right .pres-spotlight__image {
-  order: 2;
-}
-
-.pres-slide--spotlight--image-right .pres-spotlight__stats {
-  order: 1;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.pres-spotlight__image {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: 4px;
-}
-
-.pres-spotlight__image img {
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-/* Bleed mode: the image container keeps its normal cell-sized footprint
-   in the grid — so stats, headline, and kicker are NEVER affected by
-   image-mode. The bleed effect is achieved entirely through an absolutely
-   positioned <img> child that extends past the container in the outer
-   direction (left for image-left layout, right for image-right) and past
-   the bottom into the slide's padding. Slide-level overflow:hidden clips
-   the past-edge portion for the Apple-style "crops at edge" look. */
-.pres-spotlight__image--bleed {
-  overflow: visible;
-  /* container stays 100% × 100% of its grid cell; no margin/width hacks */
-}
-.pres-spotlight__image--bleed img {
-  display: block;
-  position: absolute;
-  top: 0;
-  bottom: -28px;                        /* bleed into slide's 28px bottom padding */
-  max-width: none;
-  max-height: none;
-  width: auto;
-  height: auto;
-  object-fit: cover;
-}
-.pres-slide--spotlight--image-left .pres-spotlight__image--bleed img {
-  left: -104px;                         /* 56px slide padding + 48px past-edge */
-  right: 0;
-  width: calc(100% + 104px);
-  height: calc(100% + 28px);
-  object-position: left bottom;
-}
-.pres-slide--spotlight--image-right .pres-spotlight__image--bleed img {
-  left: 0;
-  right: -104px;
-  width: calc(100% + 104px);
-  height: calc(100% + 28px);
-  object-position: right bottom;
-}
-
-/* Placeholder (no image uploaded yet) also needs to visualise the bleed
-   footprint so the user sees where their image will sit. */
-.pres-spotlight__image--bleed .pres-placeholder {
-  position: absolute;
-  inset: 0;
-}
-
 .pres-spotlight__stats {
+  position: absolute;
+  bottom: 48px;
+  right: 56px;
   display: flex;
   flex-direction: column;
-  gap: 20px;                            /* tight enough that 3 stats fit vertically */
+  gap: 20px;
   align-items: flex-end;
   text-align: right;
-  padding-bottom: 8px;
-  min-width: 0;                         /* allow children to shrink/wrap */
-  overflow: hidden;                     /* hard-stop any stat text at column edge */
+  max-width: 260px;
+  z-index: 2;
+}
+
+.pres-slide--spotlight--stats-left .pres-spotlight__stats {
+  right: auto;
+  left: 56px;
+  align-items: flex-start;
+  text-align: left;
 }
 
 .pres-spotlight__stat {
@@ -1496,15 +1436,6 @@
   max-width: 240px;
 }
 
-.pres-slide--spotlight .pres-placeholder {
-  color: color-mix(in srgb, var(--pres-spotlight-fg, #fff) 30%, transparent);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-
 /* Tektro-light spotlight: tiny yellow accent mark under the kicker so the
    brand colour is still present without fighting readability on white. */
 [data-theme="tektro-light"] .pres-slide--spotlight .pres-spotlight__kicker {
@@ -1541,16 +1472,6 @@
   }
 }
 
-@keyframes spotlightImageZoomSettle {
-  from { opacity: 0; transform: scale(1.08); }
-  to   { opacity: 1; transform: scale(1);    }
-}
-
-@keyframes spotlightImageBleedIn {
-  from { opacity: 0; transform: translateY(20px) scale(1.04); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);    }
-}
-
 @keyframes spotlightStatRise {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0);    }
@@ -1567,14 +1488,8 @@
   animation: spotlightHeadlineReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
 }
 
-.pres-slide--spotlight.pres-slide--animated .pres-spotlight__image--contained {
-  animation: spotlightImageZoomSettle 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
-  transform-origin: center center;
-}
-
-.pres-slide--spotlight.pres-slide--animated .pres-spotlight__image--bleed {
-  animation: spotlightImageBleedIn 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
-  transform-origin: center bottom;
+.pres-slide--spotlight.pres-slide--animated .pres-slide__bg {
+  animation: pressFadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0s both;
 }
 
 /* Stat callouts stagger in after the headline lands */

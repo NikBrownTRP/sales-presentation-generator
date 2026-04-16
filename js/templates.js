@@ -733,19 +733,21 @@
       fields: [
         { key: 'kicker', role: 'kicker', type: 'text', label: 'Kicker (small label)', placeholder: 'e.g., Cameras' },
         { key: 'headline', role: 'title', type: 'text', label: 'Headline', placeholder: 'e.g., A big zoom forward.', required: true },
-        { key: 'productImage', role: 'hero-image', type: 'image', label: 'Hero Image' },
+        { key: 'backgroundImage', role: 'hero-image', type: 'image', label: 'Background Image' },
         {
-          key: 'imageMode', type: 'select', label: 'Image Mode', defaultValue: 'contained',
+          key: 'overlayOpacity', type: 'select', label: 'Background Overlay', defaultValue: '0',
           options: [
-            { value: 'contained', label: 'Contained (fits inside)' },
-            { value: 'bleed', label: 'Bleed (oversized, edge-cropped)' }
+            { value: '0',    label: 'None (0%)' },
+            { value: '0.2',  label: 'Light (20%)' },
+            { value: '0.5',  label: 'Medium (50%)' },
+            { value: '0.7',  label: 'Heavy (70%)' }
           ]
         },
         {
-          key: 'layoutMode', type: 'select', label: 'Layout', defaultValue: 'image-left',
+          key: 'statsPosition', type: 'select', label: 'Stats Position', defaultValue: 'right',
           options: [
-            { value: 'image-left', label: 'Image left, stats right' },
-            { value: 'image-right', label: 'Image right, stats left' }
+            { value: 'right', label: 'Right' },
+            { value: 'left',  label: 'Left' }
           ]
         },
         { key: 'stat1Label', type: 'text', label: 'Stat 1 — small label', placeholder: 'e.g., Up to' },
@@ -765,22 +767,30 @@
       },
 
       render: function (data) {
-        var imageMode = data.imageMode || 'contained';
-        var layoutMode = data.layoutMode || 'image-left';
+        var statsPosition = data.statsPosition || 'right';
+        var overlayOpacity = data.overlayOpacity !== undefined ? data.overlayOpacity : '0';
 
-        // Collect filled stats (need at least a value to render)
+        // Collect filled stats
         var stats = [];
         for (var i = 1; i <= 3; i++) {
           if (data['stat' + i + 'Value']) {
             stats.push({
-              label: data['stat' + i + 'Label'] || '',
-              value: data['stat' + i + 'Value'],
+              label:   data['stat' + i + 'Label']   || '',
+              value:   data['stat' + i + 'Value'],
               caption: data['stat' + i + 'Caption'] || ''
             });
           }
         }
 
-        var html = '<div class="pres-slide pres-slide--spotlight pres-slide--spotlight--' + layoutMode + '">';
+        var html = '<div class="pres-slide pres-slide--spotlight pres-slide--spotlight--stats-' + statsPosition + '">';
+
+        // Background image + overlay (Title-slide pattern)
+        if (data.backgroundImage) {
+          html += '<div class="pres-slide__bg" style="background-image: url(' + data.backgroundImage + ')"></div>';
+        }
+        html += '<div class="pres-slide__overlay" style="opacity: ' + overlayOpacity + '"></div>';
+
+        // Header
         html += '<div class="pres-spotlight__head">';
         if (data.kicker) {
           html += '<div class="pres-spotlight__kicker">' + escapeHtml(data.kicker) + '</div>';
@@ -788,31 +798,19 @@
         html += '<h2 class="pres-spotlight__headline">' + escapeHtml(data.headline || 'Headline') + '</h2>';
         html += '</div>';
 
-        html += '<div class="pres-spotlight__body">';
-
-        // Image area
-        html += '<div class="pres-spotlight__image pres-spotlight__image--' + imageMode + '">';
-        if (data.productImage) {
-          html += '<img src="' + data.productImage + '" alt="' + escapeHtml(data.headline || '') + '">';
-        } else {
-          html += '<div class="pres-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Hero Image</span></div>';
-        }
-        html += '</div>';
-
-        // Stats column
+        // Stats column (absolutely positioned via CSS)
         if (stats.length > 0) {
           html += '<div class="pres-spotlight__stats">';
           stats.forEach(function (s) {
             html += '<div class="pres-spotlight__stat">';
-            if (s.label) html += '<div class="pres-spotlight__stat-label">' + escapeHtml(s.label) + '</div>';
-            html += '<div class="pres-spotlight__stat-value">' + escapeHtml(s.value) + '</div>';
+            if (s.label)   html += '<div class="pres-spotlight__stat-label">'   + escapeHtml(s.label)   + '</div>';
+            html           += '<div class="pres-spotlight__stat-value">'         + escapeHtml(s.value)   + '</div>';
             if (s.caption) html += '<div class="pres-spotlight__stat-caption">' + escapeHtml(s.caption) + '</div>';
             html += '</div>';
           });
           html += '</div>';
         }
 
-        html += '</div>'; // body
         html += renderSlideLogo(data);
         html += '</div>'; // slide
         return html;
