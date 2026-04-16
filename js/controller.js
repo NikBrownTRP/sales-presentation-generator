@@ -533,6 +533,7 @@
 
   function renderField(field, slide) {
     var value = slide.data[field.key];
+    var prefix = '';
     var html = '<div class="form-group" data-field-key="' + field.key + '">';
 
     // Label
@@ -562,6 +563,13 @@
         break;
 
       case 'list':
+        if (field.titleKey) {
+          var currentTitle = slide.data[field.titleKey] || field.titleDefault || '';
+          prefix += '<div class="form-group">';
+          prefix += '<label class="form-label">Section title</label>';
+          prefix += '<input type="text" class="form-input" data-key="' + field.titleKey + '" value="' + escAttr(currentTitle) + '" placeholder="' + escAttr(field.titleDefault || '') + '">';
+          prefix += '</div>';
+        }
         html += renderListField(field, value, slide);
         break;
 
@@ -576,7 +584,7 @@
     }
 
     html += '</div>';
-    return html;
+    return prefix + html;
   }
 
   function renderImageField(field, value) {

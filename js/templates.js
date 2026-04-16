@@ -329,7 +329,7 @@
         { key: 'productName', role: 'title', type: 'text', label: 'Product Name', placeholder: 'e.g., TRP DH-R EVO', required: true },
         { key: 'productImage', role: 'hero-image', type: 'image', label: 'Product Image' },
         { key: 'specs', type: 'keyvalue', label: 'Specifications', keyPlaceholder: 'Spec name', valuePlaceholder: 'Value' },
-        { key: 'features', role: 'list', type: 'list', label: 'Key Features', placeholder: 'Add a feature...', maxItems: 6 },
+        { key: 'features', role: 'list', type: 'list', label: 'Key Features', titleKey: 'featuresTitle', titleDefault: 'Key Features', placeholder: 'Add a feature...', maxItems: 6 },
         { key: 'footnote', role: 'footnote', type: 'text', label: 'Footnote', placeholder: 'e.g., *Weight without rotors' },
         { key: 'logo', role: 'logo', type: 'image', label: 'Logo' }
       ],
@@ -371,7 +371,7 @@
           return t && t.trim();
         })) {
           html += '<div class="pres-spec-features">';
-          html += '<div class="pres-spec-features__title">Key Features</div>';
+          html += '<div class="pres-spec-features__title">' + escapeHtml(data.featuresTitle || 'Key Features') + '</div>';
           data.features.forEach(function (raw) {
             var item = (raw && typeof raw === 'object') ? raw : { text: raw || '', indent: 0 };
             if (item.text && item.text.trim()) {
@@ -607,7 +607,7 @@
         { key: 'xAxisLabel', type: 'text', label: 'X-Axis Label', placeholder: 'e.g., Quarter' },
         { key: 'yAxisLabel', type: 'text', label: 'Y-Axis Label', placeholder: 'e.g., Units Sold' },
         { key: 'chartImage', role: 'hero-image', type: 'image', label: 'Image (for image mode)' },
-        { key: 'notes', role: 'list', type: 'list', label: 'Detail Notes', placeholder: 'Add a note...', maxItems: 8 },
+        { key: 'notes', role: 'list', type: 'list', label: 'Detail Notes', titleKey: 'notesTitle', titleDefault: 'Key Insights', placeholder: 'Add a note...', maxItems: 8 },
         { key: 'footnote', role: 'footnote', type: 'text', label: 'Footnote / Source', placeholder: 'e.g., Source: Internal sales data' },
         { key: 'logo', role: 'logo', type: 'image', label: 'Logo' }
       ],
@@ -684,7 +684,7 @@
           return t && t.trim();
         })) {
           html += '<div class="pres-graph-notes">';
-          html += '<div class="pres-graph-notes-title">Key Insights</div>';
+          html += '<div class="pres-graph-notes-title">' + escapeHtml(data.notesTitle || 'Key Insights') + '</div>';
           html += '<ul class="pres-bullet-list">';
           data.notes.forEach(function (raw) {
             var item = (raw && typeof raw === 'object') ? raw : { text: raw || '', indent: 0 };
