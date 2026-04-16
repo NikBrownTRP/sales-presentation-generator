@@ -288,9 +288,10 @@
 
         if (data.sellingPoints && data.sellingPoints.length > 0) {
           html += '<ul class="pres-selling-points">';
-          data.sellingPoints.forEach(function (point) {
-            if (point && point.trim()) {
-              html += '<li class="pres-selling-point">' + escapeHtml(point) + '</li>';
+          data.sellingPoints.forEach(function (raw) {
+            var item = (raw && typeof raw === 'object') ? raw : { text: raw || '', indent: 0 };
+            if (item.text && item.text.trim()) {
+              html += '<li class="pres-selling-point">' + escapeHtml(item.text) + '</li>';
             }
           });
           html += '</ul>';
@@ -469,9 +470,10 @@
         if (layout === 'text-full' || layout === 'text-center') {
           if (data.items && data.items.length > 0) {
             html += '<ul class="pres-bullet-list">';
-            data.items.forEach(function (item) {
-              if (item && item.trim()) {
-                html += '<li class="pres-bullet-item"><span class="pres-bullet-item__marker"></span>' + escapeHtml(item) + '</li>';
+            data.items.forEach(function (raw) {
+              var item = (raw && typeof raw === 'object') ? raw : { text: raw || '', indent: 0 };
+              if (item.text && item.text.trim()) {
+                html += '<li class="pres-bullet-item' + (item.indent ? ' pres-bullet-item--indent' : '') + '"><span class="pres-bullet-item__marker"></span>' + escapeHtml(item.text) + '</li>';
               }
             });
             html += '</ul>';
@@ -480,9 +482,10 @@
           html += '<div class="pres-generic-text">';
           if (data.items && data.items.length > 0) {
             html += '<ul class="pres-bullet-list">';
-            data.items.forEach(function (item) {
-              if (item && item.trim()) {
-                html += '<li class="pres-bullet-item"><span class="pres-bullet-item__marker"></span>' + escapeHtml(item) + '</li>';
+            data.items.forEach(function (raw) {
+              var item = (raw && typeof raw === 'object') ? raw : { text: raw || '', indent: 0 };
+              if (item.text && item.text.trim()) {
+                html += '<li class="pres-bullet-item' + (item.indent ? ' pres-bullet-item--indent' : '') + '"><span class="pres-bullet-item__marker"></span>' + escapeHtml(item.text) + '</li>';
               }
             });
             html += '</ul>';
@@ -876,7 +879,7 @@
         // list/keyvalue: non-empty if at least one entry has a value
         return v.some(function (x) {
           if (typeof x === 'string') return x.trim() !== '';
-          if (x && typeof x === 'object') return (x.key && x.key !== '') || (x.value && x.value !== '');
+          if (x && typeof x === 'object') return (x.key && x.key !== '') || (x.value && x.value !== '') || (x.text && x.text !== '');
           return false;
         });
       }
