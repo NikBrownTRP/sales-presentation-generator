@@ -38,6 +38,20 @@
     <div class="builder-header__actions">
       <!-- Theme is now per-slide, selected in Add Slide modal and editor -->
       <div class="builder-header__btn-group">
+        <div class="builder-layout-toggle" id="layout-toggle">
+          <button class="builder-layout-btn" id="btn-layout-stacked" title="Stacked layout (preview above editor)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="8" rx="1"/>
+              <rect x="3" y="13" width="18" height="8" rx="1"/>
+            </svg>
+          </button>
+          <button class="builder-layout-btn" id="btn-layout-wide" title="Wide layout (editor beside preview)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="8" height="18" rx="1"/>
+              <rect x="13" y="3" width="8" height="18" rx="1"/>
+            </svg>
+          </button>
+        </div>
         <button id="btn-new" class="builder-btn builder-btn--ghost" title="New presentation">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
           <span>New</span>

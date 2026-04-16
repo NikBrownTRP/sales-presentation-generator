@@ -1904,6 +1904,8 @@
 
     // Initial scale
     setTimeout(scalePreview, 100);
+
+    initLayoutToggle();
   }
 
   /* -----------------------------------------------------------------------
@@ -1933,6 +1935,40 @@
     closeModal: closeModal,
     getActiveSlide: getActiveSlide
   };
+
+  /* -----------------------------------------------------------------------
+     Layout preference (stacked / wide)
+     ----------------------------------------------------------------------- */
+  function initLayoutToggle() {
+    var layout = localStorage.getItem('builderLayout') || 'stacked';
+    applyLayout(layout);
+
+    document.getElementById('btn-layout-stacked').addEventListener('click', function () {
+      applyLayout('stacked');
+      localStorage.setItem('builderLayout', 'stacked');
+    });
+    document.getElementById('btn-layout-wide').addEventListener('click', function () {
+      applyLayout('wide');
+      localStorage.setItem('builderLayout', 'wide');
+    });
+  }
+
+  function applyLayout(layout) {
+    var layoutEl = document.querySelector('.builder-layout');
+    var stackedBtn = document.getElementById('btn-layout-stacked');
+    var wideBtn = document.getElementById('btn-layout-wide');
+    if (layout === 'wide') {
+      layoutEl.classList.add('builder-layout--wide');
+      stackedBtn.classList.remove('builder-layout-btn--active');
+      wideBtn.classList.add('builder-layout-btn--active');
+    } else {
+      layoutEl.classList.remove('builder-layout--wide');
+      stackedBtn.classList.add('builder-layout-btn--active');
+      wideBtn.classList.remove('builder-layout-btn--active');
+    }
+    // Trigger preview rescale after layout change
+    if (typeof scalePreview === 'function') scalePreview();
+  }
 
   /* -----------------------------------------------------------------------
      Boot

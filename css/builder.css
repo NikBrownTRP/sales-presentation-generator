@@ -124,6 +124,44 @@ body.builder-body {
   gap: 12px;
 }
 
+/* --------------------------------------------------------------------------
+   Layout Toggle
+   -------------------------------------------------------------------------- */
+.builder-layout-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--builder-surface-alt);
+  border: 1px solid var(--builder-border);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+  margin-right: 8px;
+}
+
+.builder-layout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 26px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--builder-text-secondary);
+  cursor: pointer;
+  transition: background var(--builder-transition), color var(--builder-transition);
+}
+
+.builder-layout-btn:hover {
+  background: var(--builder-surface-hover);
+  color: var(--builder-text);
+}
+
+.builder-layout-btn--active {
+  background: var(--builder-surface-hover);
+  color: var(--builder-text);
+}
+
 .builder-header__theme-group {
   display: flex;
   align-items: center;
@@ -492,6 +530,45 @@ body.builder-body {
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
+}
+
+/* Wide layout: editor | preview side by side inside builder-main */
+.builder-layout--wide .builder-main {
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.builder-layout--wide .builder-editor {
+  flex: 1;
+  min-width: 280px;
+  max-width: 420px;
+  border-right: 1px solid var(--builder-border);
+  border-bottom: none;
+  overflow-y: auto;
+}
+
+.builder-layout--wide .builder-preview {
+  flex: 1;
+  min-width: 360px;
+  max-height: none;
+  border-bottom: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1199px) {
+  .builder-layout--wide .builder-main {
+    flex-direction: column;
+  }
+  .builder-layout--wide .builder-editor {
+    max-width: none;
+    border-right: none;
+    border-bottom: 1px solid var(--builder-border);
+  }
+  .builder-layout--wide .builder-preview {
+    max-height: 50vh;
+  }
 }
 
 /* --------------------------------------------------------------------------
