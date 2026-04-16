@@ -1966,8 +1966,8 @@
       stackedBtn.classList.add('builder-layout-btn--active');
       wideBtn.classList.remove('builder-layout-btn--active');
     }
-    // Trigger preview rescale after layout change
-    if (typeof scalePreview === 'function') scalePreview();
+    // Trigger preview rescale after layout change (setTimeout lets the browser reflow first)
+    if (typeof scalePreview === 'function') setTimeout(scalePreview, 50);
   }
 
   /* -----------------------------------------------------------------------

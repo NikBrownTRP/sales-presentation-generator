@@ -158,8 +158,9 @@ body.builder-body {
 }
 
 .builder-layout-btn--active {
-  background: var(--builder-surface-hover);
-  color: var(--builder-text);
+  background: rgba(227, 24, 55, 0.12);
+  color: var(--builder-accent);
+  box-shadow: inset 0 0 0 1px rgba(227, 24, 55, 0.25);
 }
 
 .builder-header__theme-group {
