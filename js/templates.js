@@ -366,7 +366,10 @@
         }
 
         // Features below specs
-        if (data.features && data.features.length > 0) {
+        if (data.features && data.features.some(function (raw) {
+          var t = (raw && typeof raw === 'object') ? raw.text : raw;
+          return t && t.trim();
+        })) {
           html += '<div class="pres-spec-features">';
           html += '<div class="pres-spec-features__title">Key Features</div>';
           data.features.forEach(function (raw) {
