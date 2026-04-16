@@ -369,11 +369,12 @@
         if (data.features && data.features.length > 0) {
           html += '<div class="pres-spec-features">';
           html += '<div class="pres-spec-features__title">Key Features</div>';
-          data.features.forEach(function (feature) {
-            if (feature && feature.trim()) {
-              html += '<div class="pres-spec-feature">';
+          data.features.forEach(function (raw) {
+            var item = (raw && typeof raw === 'object') ? raw : { text: raw || '', indent: 0 };
+            if (item.text && item.text.trim()) {
+              html += '<div class="pres-spec-feature' + (item.indent ? ' pres-spec-feature--indent' : '') + '">';
               html += '<span class="pres-spec-feature__icon">' + checkSvg + '</span>';
-              html += '<span>' + escapeHtml(feature) + '</span>';
+              html += '<span>' + escapeHtml(item.text) + '</span>';
               html += '</div>';
             }
           });
@@ -675,13 +676,17 @@
         html += '</div>'; // graph-main
 
         // Sidebar notes
-        if (data.notes && data.notes.some(function (n) { return n && n.trim(); })) {
+        if (data.notes && data.notes.some(function (n) {
+          var t = (n && typeof n === 'object') ? n.text : n;
+          return t && t.trim();
+        })) {
           html += '<div class="pres-graph-notes">';
           html += '<div class="pres-graph-notes-title">Key Insights</div>';
           html += '<ul class="pres-bullet-list">';
-          data.notes.forEach(function (note) {
-            if (note && note.trim()) {
-              html += '<li class="pres-bullet-item"><span class="pres-bullet-item__marker"></span>' + escapeHtml(note) + '</li>';
+          data.notes.forEach(function (raw) {
+            var item = (raw && typeof raw === 'object') ? raw : { text: raw || '', indent: 0 };
+            if (item.text && item.text.trim()) {
+              html += '<li class="pres-bullet-item' + (item.indent ? ' pres-bullet-item--indent' : '') + '"><span class="pres-bullet-item__marker"></span>' + escapeHtml(item.text) + '</li>';
             }
           });
           html += '</ul>';

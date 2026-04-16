@@ -519,6 +519,15 @@
   margin-top: 1px;
 }
 
+/* Indented list item (hierarchy level 1) */
+.pres-spec-feature--indent {
+  padding-left: 1.5em;
+}
+
+.pres-bullet-item--indent {
+  padding-left: 1.5em;
+}
+
 /* Spec product image */
 .pres-spec-product-img {
   max-width: 95%;
