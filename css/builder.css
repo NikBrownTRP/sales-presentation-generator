@@ -819,6 +819,34 @@ body.builder-body {
   background: rgba(231, 76, 60, 0.1);
 }
 
+.form-list__indent-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  background: none;
+  border: 1px solid var(--builder-border);
+  border-radius: 3px;
+  color: var(--builder-text-secondary);
+  cursor: pointer;
+  transition: background var(--builder-transition), color var(--builder-transition), border-color var(--builder-transition);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.form-list__indent-btn:hover:not(:disabled) {
+  background: var(--builder-surface-hover);
+  color: var(--builder-text);
+  border-color: var(--builder-text-muted);
+}
+
+.form-list__indent-btn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
 .form-list__add {
   display: inline-flex;
   align-items: center;

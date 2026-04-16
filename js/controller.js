@@ -449,7 +449,8 @@
         var key = dragState.key;
         var items = (slide.data[key] || []).slice();
         var moved = items.splice(dragState.fromIdx, 1)[0];
-        items.splice(toIdx, 0, moved);
+        var movedNorm = listItem(moved);
+        items.splice(toIdx, 0, { text: movedNorm.text, indent: 0 });
         updateSlideData(slide.id, key, items);
         dragState = null;
         renderEditor();
@@ -603,13 +604,19 @@
     items = items || [''];
     var html = '<div class="form-list" data-key="' + field.key + '">';
 
-    items.forEach(function (item, i) {
+    items.forEach(function (raw, i) {
+      var item = listItem(raw);
       html += '<div class="form-list__item" draggable="true" data-list-row-key="' + field.key + '" data-list-row-index="' + i + '">';
-      // Drag handle (also serves as drag affordance — input itself isn't draggable to allow text selection)
       html += '<span class="form-list__drag-handle" title="Drag to reorder">';
       html += '<svg width="10" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="4" r="2"/><circle cx="16" cy="4" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="20" r="2"/><circle cx="16" cy="20" r="2"/></svg>';
       html += '</span>';
-      html += '<input type="text" class="form-input" data-list-key="' + field.key + '" data-list-index="' + i + '" value="' + escAttr(item || '') + '" placeholder="' + escAttr(field.placeholder || '') + '">';
+      html += '<button type="button" class="form-list__indent-btn" data-list-unindent="' + field.key + '" data-list-index="' + i + '" title="Unindent"' + (item.indent === 0 ? ' disabled' : '') + '>';
+      html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>';
+      html += '</button>';
+      html += '<button type="button" class="form-list__indent-btn" data-list-indent="' + field.key + '" data-list-index="' + i + '" title="Indent"' + (item.indent >= 1 ? ' disabled' : '') + '>';
+      html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>';
+      html += '</button>';
+      html += '<input type="text" class="form-input form-list__text-input" data-list-key="' + field.key + '" data-list-index="' + i + '" value="' + escAttr(item.text) + '" placeholder="' + escAttr(field.placeholder || '') + '">';
       html += '<button type="button" class="form-list__remove" data-list-remove="' + field.key + '" data-list-index="' + i + '" title="Remove">';
       html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
       html += '</button>';
@@ -651,6 +658,12 @@
 
   function escAttr(str) {
     return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // Normalise a list item: accepts plain string (legacy) or {text,indent} object
+  function listItem(raw) {
+    if (raw && typeof raw === 'object') return raw;
+    return { text: raw || '', indent: 0 };
   }
 
   /* -----------------------------------------------------------------------
@@ -729,9 +742,12 @@
     // List inputs
     dom.editorForm.querySelectorAll('[data-list-key]').forEach(function (el) {
       el.addEventListener('input', function () {
-        var items = slide.data[el.dataset.listKey] || [];
-        items[parseInt(el.dataset.listIndex, 10)] = el.value;
-        updateSlideData(slide.id, el.dataset.listKey, items);
+        var key = el.dataset.listKey;
+        var idx = parseInt(el.dataset.listIndex, 10);
+        var items = (slide.data[key] || []).slice();
+        var cur = listItem(items[idx]);
+        items[idx] = { text: el.value, indent: cur.indent };
+        updateSlideData(slide.id, key, items);
         debouncedThumbnailUpdate();
       });
     });
@@ -740,8 +756,8 @@
     dom.editorForm.querySelectorAll('[data-list-add]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var key = btn.dataset.listAdd;
-        var items = slide.data[key] || [];
-        items.push('');
+        var items = (slide.data[key] || []).slice();
+        items.push({ text: '', indent: 0 });
         updateSlideData(slide.id, key, items);
         renderEditor();
       });
@@ -752,11 +768,41 @@
       btn.addEventListener('click', function () {
         var key = btn.dataset.listRemove;
         var idx = parseInt(btn.dataset.listIndex, 10);
-        var items = slide.data[key] || [];
+        var items = (slide.data[key] || []).slice();
         items.splice(idx, 1);
-        if (items.length === 0) items.push('');
+        if (items.length === 0) items.push({ text: '', indent: 0 });
         updateSlideData(slide.id, key, items);
         renderEditor();
+      });
+    });
+
+    // List indent
+    dom.editorForm.querySelectorAll('[data-list-indent]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.dataset.listIndent;
+        var idx = parseInt(btn.dataset.listIndex, 10);
+        var items = (slide.data[key] || []).slice();
+        var cur = listItem(items[idx]);
+        if (cur.indent < 1) {
+          items[idx] = { text: cur.text, indent: 1 };
+          updateSlideData(slide.id, key, items);
+          renderEditor();
+        }
+      });
+    });
+
+    // List unindent
+    dom.editorForm.querySelectorAll('[data-list-unindent]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.dataset.listUnindent;
+        var idx = parseInt(btn.dataset.listIndex, 10);
+        var items = (slide.data[key] || []).slice();
+        var cur = listItem(items[idx]);
+        if (cur.indent > 0) {
+          items[idx] = { text: cur.text, indent: 0 };
+          updateSlideData(slide.id, key, items);
+          renderEditor();
+        }
       });
     });
 
