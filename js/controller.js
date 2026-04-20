@@ -54,9 +54,6 @@
   var importPickerSlides = [];
   var importPickerSelected = {};
 
-  var importPickerSlides = [];
-  var importPickerSelected = {};
-
   /* -----------------------------------------------------------------------
      DOM references
      ----------------------------------------------------------------------- */
