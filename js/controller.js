@@ -363,6 +363,14 @@
         item.classList.add('slide-item--dragging');
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', draggedId);
+        // Use a lightweight ghost instead of the full slide thumbnail
+        var idx = slideIndex(draggedId);
+        var ghost = document.createElement('div');
+        ghost.className = 'slide-drag-ghost';
+        ghost.textContent = 'Slide ' + (idx + 1);
+        document.body.appendChild(ghost);
+        e.dataTransfer.setDragImage(ghost, ghost.offsetWidth / 2, ghost.offsetHeight / 2);
+        setTimeout(function () { document.body.removeChild(ghost); }, 0);
       });
 
       item.addEventListener('dragend', function () {
