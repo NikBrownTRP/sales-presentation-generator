@@ -1657,6 +1657,10 @@
       }).length;
       countEl.textContent = selectedCount + ' selected';
       confirmBtn.disabled = selectedCount === 0;
+      selectAllBtn.textContent =
+        (selectedCount === importPickerSlides.length && importPickerSlides.length > 0)
+          ? 'Deselect all'
+          : 'Select all';
     }
     updateConfirmState();
 
@@ -1975,6 +1979,9 @@
             Dialog.alert('Cannot Import', 'This HTML file does not contain embedded presentation data.\n\nOnly HTML files exported from this tool can be re-imported.', 'error');
             return;
           }
+        } else {
+          Dialog.alert('Unsupported File', 'Please select a .json or .html file exported from this tool.', 'error');
+          return;
         }
 
         if (parsed && parsed.slides && parsed.slides.length > 0) {
