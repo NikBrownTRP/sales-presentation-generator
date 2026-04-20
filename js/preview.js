@@ -222,6 +222,20 @@
   }
 
   function bindSlideshowEvents() {
+    // Tear down any existing listeners before rebinding (prevents double-registration)
+    if (slideshowMouseMoveHandler) {
+      var existingModal = document.getElementById('slideshow-modal');
+      if (existingModal) existingModal.removeEventListener('mousemove', slideshowMouseMoveHandler);
+      slideshowMouseMoveHandler = null;
+    }
+    if (slideshowKeyHandler) {
+      document.removeEventListener('keydown', slideshowKeyHandler);
+      slideshowKeyHandler = null;
+    }
+    if (slideshowResizeHandler) {
+      window.removeEventListener('resize', slideshowResizeHandler);
+      slideshowResizeHandler = null;
+    }
     var prevBtn = document.getElementById('slideshow-prev');
     var nextBtn = document.getElementById('slideshow-next');
     var closeBtn = document.getElementById('slideshow-close');
@@ -237,7 +251,7 @@
     };
 
     var modal = document.getElementById('slideshow-modal');
-    slideshowMouseMoveHandler = function () { showSlideshowUi(); };
+    slideshowMouseMoveHandler = showSlideshowUi;
     modal.addEventListener('mousemove', slideshowMouseMoveHandler);
 
     slideshowKeyHandler = function (e) {
@@ -276,8 +290,6 @@
       if (modal) modal.removeEventListener('mousemove', slideshowMouseMoveHandler);
       slideshowMouseMoveHandler = null;
     }
-    clearTimeout(slideshowUiTimer);
-    slideshowUiTimer = null;
     hideSlideshowUi();
   }
 
