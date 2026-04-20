@@ -1908,3 +1908,120 @@ body.builder-body {
 .form-image-upload__edit-btn:hover {
   background: rgba(255, 255, 255, 0.25);
 }
+
+/* ==========================================================================
+   Import Slides Picker Modal
+   ========================================================================== */
+
+.modal--import-picker .modal__content {
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;
+}
+
+.import-picker__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--builder-border);
+}
+
+.import-picker__count {
+  font-size: 13px;
+  color: var(--builder-text-muted);
+}
+
+.import-picker__grid {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  padding: 4px 2px;
+}
+
+.import-picker__card {
+  position: relative;
+  border: 2px solid var(--builder-border);
+  border-radius: var(--builder-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--builder-transition);
+  background: var(--builder-bg);
+}
+
+.import-picker__card:hover {
+  border-color: var(--builder-accent);
+}
+
+.import-picker__card--selected {
+  border-color: var(--builder-accent);
+}
+
+.import-picker__card__thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  position: relative;
+}
+
+.import-picker__card__thumb-inner {
+  width: 960px;
+  height: 540px;
+  transform-origin: top left;
+}
+
+.import-picker__card__label {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--builder-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-top: 1px solid var(--builder-border);
+}
+
+.import-picker__card__checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--builder-transition);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.import-picker__card--selected .import-picker__card__checkbox {
+  background: var(--builder-accent);
+  border-color: var(--builder-accent);
+}
+
+.import-picker__card__checkbox-tick {
+  display: none;
+  width: 12px;
+  height: 12px;
+  stroke: #fff;
+}
+
+.import-picker__card--selected .import-picker__card__checkbox-tick {
+  display: block;
+}
+
+.import-picker__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--builder-border);
+}
