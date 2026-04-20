@@ -1271,6 +1271,9 @@ body.builder-body {
   padding: 16px 24px;
   z-index: 10;
   background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 .slideshow-modal__counter {
@@ -1339,8 +1342,10 @@ body.builder-body {
   color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   border-radius: var(--builder-radius);
-  transition: all var(--builder-transition);
+  transition: all var(--builder-transition), opacity 0.3s ease;
   z-index: 10;
+  opacity: 0;
+  pointer-events: none;
 }
 .slideshow-modal__nav:hover {
   background: rgba(255, 255, 255, 0.15);
@@ -1363,6 +1368,9 @@ body.builder-body {
   display: flex;
   gap: 8px;
   z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 .slideshow-modal__dot {
@@ -1379,6 +1387,14 @@ body.builder-body {
 .slideshow-modal__dot--active {
   background: var(--builder-accent);
   transform: scale(1.3);
+}
+
+/* UI controls shown only when mouse is active */
+.slideshow-modal--ui-visible .slideshow-modal__header,
+.slideshow-modal--ui-visible .slideshow-modal__nav,
+.slideshow-modal--ui-visible .slideshow-modal__dots {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* --------------------------------------------------------------------------
