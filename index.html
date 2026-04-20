@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Sales Presentation Generator | TEKTRO / TRP</title>
   <meta name="description" content="Create professional sales presentations for TEKTRO and TRP cycling components.">
   <meta name="theme-color" content="#0A0A0A">
@@ -16,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/builder.css?v=33">
+  <link rel="stylesheet" href="css/builder.css?v=34">
   <link rel="stylesheet" href="css/slides.css?v=33">
 
   <!-- Slides CSS embedded as JS string for reliable export (works on file:// URLs) -->
@@ -384,13 +387,13 @@
           h += '@media (max-width:640px){.slideshow-nav{padding:0 12px;height:44px}.slideshow-title{font-size:11px}.slideshow-counter{font-size:12px;min-width:44px}.slideshow-btn{padding:8px 10px;font-size:18px}}\n';
           h += '@media (hover:none){.slideshow-btn:hover{background:rgba(255,255,255,0.1)}}\n';
           h += '</style>\n</head>\n<body>\n';
-          h += '<div class="slideshow-nav"><span class="slideshow-counter" id="counter">1 / '+slides.length+'</span><span class="slideshow-title">'+title.replace(/</g,'&lt;')+'</span>';
+          h += '<div class="slideshow-nav slideshow-nav--hidden"><span class="slideshow-counter" id="counter">1 / '+slides.length+'</span><span class="slideshow-title">'+title.replace(/</g,'&lt;')+'</span>';
           h += '<div class="slideshow-controls"><button onclick="prev()" class="slideshow-btn">&larr;</button><button onclick="next()" class="slideshow-btn">&rarr;</button>';
           h += '<button onclick="toggleFullscreen()" class="slideshow-btn">&#x26F6;</button></div></div>\n';
           h += '<div class="slideshow-stage" id="stage">\n'+slidesHtml+'</div>\n';
           h += '<div class="slideshow-tap-zone slideshow-tap-zone--left" onclick="prev()" aria-label="Previous slide"></div>\n';
           h += '<div class="slideshow-tap-zone slideshow-tap-zone--right" onclick="next()" aria-label="Next slide"></div>\n';
-          h += '<div class="slideshow-dots" id="dots">\n';
+          h += '<div class="slideshow-dots slideshow-dots--hidden" id="dots">\n';
           slides.forEach(function(s,i){h+='<button class="slideshow-dot'+(i===0?' slideshow-dot--active':'')+'" onclick="goTo('+i+')"></button>\n'});
           h += '</div>\n';
           h += '<script type="application/json" id="presentation-data">'+sj+'<\/script>\n';
@@ -399,13 +402,19 @@
           h += 'function next(){goTo(current+1)}function prev(){goTo(current-1)}\n';
           h += 'function toggleFullscreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen().then(scaleSlides)}else{document.exitFullscreen().then(scaleSlides)}}document.addEventListener("fullscreenchange",function(){setTimeout(scaleSlides,100)});\n';
           h += 'function scaleSlides(){var vw=window.innerWidth-40,vh=window.innerHeight-80,sw=960,sh=540,scale=Math.min(vw/sw,vh/sh,2);document.querySelectorAll(".slideshow-slide").forEach(function(el){el.style.setProperty("--scale",scale)})}\n';
-          h += 'document.addEventListener("keydown",function(e){if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();next()}else if(e.key==="ArrowLeft"){e.preventDefault();prev()}else if(e.key==="f"||e.key==="F"){e.preventDefault();toggleFullscreen()}});\n';
+          h += 'document.addEventListener("keydown",function(e){if(e.key==="ArrowRight"||e.key===" "){e.preventDefault();keyNavMode=true;mouseAccum=0;hideNav();next()}else if(e.key==="ArrowLeft"){e.preventDefault();keyNavMode=true;mouseAccum=0;hideNav();prev()}else if(e.key==="f"||e.key==="F"){e.preventDefault();toggleFullscreen()}});\n';
           // Touch/swipe navigation
           h += 'var tsX=0,tsY=0,tsT=0;document.addEventListener("touchstart",function(e){var t=e.changedTouches[0];tsX=t.clientX;tsY=t.clientY;tsT=Date.now()},{passive:true});\n';
           h += 'document.addEventListener("touchend",function(e){if(Date.now()-tsT>600)return;var t=e.changedTouches[0];var dx=t.clientX-tsX,dy=t.clientY-tsY;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){if(dx<0)next();else prev()}},{passive:true});\n';
-          // Auto-hide nav after inactivity
-          h += 'var hideTimer;function showNav(){document.querySelector(".slideshow-nav").classList.remove("slideshow-nav--hidden");document.getElementById("dots").classList.remove("slideshow-dots--hidden");clearTimeout(hideTimer);hideTimer=setTimeout(function(){document.querySelector(".slideshow-nav").classList.add("slideshow-nav--hidden");document.getElementById("dots").classList.add("slideshow-dots--hidden")},3000)}\n';
-          h += 'document.addEventListener("mousemove",showNav);document.addEventListener("touchstart",showNav,{passive:true});document.addEventListener("keydown",showNav);showNav();\n';
+          // Auto-hide nav: reveal on genuine mouse/touch movement, hide after 3s idle.
+          // Keyboard navigation puts us in keyNavMode — mousemove has to cover 20px of
+          // real movement before re-enabling the reveal, so trackpad jitter from key
+          // presses won't flash the UI back in.
+          h += 'var hideTimer,keyNavMode=false,mouseAccum=0;var MOUSE_THRESHOLD=20;\n';
+          h += 'function showNav(){document.querySelector(".slideshow-nav").classList.remove("slideshow-nav--hidden");document.getElementById("dots").classList.remove("slideshow-dots--hidden");clearTimeout(hideTimer);hideTimer=setTimeout(hideNav,3000)}\n';
+          h += 'function hideNav(){document.querySelector(".slideshow-nav").classList.add("slideshow-nav--hidden");document.getElementById("dots").classList.add("slideshow-dots--hidden");clearTimeout(hideTimer);hideTimer=null}\n';
+          h += 'document.addEventListener("mousemove",function(e){if(keyNavMode){mouseAccum+=Math.abs(e.movementX||0)+Math.abs(e.movementY||0);if(mouseAccum>=MOUSE_THRESHOLD){keyNavMode=false}return}showNav()});\n';
+          h += 'document.addEventListener("touchstart",showNav,{passive:true});\n';
           h += 'window.addEventListener("resize",scaleSlides);scaleSlides();\n';
           h += 'document.querySelectorAll(".slideshow-slide:not(.slideshow-slide--active)").forEach(function(s){s.classList.add("slideshow-slide--next")});\n';
           h += '<\/script>\n</body>\n</html>';
@@ -519,9 +528,9 @@
 
   <!-- App modules -->
   <script src="js/templates.js?v=33" defer></script>
-  <script src="js/preview.js?v=32" defer></script>
-  <script src="js/exporter.js?v=32" defer></script>
+  <script src="js/preview.js?v=34" defer></script>
+  <script src="js/exporter.js?v=35" defer></script>
   <script src="js/pptx-import.js?v=2" defer></script>
-  <script src="js/controller.js?v=33" defer></script>
+  <script src="js/controller.js?v=34" defer></script>
 </body>
 </html>
