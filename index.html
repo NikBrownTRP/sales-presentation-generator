@@ -179,6 +179,30 @@
     </div>
   </div>
 
+  <!-- ===== MODAL: Import Slides Picker ===== -->
+  <div class="modal modal--import-picker" id="modal-import-picker" aria-hidden="true">
+    <div class="modal__overlay" id="import-picker-overlay"></div>
+    <div class="modal__content modal__content--wide">
+      <div class="modal__header">
+        <h3 class="modal__title" id="import-picker-title">Import Slides</h3>
+        <button class="modal__close" id="import-picker-close" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="import-picker__toolbar">
+        <span class="import-picker__count" id="import-picker-count">0 selected</span>
+        <button class="builder-btn builder-btn--ghost builder-btn--sm" id="import-picker-select-all">Select all</button>
+      </div>
+      <div class="import-picker__grid" id="import-picker-grid">
+        <!-- Dynamically rendered slide thumbnails -->
+      </div>
+      <div class="import-picker__footer">
+        <button class="builder-btn builder-btn--ghost" id="import-picker-cancel">Cancel</button>
+        <button class="builder-btn builder-btn--primary" id="import-picker-confirm" disabled>Import Selected</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== MODAL: Export Progress ===== -->
   <div class="modal modal--sm" id="modal-export" aria-hidden="true">
     <div class="modal__overlay"></div>
@@ -274,6 +298,7 @@
 
   <!-- Hidden file input for loading -->
   <input type="file" id="file-input-load" accept=".json,.pptx" style="display:none">
+  <input type="file" id="file-input-import" style="display:none" accept=".json,.html,.htm">
   <input type="file" id="file-input-image" accept="image/*" style="display:none">
 
   <!-- ===== SCRIPTS ===== -->
