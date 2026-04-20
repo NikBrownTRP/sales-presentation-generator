@@ -60,10 +60,11 @@
     slides: [],
     theme: '',
     currentIndex: 0,
-    renderedSlides: []
+    renderedSlides: [],
+    onClose: null
   };
 
-  function openSlideshow(slides, theme, startIndex) {
+  function openSlideshow(slides, theme, startIndex, onClose) {
     if (!slides || slides.length === 0) return;
 
     var startAt = (typeof startIndex === 'number' && startIndex >= 0 && startIndex < slides.length) ? startIndex : 0;
@@ -71,6 +72,7 @@
     slideshowState.slides = slides;
     slideshowState.theme = theme;
     slideshowState.currentIndex = startAt;
+    slideshowState.onClose = (typeof onClose === 'function') ? onClose : null;
 
     var modal = document.getElementById('slideshow-modal');
     var stage = document.getElementById('slideshow-stage');
@@ -187,6 +189,13 @@
     modal.classList.remove('slideshow-modal--visible');
     modal.setAttribute('aria-hidden', 'true');
     unbindSlideshowEvents();
+    if (slideshowState.onClose) {
+      var closedSlide = slideshowState.slides[slideshowState.currentIndex];
+      if (closedSlide) {
+        slideshowState.onClose(closedSlide.id);
+      }
+      slideshowState.onClose = null;
+    }
   }
 
   var slideshowKeyHandler = null;
