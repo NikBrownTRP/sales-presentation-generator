@@ -190,11 +190,12 @@
     modal.setAttribute('aria-hidden', 'true');
     unbindSlideshowEvents();
     if (slideshowState.onClose) {
+      var cb = slideshowState.onClose;
+      slideshowState.onClose = null;
       var closedSlide = slideshowState.slides[slideshowState.currentIndex];
       if (closedSlide) {
-        slideshowState.onClose(closedSlide.id);
+        cb(closedSlide.id);
       }
-      slideshowState.onClose = null;
     }
   }
 
