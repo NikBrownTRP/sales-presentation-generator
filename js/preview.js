@@ -120,6 +120,7 @@
     modal.setAttribute('aria-hidden', 'false');
 
     // Bind events
+    showSlideshowUi();
     bindSlideshowEvents();
   }
 
@@ -201,6 +202,24 @@
 
   var slideshowKeyHandler = null;
   var slideshowResizeHandler = null;
+  var slideshowMouseMoveHandler = null;
+  var slideshowUiTimer = null;
+
+  function showSlideshowUi() {
+    var modal = document.getElementById('slideshow-modal');
+    if (!modal) return;
+    modal.classList.add('slideshow-modal--ui-visible');
+    clearTimeout(slideshowUiTimer);
+    slideshowUiTimer = setTimeout(hideSlideshowUi, 2500);
+  }
+
+  function hideSlideshowUi() {
+    var modal = document.getElementById('slideshow-modal');
+    if (!modal) return;
+    modal.classList.remove('slideshow-modal--ui-visible');
+    clearTimeout(slideshowUiTimer);
+    slideshowUiTimer = null;
+  }
 
   function bindSlideshowEvents() {
     var prevBtn = document.getElementById('slideshow-prev');
@@ -217,12 +236,18 @@
       if (dot) goToSlide(parseInt(dot.dataset.dotIndex, 10));
     };
 
+    var modal = document.getElementById('slideshow-modal');
+    slideshowMouseMoveHandler = function () { showSlideshowUi(); };
+    modal.addEventListener('mousemove', slideshowMouseMoveHandler);
+
     slideshowKeyHandler = function (e) {
       if (e.key === 'ArrowRight' || e.key === ' ') {
         e.preventDefault();
+        hideSlideshowUi();
         goToSlide(slideshowState.currentIndex + 1);
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
+        hideSlideshowUi();
         goToSlide(slideshowState.currentIndex - 1);
       } else if (e.key === 'Escape') {
         closeSlideshow();
@@ -246,6 +271,14 @@
       window.removeEventListener('resize', slideshowResizeHandler);
       slideshowResizeHandler = null;
     }
+    if (slideshowMouseMoveHandler) {
+      var modal = document.getElementById('slideshow-modal');
+      if (modal) modal.removeEventListener('mousemove', slideshowMouseMoveHandler);
+      slideshowMouseMoveHandler = null;
+    }
+    clearTimeout(slideshowUiTimer);
+    slideshowUiTimer = null;
+    hideSlideshowUi();
   }
 
   /* -----------------------------------------------------------------------
