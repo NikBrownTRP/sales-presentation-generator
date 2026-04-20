@@ -816,7 +816,6 @@
   display: flex;
   padding: 8px 48px 12px;
   gap: 24px;
-  overflow: hidden;
   min-height: 0;
 }
 
