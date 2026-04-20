@@ -1681,7 +1681,6 @@
       grid.querySelectorAll('[data-import-idx]').forEach(function (card) {
         card.classList.toggle('import-picker__card--selected', !!importPickerSelected[parseInt(card.dataset.importIdx, 10)]);
       });
-      selectAllBtn.textContent = allSelected ? 'Select all' : 'Deselect all';
       updateConfirmState();
     };
 
