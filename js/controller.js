@@ -51,6 +51,12 @@
     meta: { title: 'Untitled Presentation', updatedAt: null }
   };
 
+  var importPickerSlides = [];
+  var importPickerSelected = {};
+
+  var importPickerSlides = [];
+  var importPickerSelected = {};
+
   /* -----------------------------------------------------------------------
      DOM references
      ----------------------------------------------------------------------- */
@@ -76,6 +82,7 @@
     dom.exportProgressText = document.getElementById('export-progress-text');
     dom.exportProgressFill = document.getElementById('export-progress-fill');
     dom.fileInputLoad = document.getElementById('file-input-load');
+    dom.fileInputImport = document.getElementById('file-input-import');
     dom.fileInputImage = document.getElementById('file-input-image');
     dom.presTitle = document.getElementById('pres-title');
   }
@@ -1598,6 +1605,117 @@
   }
 
   /* -----------------------------------------------------------------------
+     Import Slides Picker
+     ----------------------------------------------------------------------- */
+  function openImportPicker(parsedState, filename) {
+    importPickerSlides = parsedState.slides || [];
+    importPickerSelected = {};
+
+    var modal = document.getElementById('modal-import-picker');
+    var grid = document.getElementById('import-picker-grid');
+    var title = document.getElementById('import-picker-title');
+    var confirmBtn = document.getElementById('import-picker-confirm');
+    var countEl = document.getElementById('import-picker-count');
+    var selectAllBtn = document.getElementById('import-picker-select-all');
+
+    if (!modal || !grid) return;
+
+    title.textContent = 'Import Slides' + (filename ? ' — ' + filename : '');
+    selectAllBtn.textContent = 'Select all';
+
+    // Build thumbnail grid HTML (same pattern as template picker)
+    var html = '';
+    importPickerSlides.forEach(function (slide, i) {
+      var template = window.SlideTemplates[slide.templateId];
+      var thumbHtml = template ? template.render(slide.data) : '';
+      var labelText = template ? template.getTitle(slide.data) : ('Slide ' + (i + 1));
+      html += '<div class="import-picker__card" data-import-idx="' + i + '">';
+      html += '<div class="import-picker__card__thumb">';
+      html += '<div class="import-picker__card__thumb-inner" data-theme="' + (slide.theme || state.theme) + '">' + thumbHtml + '</div>';
+      html += '</div>';
+      html += '<div class="import-picker__card__checkbox">';
+      html += '<svg class="import-picker__card__checkbox-tick" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1.5,6 4.5,9.5 10.5,2.5"/></svg>';
+      html += '</div>';
+      html += '<div class="import-picker__card__label">Slide ' + (i + 1) + ' — ' + labelText + '</div>';
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+
+    // Scale thumbnails after layout settles (same pattern as template picker)
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        grid.querySelectorAll('.import-picker__card__thumb').forEach(function (thumb) {
+          var inner = thumb.querySelector('.import-picker__card__thumb-inner');
+          if (inner) {
+            inner.style.transform = 'scale(' + (thumb.offsetWidth / 960) + ')';
+            inner.style.transformOrigin = 'top left';
+          }
+        });
+      });
+    });
+
+    function updateConfirmState() {
+      var selectedCount = Object.keys(importPickerSelected).filter(function (k) {
+        return importPickerSelected[k];
+      }).length;
+      countEl.textContent = selectedCount + ' selected';
+      confirmBtn.disabled = selectedCount === 0;
+    }
+    updateConfirmState();
+
+    // Card click: toggle selection
+    grid.onclick = function (e) {
+      var card = e.target.closest('[data-import-idx]');
+      if (!card) return;
+      var idx = parseInt(card.dataset.importIdx, 10);
+      importPickerSelected[idx] = !importPickerSelected[idx];
+      card.classList.toggle('import-picker__card--selected', !!importPickerSelected[idx]);
+      updateConfirmState();
+    };
+
+    // Select all / deselect all
+    selectAllBtn.onclick = function () {
+      var allSelected = importPickerSlides.every(function (_, i) { return importPickerSelected[i]; });
+      importPickerSlides.forEach(function (_, i) { importPickerSelected[i] = !allSelected; });
+      grid.querySelectorAll('[data-import-idx]').forEach(function (card) {
+        card.classList.toggle('import-picker__card--selected', !!importPickerSelected[parseInt(card.dataset.importIdx, 10)]);
+      });
+      selectAllBtn.textContent = allSelected ? 'Select all' : 'Deselect all';
+      updateConfirmState();
+    };
+
+    confirmBtn.onclick = function () {
+      var toImport = importPickerSlides.filter(function (_, i) { return importPickerSelected[i]; });
+      confirmImport(toImport);
+    };
+
+    document.getElementById('import-picker-cancel').onclick = function () { closeModal(modal); };
+
+    openModal(modal);
+  }
+
+  function confirmImport(slides) {
+    var firstNewId = null;
+    slides.forEach(function (original) {
+      var copy = {
+        id: uid(),
+        templateId: original.templateId,
+        theme: original.theme || state.theme,
+        hidden: false,
+        data: JSON.parse(JSON.stringify(original.data))
+      };
+      if (!firstNewId) firstNewId = copy.id;
+      state.slides.push(copy);
+    });
+
+    closeModal(document.getElementById('modal-import-picker'));
+    renderSidebar();
+    autoSave();
+
+    if (firstNewId) selectSlide(firstNewId);
+  }
+
+  /* -----------------------------------------------------------------------
      Slideshow
      ----------------------------------------------------------------------- */
   var slideshowIndex = 0;
@@ -1741,6 +1859,7 @@
         { label: 'JSON', style: 'primary', value: 'json' },
         { label: 'HTML', style: 'secondary', value: 'html' },
         { label: 'PowerPoint', style: 'secondary', value: 'pptx' },
+        { label: 'Import Slides', style: 'secondary', value: 'import' },
         { label: 'Cancel', style: 'ghost', value: null }
       ]).then(function (choice) {
         if (choice === 'json') {
@@ -1765,6 +1884,8 @@
             dom.fileInputLoad.accept = '.pptx';
             dom.fileInputLoad.click();
           });
+        } else if (choice === 'import') {
+          dom.fileInputImport.click();
         }
       });
     });
@@ -1830,6 +1951,39 @@
           autoSave();
         } else {
           Dialog.alert('Invalid File', 'This file does not contain valid presentation data.', 'error');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    dom.fileInputImport.addEventListener('change', function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+
+      var reader = new FileReader();
+      reader.onload = function (ev) {
+        var content = ev.target.result;
+        var parsed = null;
+
+        if (file.name.endsWith('.json')) {
+          try { parsed = JSON.parse(content); }
+          catch (err) {
+            Dialog.alert('Invalid File', 'This file is not a valid JSON file.', 'error');
+            return;
+          }
+        } else if (file.name.endsWith('.html') || file.name.endsWith('.htm')) {
+          parsed = extractStateFromHtml(content);
+          if (!parsed) {
+            Dialog.alert('Cannot Import', 'This HTML file does not contain embedded presentation data.\n\nOnly HTML files exported from this tool can be re-imported.', 'error');
+            return;
+          }
+        }
+
+        if (parsed && parsed.slides && parsed.slides.length > 0) {
+          openImportPicker(parsed, file.name);
+        } else {
+          Dialog.alert('No Slides Found', 'This file does not contain any slides to import.', 'warning');
         }
       };
       reader.readAsText(file);
