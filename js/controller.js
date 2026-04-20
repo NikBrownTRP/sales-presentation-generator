@@ -1620,7 +1620,9 @@
     slideshowIndex = startIndex;
 
     if (window.PreviewRenderer) {
-      window.PreviewRenderer.openSlideshow(visibleSlides, state.theme, startIndex);
+      window.PreviewRenderer.openSlideshow(visibleSlides, state.theme, startIndex, function (slideId) {
+        if (slideId) selectSlide(slideId);
+      });
     }
   }
 
