@@ -119,8 +119,8 @@
 
 /* --------------------------------------------------------------------------
    TRP/Tektro Corporate — brand signature micro-mark
-   Yellow 7×7px square (Tektro) + 3px gap + 14×7px red/blue bar (red 5px,
-   blue 9px) → the fused red/blue block represents TRP (red + blue brand
+   Yellow 7×7px square (Tektro) + 3px gap + 14×7px blue/red bar (blue 9px,
+   red 5px) → the fused blue/red block represents TRP (blue + red brand
    colors), sized 2× the Tektro square with blue dominant (~2/3).
    Pure CSS — appears on all templates without touching JS rendering.
    -------------------------------------------------------------------------- */
@@ -129,11 +129,11 @@
   position: absolute;
   bottom: 18px;
   left: 24px;
-  width: 24px;   /* 7 (yellow) + 3 (gap) + 14 (red 5 + blue 9) */
+  width: 24px;   /* 7 (yellow) + 3 (gap) + 14 (blue 9 + red 5) */
   height: 7px;
   z-index: 3;
-  /* SVG fills: #FFDF00 Tektro yellow, #DE2A2A TRP red, #1E2D7D TRP blue */
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='7' viewBox='0 0 24 7'><rect x='0' y='0' width='7' height='7' fill='%23FFDF00'/><rect x='10' y='0' width='5' height='7' fill='%23DE2A2A'/><rect x='15' y='0' width='9' height='7' fill='%231E2D7D'/></svg>");
+  /* SVG fills: #FFDF00 Tektro yellow, #1E2D7D TRP blue, #DE2A2A TRP red */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='7' viewBox='0 0 24 7'><rect x='0' y='0' width='7' height='7' fill='%23FFDF00'/><rect x='10' y='0' width='9' height='7' fill='%231E2D7D'/><rect x='19' y='0' width='5' height='7' fill='%23DE2A2A'/></svg>");
   background-repeat: no-repeat;
   pointer-events: none;
 }
