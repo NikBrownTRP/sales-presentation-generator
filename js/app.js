@@ -401,6 +401,7 @@
     html += '<div class="form-theme-toggle">';
     html += '<button class="form-theme-btn' + (slideTheme === 'trp-dark' ? ' form-theme-btn--active' : '') + '" data-set-theme="trp-dark">TRP Racing</button>';
     html += '<button class="form-theme-btn' + (slideTheme === 'tektro-light' ? ' form-theme-btn--active' : '') + '" data-set-theme="tektro-light">Tektro</button>';
+    html += '<button class="form-theme-btn' + (slideTheme === 'trp-tektro-corporate' ? ' form-theme-btn--active' : '') + '" data-set-theme="trp-tektro-corporate">Corporate</button>';
     html += '</div></div>';
 
     template.fields.forEach(function (field) {
@@ -414,18 +415,18 @@
       btn.addEventListener('click', function () {
         var oldTheme = slide.theme;
         slide.theme = btn.dataset.setTheme;
-        // Swap brand logo if it's still the default
+        // Swap brand logo if it's still the prior theme's default
         if (slide.data.hasOwnProperty('logo')) {
-          var oldLogo = oldTheme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+          var oldLogo = defaultLogoForTheme(oldTheme);
           if (!slide.data.logo || slide.data.logo === oldLogo) {
-            slide.data.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+            slide.data.logo = defaultLogoForTheme(slide.theme);
           }
         }
-        // Swap brand line if it's still the default
+        // Swap brand line if it's still the prior theme's default
         if (slide.data.hasOwnProperty('brandLine')) {
-          var oldBrand = oldTheme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+          var oldBrand = defaultBrandLineForTheme(oldTheme);
           if (!slide.data.brandLine || slide.data.brandLine === oldBrand) {
-            slide.data.brandLine = slide.theme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+            slide.data.brandLine = defaultBrandLineForTheme(slide.theme);
           }
         }
         renderEditor();
