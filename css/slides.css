@@ -126,10 +126,11 @@
   content: '';
   position: absolute;
   bottom: 18px;
-  right: 24px;
+  left: 24px;
   width: 27px;   /* 7 + 3 + 7 + 3 + 7 */
   height: 7px;
   z-index: 3;
+  /* SVG squares: #FFDF00 Tektro yellow, #DE2A2A TRP red, #1E2D7D TRP blue */
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='27' height='7' viewBox='0 0 27 7'><rect x='0' y='0' width='7' height='7' fill='%23FFDF00'/><rect x='10' y='0' width='7' height='7' fill='%23DE2A2A'/><rect x='20' y='0' width='7' height='7' fill='%231E2D7D'/></svg>");
   background-repeat: no-repeat;
   pointer-events: none;
