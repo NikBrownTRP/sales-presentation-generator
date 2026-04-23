@@ -1,7 +1,9 @@
 /* ==========================================================================
    Sales Presentation Generator — Slide Styles & Themes
-   Two brand design systems: TRP Dark + Tektro Light
-   Aligned with Stitch MCP-generated corporate design systems
+   Three brand design systems:
+     - TRP Dark (racing)
+     - Tektro Light (editorial)
+     - TRP/Tektro Corporate (company-wide business)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -81,6 +83,57 @@
   --pres-accent-bar-height: 2px;
   --pres-underline-height: 2px;
   --pres-radius: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Theme: TRP / Tektro Corporate
+   Company-wide business deck — warm-neutral editorial, single charcoal accent.
+   Three-color brand micro-mark in footer (yellow / red / blue).
+   Fonts: Manrope (heading) + Inter (body)
+   -------------------------------------------------------------------------- */
+[data-theme="trp-tektro-corporate"] {
+  --pres-bg: #FAF8F4;
+  --pres-bg-alt: #F4F1EB;
+  --pres-bg-surface: #EDE9E1;
+  --pres-text: #1A1A1A;
+  --pres-text-secondary: #5E5E5E;
+  --pres-text-muted: #999999;
+  --pres-accent: #2A2A2A;
+  --pres-accent-light: #4A4A4A;
+  --pres-accent-secondary: #5E5E5E;
+  --pres-accent-tertiary: #FFDF00;
+  --pres-accent-glow: rgba(26, 26, 26, 0.06);
+  --pres-chart-color: #2A2A2A;
+  --pres-border: #D8D4CC;
+  --pres-font-heading: 'Manrope', sans-serif;
+  --pres-font-body: 'Inter', sans-serif;
+  --pres-heading-weight: 700;
+  --pres-heading-transform: none;
+  --pres-heading-tracking: -0.02em;
+  --pres-corner-size: 0px;
+  --pres-corner-weight: 1px;
+  --pres-accent-bar-height: 2px;
+  --pres-underline-height: 2px;
+  --pres-radius: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   TRP/Tektro Corporate — brand signature micro-mark
+   Three 7×7px squares (yellow / red / blue), bottom-right of every slide.
+   Pure CSS — appears on all templates without touching JS rendering.
+   -------------------------------------------------------------------------- */
+[data-theme="trp-tektro-corporate"] .pres-slide::after {
+  content: '';
+  position: absolute;
+  bottom: 18px;
+  left: 24px;
+  width: 27px;   /* 7 + 3 + 7 + 3 + 7 */
+  height: 7px;
+  z-index: 3;
+  /* SVG squares: #FFDF00 Tektro yellow, #DE2A2A TRP red, #1E2D7D TRP blue */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='27' height='7' viewBox='0 0 27 7'><rect x='0' y='0' width='7' height='7' fill='%23FFDF00'/><rect x='10' y='0' width='7' height='7' fill='%23DE2A2A'/><rect x='20' y='0' width='7' height='7' fill='%231E2D7D'/></svg>");
+  background-repeat: no-repeat;
+  pointer-events: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -238,7 +291,8 @@
 }
 
 /* Hide corners for Tektro (clean editorial, no decorations) */
-[data-theme="tektro-light"] .pres-corner {
+[data-theme="tektro-light"] .pres-corner,
+[data-theme="trp-tektro-corporate"] .pres-corner {
   display: none;
 }
 
@@ -1238,6 +1292,69 @@
 [data-theme="tektro-light"] .pres-slide--animated .pres-bullet-item:nth-child(6) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.20s both; }
 [data-theme="tektro-light"] .pres-slide--animated .pres-bullet-item:nth-child(7) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.35s both; }
 [data-theme="tektro-light"] .pres-slide--animated .pres-bullet-item:nth-child(8) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.50s both; }
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-logo {
+  animation: pressFadeIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-title,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-product-name,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-spec-product-name,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-generic-heading,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-gallery-heading,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-graph-heading {
+  animation: tektroBlurIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-subtitle,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-tagline,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-generic-subheading,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-gallery-subheading,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-graph-subheading {
+  animation: tektroSoftRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-accent-bar {
+  animation: tektroAccentCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-accent-line,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-spec-underline,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-generic-underline,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-gallery-underline,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-graph-underline {
+  animation: tektroAccentCenter 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-brandline {
+  animation: pressFadeIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.9s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-category,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-badge {
+  animation: tektroSoftRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-product-img,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-spec-product-img,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-generic-img {
+  animation: tektroImageReveal 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(1) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(2) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.70s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(3) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.85s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(4) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.00s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(5) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.15s both; }
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(1) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(2) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.60s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(3) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(4) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.90s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(5) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(6) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.20s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(7) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.35s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(8) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.50s both; }
 
 /* Spec table rows: staggered fade (both themes) */
 .pres-slide--animated .pres-spec-table tr:nth-child(1) { animation: pressFadeIn 0.4s ease 0.3s both; }

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Corporate Theme Mockup — TRP/Tektro</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pres-bg: #FAF8F4;
+    --pres-bg-alt: #F4F1EB;
+    --pres-bg-surface: #EDE9E1;
+    --pres-text: #1A1A1A;
+    --pres-text-secondary: #5E5E5E;
+    --pres-text-muted: #999999;
+    --pres-accent: #2A2A2A;
+    --pres-accent-light: #4A4A4A;
+    --pres-accent-secondary: #5E5E5E;
+    --pres-accent-tertiary: #FFDF00;
+    --pres-border: #D8D4CC;
+    --pres-font-heading: 'Manrope', sans-serif;
+    --pres-font-body: 'Inter', sans-serif;
+  }
+  body {
+    margin: 0;
+    padding: 40px;
+    background: #2a2a2a;
+    font-family: var(--pres-font-body);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
+  }
+  h1.page-title { color: #fff; font-family: var(--pres-font-heading); font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px; margin: 0 0 8px; }
+  .label { color: #999; font-family: var(--pres-font-body); font-size: 11px; margin: 0 0 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .slide {
+    width: 960px; height: 540px;
+    background: var(--pres-bg);
+    color: var(--pres-text);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .accent-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: var(--pres-accent);
+  }
+  .footer {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 14px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 10px; color: var(--pres-text-muted);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    border-top: 1px solid var(--pres-border);
+  }
+  .footer__left { display: flex; align-items: center; gap: 10px; }
+  .footer__logo { font-family: var(--pres-font-heading); font-weight: 700; font-size: 11px; color: var(--pres-text); letter-spacing: 0.08em; }
+  .micro-marks { display: inline-flex; gap: 3px; }
+  .micro-mark {
+    width: 7px; height: 7px;
+    display: inline-block;
+  }
+  .micro-mark--blue   { background: #1E2D7D; }
+  .micro-mark--red    { background: #DE2A2A; }
+  .micro-mark--yellow { background: #FFDF00; }
+  .footer__center { font-weight: 600; }
+  .footer__right { font-family: var(--pres-font-body); font-weight: 400; letter-spacing: 0.1em; }
+
+  /* ----- SLIDE 1: TITLE ----- */
+  .slide--title { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px; }
+  .slide--title .logo-placeholder {
+    font-family: var(--pres-font-heading); font-weight: 700; font-size: 22px;
+    letter-spacing: 0.25em; color: var(--pres-text);
+    margin-bottom: 48px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .slide--title .logo-placeholder .sep { width: 1px; height: 20px; background: var(--pres-border); }
+  .slide--title .pres-title {
+    font-family: var(--pres-font-heading); font-weight: 700; font-size: 56px;
+    letter-spacing: -0.02em; line-height: 1.05; margin: 0 0 18px;
+  }
+  .slide--title .pres-subtitle {
+    font-family: var(--pres-font-body); font-weight: 300; font-size: 22px;
+    color: var(--pres-text-secondary); letter-spacing: 0.02em; margin: 0 0 28px;
+  }
+  .slide--title .hairline {
+    width: 64px; height: 2px; background: var(--pres-accent);
+  }
+  .slide--title .brandline {
+    position: absolute; bottom: 70px; left: 0; right: 0; text-align: center;
+    font-family: var(--pres-font-heading); font-weight: 600; font-size: 11px;
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--pres-text-muted);
+  }
+
+  /* ----- SLIDE 2: GENERIC / EXECUTIVE BULLETS ----- */
+  .slide--generic { padding: 72px 80px 64px; display: flex; flex-direction: column; }
+  .slide--generic .kicker {
+    font-family: var(--pres-font-heading); font-weight: 600; font-size: 11px;
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--pres-text-muted);
+    margin-bottom: 16px;
+  }
+  .slide--generic .heading {
+    font-family: var(--pres-font-heading); font-weight: 700; font-size: 38px;
+    letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 10px;
+  }
+  .slide--generic .subheading {
+    font-family: var(--pres-font-body); font-weight: 400; font-size: 17px;
+    color: var(--pres-text-secondary); margin: 0 0 4px;
+  }
+  .slide--generic .underline { width: 48px; height: 2px; background: var(--pres-accent); margin: 22px 0 32px; }
+  .slide--generic .bullets { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 56px; }
+  .slide--generic .bullet { display: flex; gap: 14px; }
+  .slide--generic .bullet-num {
+    font-family: var(--pres-font-heading); font-weight: 700; font-size: 13px;
+    color: var(--pres-text-muted); letter-spacing: 0.08em; min-width: 24px;
+    padding-top: 3px;
+  }
+  .slide--generic .bullet-body h4 {
+    font-family: var(--pres-font-heading); font-weight: 700; font-size: 15px;
+    margin: 0 0 4px; letter-spacing: -0.01em;
+  }
+  .slide--generic .bullet-body p {
+    font-family: var(--pres-font-body); font-weight: 400; font-size: 13px;
+    color: var(--pres-text-secondary); line-height: 1.5; margin: 0;
+  }
+
+  /* ----- SLIDE 3: GRAPH / KPI ----- */
+  .slide--graph { padding: 56px 72px 64px; display: flex; flex-direction: column; }
+  .slide--graph .heading {
+    font-family: var(--pres-font-heading); font-weight: 700; font-size: 30px;
+    letter-spacing: -0.02em; margin: 0 0 6px;
+  }
+  .slide--graph .subheading { font-size: 14px; color: var(--pres-text-secondary); margin: 0 0 20px; }
+  .slide--graph .underline { width: 40px; height: 2px; background: var(--pres-accent); margin-bottom: 28px; }
+  .slide--graph .body { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; flex: 1; }
+  .slide--graph .chart {
+    background: var(--pres-bg-alt);
+    border: 1px solid var(--pres-border);
+    border-radius: 6px;
+    padding: 22px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    gap: 10px;
+  }
+  .bar-row { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--pres-text-secondary); }
+  .bar-row .bar-label { width: 60px; font-family: var(--pres-font-heading); font-weight: 600; color: var(--pres-text); }
+  .bar-row .bar-track { flex: 1; height: 14px; background: var(--pres-bg-surface); border-radius: 2px; overflow: hidden; }
+  .bar-row .bar-fill { height: 100%; background: var(--pres-accent); }
+  .bar-row .bar-val { min-width: 46px; text-align: right; font-family: var(--pres-font-heading); font-weight: 700; color: var(--pres-text); }
+  .slide--graph .kpis { display: flex; flex-direction: column; gap: 14px; }
+  .kpi-card {
+    border: 1px solid var(--pres-border);
+    border-radius: 6px;
+    padding: 18px 20px;
+    background: #fff;
+  }
+  .kpi-card .kpi-label {
+    font-family: var(--pres-font-heading); font-weight: 600; font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--pres-text-muted);
+    margin-bottom: 6px;
+  }
+  .kpi-card .kpi-value {
+    font-family: var(--pres-font-heading); font-weight: 700; font-size: 30px;
+    letter-spacing: -0.02em; color: var(--pres-text);
+  }
+  .kpi-card .kpi-caption { font-size: 11px; color: var(--pres-text-secondary); margin-top: 4px; }
+</style>
+</head>
+<body>
+  <h1 class="page-title">Corporate Theme Mockup — TRP / Tektro</h1>
+
+  <div>
+    <p class="label">01 · Title slide</p>
+    <div class="slide slide--title">
+      <div class="accent-bar"></div>
+      <div class="logo-placeholder">
+        <span>TRP</span><span class="sep"></span><span>TEKTRO</span>
+      </div>
+      <div class="pres-title">Corporate Overview 2026</div>
+      <div class="pres-subtitle">Two Brands. One Company.</div>
+      <div class="hairline"></div>
+      <div class="brandline">Global Component Group · Annual Partner Briefing</div>
+      <div class="footer">
+        <div class="footer__left">
+          <span class="footer__logo">TRP · TEKTRO</span>
+          <span class="micro-marks" title="brand marks"><span class="micro-mark micro-mark--yellow"></span><span class="micro-mark micro-mark--red"></span><span class="micro-mark micro-mark--blue"></span></span>
+        </div>
+        <div class="footer__center">Corporate Overview 2026</div>
+        <div class="footer__right">01 / 24</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <p class="label">02 · Generic / Executive narrative</p>
+    <div class="slide slide--generic">
+      <div class="accent-bar"></div>
+      <div class="kicker">Strategic Priorities</div>
+      <h2 class="heading">Four pillars for the 2026 planning cycle</h2>
+      <p class="subheading">A unified operating model across TRP and Tektro, anchored in quality, cadence, and customer proximity.</p>
+      <div class="underline"></div>
+      <div class="bullets">
+        <div class="bullet">
+          <div class="bullet-num">01</div>
+          <div class="bullet-body">
+            <h4>Unified supply chain</h4>
+            <p>Consolidated sourcing and logistics across both brands to reduce lead times and improve OEM response.</p>
+          </div>
+        </div>
+        <div class="bullet">
+          <div class="bullet-num">02</div>
+          <div class="bullet-body">
+            <h4>Differentiated product DNA</h4>
+            <p>Sharper brand positioning: TRP for race-driven innovation, Tektro for trusted everyday performance.</p>
+          </div>
+        </div>
+        <div class="bullet">
+          <div class="bullet-num">03</div>
+          <div class="bullet-body">
+            <h4>Global partner experience</h4>
+            <p>Aligned sales support, warranty handling, and aftermarket programs across regional distributors.</p>
+          </div>
+        </div>
+        <div class="bullet">
+          <div class="bullet-num">04</div>
+          <div class="bullet-body">
+            <h4>Sustainable operations</h4>
+            <p>Measurable targets for packaging, materials, and end-of-life programs, reported annually.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="footer__left">
+          <span class="footer__logo">TRP · TEKTRO</span>
+          <span class="micro-marks"><span class="micro-mark micro-mark--yellow"></span><span class="micro-mark micro-mark--red"></span><span class="micro-mark micro-mark--blue"></span></span>
+        </div>
+        <div class="footer__center">Strategic Priorities</div>
+        <div class="footer__right">07 / 24</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <p class="label">03 · Graph / KPI</p>
+    <div class="slide slide--graph">
+      <div class="accent-bar"></div>
+      <h2 class="heading">Combined revenue by channel · FY2025</h2>
+      <p class="subheading">Aggregated TRP and Tektro performance — OEM, aftermarket, and direct.</p>
+      <div class="underline"></div>
+      <div class="body">
+        <div class="chart">
+          <div class="bar-row"><div class="bar-label">OEM</div><div class="bar-track"><div class="bar-fill" style="width: 92%"></div></div><div class="bar-val">€184M</div></div>
+          <div class="bar-row"><div class="bar-label">AM</div><div class="bar-track"><div class="bar-fill" style="width: 64%"></div></div><div class="bar-val">€128M</div></div>
+          <div class="bar-row"><div class="bar-label">Direct</div><div class="bar-track"><div class="bar-fill" style="width: 28%"></div></div><div class="bar-val">€56M</div></div>
+          <div class="bar-row"><div class="bar-label">Service</div><div class="bar-track"><div class="bar-fill" style="width: 14%"></div></div><div class="bar-val">€28M</div></div>
+        </div>
+        <div class="kpis">
+          <div class="kpi-card">
+            <div class="kpi-label">Total revenue</div>
+            <div class="kpi-value">€396M</div>
+            <div class="kpi-caption">+11.4% YoY</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">OEM share</div>
+            <div class="kpi-value">46%</div>
+            <div class="kpi-caption">Stable vs. FY24</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Aftermarket growth</div>
+            <div class="kpi-value">+18%</div>
+            <div class="kpi-caption">Led by EU distributors</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="footer__left">
+          <span class="footer__logo">TRP · TEKTRO</span>
+          <span class="micro-marks"><span class="micro-mark micro-mark--yellow"></span><span class="micro-mark micro-mark--red"></span><span class="micro-mark micro-mark--blue"></span></span>
+        </div>
+        <div class="footer__center">Financial Review</div>
+        <div class="footer__right">12 / 24</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

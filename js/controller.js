@@ -85,6 +85,22 @@
   }
 
   /* -----------------------------------------------------------------------
+     Theme defaults
+     ----------------------------------------------------------------------- */
+  var DEFAULT_LOGOS = {
+    'trp-dark':             'assets/Logo TRP_w.png',
+    'tektro-light':         'assets/Logo Tektro.png',
+    'trp-tektro-corporate': 'assets/Logo TRP Tektro Small.png'
+  };
+  var DEFAULT_BRANDLINES = {
+    'trp-dark':             'Product Quality \u2014 Performance Driven \u2014 Innovation Forward',
+    'tektro-light':         'Product Quality \u2014 Value Driven \u2014 Purpose Built',
+    'trp-tektro-corporate': 'Performance \u2014 Quality \u2014 Integrity'
+  };
+  function defaultLogoForTheme(theme)      { return DEFAULT_LOGOS[theme]      || DEFAULT_LOGOS['trp-dark']; }
+  function defaultBrandLineForTheme(theme) { return DEFAULT_BRANDLINES[theme] || DEFAULT_BRANDLINES['trp-dark']; }
+
+  /* -----------------------------------------------------------------------
      Slide CRUD
      ----------------------------------------------------------------------- */
   function addSlide(templateId, theme) {
@@ -96,11 +112,11 @@
     };
     // Prefill brand logo for templates that have a logo field
     if (slide.data.hasOwnProperty('logo') && !slide.data.logo) {
-      slide.data.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+      slide.data.logo = defaultLogoForTheme(slide.theme);
     }
     // Prefill brand line for title slides
     if (slide.data.hasOwnProperty('brandLine') && !slide.data.brandLine) {
-      slide.data.brandLine = slide.theme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+      slide.data.brandLine = defaultBrandLineForTheme(slide.theme);
     }
     state.lastTheme = slide.theme;
     // Insert after the currently active slide, or at the end
@@ -127,12 +143,12 @@
     // didn't carry one over (keeps parity with addSlide's behaviour).
     var hasLogoField = (window.SlideTemplates[newTemplateId].fields || []).some(function (f) { return f.key === 'logo'; });
     if (hasLogoField && !newData.logo) {
-      newData.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+      newData.logo = defaultLogoForTheme(slide.theme);
     }
     // Same for brandLine on title slides.
     var hasBrandLineField = (window.SlideTemplates[newTemplateId].fields || []).some(function (f) { return f.key === 'brandLine'; });
     if (hasBrandLineField && !newData.brandLine) {
-      newData.brandLine = slide.theme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+      newData.brandLine = defaultBrandLineForTheme(slide.theme);
     }
 
     slide.templateId = newTemplateId;
@@ -506,6 +522,7 @@
     html += '<div class="form-theme-toggle">';
     html += '<button class="form-theme-btn' + (slideTheme === 'trp-dark' ? ' form-theme-btn--active' : '') + '" data-set-theme="trp-dark">TRP Racing</button>';
     html += '<button class="form-theme-btn' + (slideTheme === 'tektro-light' ? ' form-theme-btn--active' : '') + '" data-set-theme="tektro-light">Tektro</button>';
+    html += '<button class="form-theme-btn' + (slideTheme === 'trp-tektro-corporate' ? ' form-theme-btn--active' : '') + '" data-set-theme="trp-tektro-corporate">Corporate</button>';
     html += '</div></div>';
 
     template.fields.forEach(function (field) {
@@ -519,18 +536,18 @@
       btn.addEventListener('click', function () {
         var oldTheme = slide.theme;
         slide.theme = btn.dataset.setTheme;
-        // Swap brand logo if it's still the default
+        // Swap brand logo if it's still the prior theme's default
         if (slide.data.hasOwnProperty('logo')) {
-          var oldLogo = oldTheme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+          var oldLogo = defaultLogoForTheme(oldTheme);
           if (!slide.data.logo || slide.data.logo === oldLogo) {
-            slide.data.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+            slide.data.logo = defaultLogoForTheme(slide.theme);
           }
         }
-        // Swap brand line if it's still the default
+        // Swap brand line if it's still the prior theme's default
         if (slide.data.hasOwnProperty('brandLine')) {
-          var oldBrand = oldTheme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+          var oldBrand = defaultBrandLineForTheme(oldTheme);
           if (!slide.data.brandLine || slide.data.brandLine === oldBrand) {
-            slide.data.brandLine = slide.theme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+            slide.data.brandLine = defaultBrandLineForTheme(slide.theme);
           }
         }
         renderEditor();
@@ -1032,7 +1049,9 @@
   function getEditorBackgroundColor(slideId) {
     var slide = state.slides.find(function (s) { return s.id === slideId; });
     if (!slide) return '#000000';
-    return slide.theme === 'tektro-light' ? '#FFFFFF' : '#000000';
+    if (slide.theme === 'tektro-light') return '#FFFFFF';
+    if (slide.theme === 'trp-tektro-corporate') return '#FAF8F4';
+    return '#000000';
   }
 
   function openImageEditor(slideId, fieldKey) {
@@ -1532,6 +1551,7 @@
       html += '<div class="template-theme-picker">';
       html += '<button class="template-theme-btn' + (modalTheme === 'trp-dark' ? ' template-theme-btn--active' : '') + '" data-pick-theme="trp-dark">TRP Racing</button>';
       html += '<button class="template-theme-btn' + (modalTheme === 'tektro-light' ? ' template-theme-btn--active' : '') + '" data-pick-theme="tektro-light">Tektro</button>';
+      html += '<button class="template-theme-btn' + (modalTheme === 'trp-tektro-corporate' ? ' template-theme-btn--active' : '') + '" data-pick-theme="trp-tektro-corporate">Corporate</button>';
       html += '</div>';
     }
 
@@ -1885,6 +1905,7 @@
           Dialog.choose('Import as…', 'Which template should the imported slides use?', [
             { label: 'TRP Racing', style: 'secondary', value: 'trp-dark' },
             { label: 'Tektro', style: 'secondary', value: 'tektro-light' },
+            { label: 'Corporate', style: 'secondary', value: 'trp-tektro-corporate' },
             { label: 'Cancel', style: 'ghost', value: null }
           ]).then(function (themeChoice) {
             if (!themeChoice) return;
