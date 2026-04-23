@@ -1122,7 +1122,6 @@
     var html = '<div class="template-theme-picker">';
     html += '<button class="template-theme-btn' + (modalTheme === 'trp-dark' ? ' template-theme-btn--active' : '') + '" data-pick-theme="trp-dark">TRP Racing</button>';
     html += '<button class="template-theme-btn' + (modalTheme === 'tektro-light' ? ' template-theme-btn--active' : '') + '" data-pick-theme="tektro-light">Tektro</button>';
-    html += '<button class="template-theme-btn' + (modalTheme === 'trp-tektro-corporate' ? ' template-theme-btn--active' : '') + '" data-pick-theme="trp-tektro-corporate">Corporate</button>';
     html += '</div>';
 
     // Template cards with live previews
