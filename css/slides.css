@@ -1290,6 +1290,69 @@
 [data-theme="tektro-light"] .pres-slide--animated .pres-bullet-item:nth-child(7) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.35s both; }
 [data-theme="tektro-light"] .pres-slide--animated .pres-bullet-item:nth-child(8) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.50s both; }
 
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-logo {
+  animation: pressFadeIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-title,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-product-name,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-spec-product-name,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-generic-heading,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-gallery-heading,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-graph-heading {
+  animation: tektroBlurIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-subtitle,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-tagline,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-generic-subheading,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-gallery-subheading,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-graph-subheading {
+  animation: tektroSoftRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-accent-bar {
+  animation: tektroAccentCenter 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-accent-line,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-spec-underline,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-generic-underline,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-gallery-underline,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-graph-underline {
+  animation: tektroAccentCenter 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-brandline {
+  animation: pressFadeIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.9s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-category,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-badge {
+  animation: tektroSoftRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-product-img,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-spec-product-img,
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-generic-img {
+  animation: tektroImageReveal 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(1) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(2) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.70s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(3) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.85s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(4) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.00s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-selling-point:nth-child(5) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.15s both; }
+
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(1) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(2) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.60s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(3) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(4) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.90s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(5) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(6) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.20s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(7) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.35s both; }
+[data-theme="trp-tektro-corporate"] .pres-slide--animated .pres-bullet-item:nth-child(8) { animation: tektroGentleRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.50s both; }
+
 /* Spec table rows: staggered fade (both themes) */
 .pres-slide--animated .pres-spec-table tr:nth-child(1) { animation: pressFadeIn 0.4s ease 0.3s both; }
 .pres-slide--animated .pres-spec-table tr:nth-child(2) { animation: pressFadeIn 0.4s ease 0.38s both; }
