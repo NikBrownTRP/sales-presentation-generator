@@ -223,6 +223,10 @@
     'tektro-light': {
       logo: 'assets/Logo Tektro.png',
       brandLine: 'Product Quality \u2014 Value Driven \u2014 Purpose Built'
+    },
+    'trp-tektro-corporate': {
+      logo: 'assets/Logo TRP Tektro Small.png',
+      brandLine: 'Performance \u2014 Quality \u2014 Integrity'
     }
   };
 
@@ -302,8 +306,9 @@
   }
 
   /* -----------------------------------------------------------------------
-     Main entry point. `options.theme` selects the brand ("trp-dark" or
-     "tektro-light"); defaults to TRP for backwards compatibility.
+     Main entry point. `options.theme` selects the brand ("trp-dark",
+     "tektro-light", or "trp-tektro-corporate"); defaults to TRP for
+     backwards compatibility.
      ----------------------------------------------------------------------- */
   function parse(arrayBuffer, options) {
     var theme = (options && options.theme) || 'trp-dark';
