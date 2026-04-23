@@ -81,6 +81,22 @@
   }
 
   /* -----------------------------------------------------------------------
+     Theme defaults
+     ----------------------------------------------------------------------- */
+  var DEFAULT_LOGOS = {
+    'trp-dark':             'assets/Logo TRP_w.png',
+    'tektro-light':         'assets/Logo Tektro.png',
+    'trp-tektro-corporate': 'assets/Logo TRP Tektro Small.png'
+  };
+  var DEFAULT_BRANDLINES = {
+    'trp-dark':             'Product Quality \u2014 Performance Driven \u2014 Innovation Forward',
+    'tektro-light':         'Product Quality \u2014 Value Driven \u2014 Purpose Built',
+    'trp-tektro-corporate': 'Performance \u2014 Quality \u2014 Integrity'
+  };
+  function defaultLogoForTheme(theme)      { return DEFAULT_LOGOS[theme]      || DEFAULT_LOGOS['trp-dark']; }
+  function defaultBrandLineForTheme(theme) { return DEFAULT_BRANDLINES[theme] || DEFAULT_BRANDLINES['trp-dark']; }
+
+  /* -----------------------------------------------------------------------
      Slide CRUD
      ----------------------------------------------------------------------- */
   function addSlide(templateId, theme) {
@@ -92,11 +108,11 @@
     };
     // Prefill brand logo for templates that have a logo field
     if (slide.data.hasOwnProperty('logo') && !slide.data.logo) {
-      slide.data.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
+      slide.data.logo = defaultLogoForTheme(slide.theme);
     }
     // Prefill brand line for title slides
     if (slide.data.hasOwnProperty('brandLine') && !slide.data.brandLine) {
-      slide.data.brandLine = slide.theme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
+      slide.data.brandLine = defaultBrandLineForTheme(slide.theme);
     }
     state.lastTheme = slide.theme;
     // Insert after the currently active slide, or at the end
