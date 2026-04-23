@@ -87,14 +87,14 @@
 
 /* --------------------------------------------------------------------------
    Theme: TRP / Tektro Corporate
-   Company-wide business deck — warm-neutral editorial, single charcoal accent.
-   Three-color brand micro-mark in footer (yellow / red / blue).
+   Company-wide business deck — pure white editorial, single charcoal accent.
+   Three-color brand micro-mark in footer (yellow / blue / red).
    Fonts: Manrope (heading) + Inter (body)
    -------------------------------------------------------------------------- */
 [data-theme="trp-tektro-corporate"] {
-  --pres-bg: #FAF8F4;
-  --pres-bg-alt: #F4F1EB;
-  --pres-bg-surface: #EDE9E1;
+  --pres-bg: #FFFFFF;
+  --pres-bg-alt: #F9F9F9;
+  --pres-bg-surface: #F0F0F0;
   --pres-text: #1A1A1A;
   --pres-text-secondary: #5E5E5E;
   --pres-text-muted: #999999;
@@ -104,7 +104,7 @@
   --pres-accent-tertiary: #FFDF00;
   --pres-accent-glow: rgba(26, 26, 26, 0.06);
   --pres-chart-color: #2A2A2A;
-  --pres-border: #D8D4CC;
+  --pres-border: #DADADA;
   --pres-font-heading: 'Manrope', sans-serif;
   --pres-font-body: 'Inter', sans-serif;
   --pres-heading-weight: 700;

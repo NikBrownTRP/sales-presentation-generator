@@ -1050,7 +1050,7 @@
     var slide = state.slides.find(function (s) { return s.id === slideId; });
     if (!slide) return '#000000';
     if (slide.theme === 'tektro-light') return '#FFFFFF';
-    if (slide.theme === 'trp-tektro-corporate') return '#FAF8F4';
+    if (slide.theme === 'trp-tektro-corporate') return '#FFFFFF';
     return '#000000';
   }
 
