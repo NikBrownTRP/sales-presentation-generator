@@ -119,7 +119,9 @@
 
 /* --------------------------------------------------------------------------
    TRP/Tektro Corporate — brand signature micro-mark
-   Three 7×7px squares (yellow / red / blue), bottom-right of every slide.
+   Yellow 7×7px square (Tektro) + 3px gap + 14×7px red/blue bar (red 5px,
+   blue 9px) → the fused red/blue block represents TRP (red + blue brand
+   colors), sized 2× the Tektro square with blue dominant (~2/3).
    Pure CSS — appears on all templates without touching JS rendering.
    -------------------------------------------------------------------------- */
 [data-theme="trp-tektro-corporate"] .pres-slide::after {
@@ -127,11 +129,11 @@
   position: absolute;
   bottom: 18px;
   left: 24px;
-  width: 27px;   /* 7 + 3 + 7 + 3 + 7 */
+  width: 24px;   /* 7 (yellow) + 3 (gap) + 14 (red 5 + blue 9) */
   height: 7px;
   z-index: 3;
-  /* SVG squares: #FFDF00 Tektro yellow, #DE2A2A TRP red, #1E2D7D TRP blue */
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='27' height='7' viewBox='0 0 27 7'><rect x='0' y='0' width='7' height='7' fill='%23FFDF00'/><rect x='10' y='0' width='7' height='7' fill='%23DE2A2A'/><rect x='20' y='0' width='7' height='7' fill='%231E2D7D'/></svg>");
+  /* SVG fills: #FFDF00 Tektro yellow, #DE2A2A TRP red, #1E2D7D TRP blue */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='7' viewBox='0 0 24 7'><rect x='0' y='0' width='7' height='7' fill='%23FFDF00'/><rect x='10' y='0' width='5' height='7' fill='%23DE2A2A'/><rect x='15' y='0' width='9' height='7' fill='%231E2D7D'/></svg>");
   background-repeat: no-repeat;
   pointer-events: none;
 }
