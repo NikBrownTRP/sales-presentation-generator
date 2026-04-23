@@ -116,6 +116,24 @@
 }
 
 /* --------------------------------------------------------------------------
+   TRP/Tektro Corporate — brand signature micro-mark
+   Three 7×7px squares (yellow / red / blue), bottom-right of every slide.
+   Pure CSS — appears on all templates without touching JS rendering.
+   -------------------------------------------------------------------------- */
+[data-theme="trp-tektro-corporate"] .pres-slide::after {
+  content: '';
+  position: absolute;
+  bottom: 18px;
+  right: 24px;
+  width: 27px;   /* 7 + 3 + 7 + 3 + 7 */
+  height: 7px;
+  z-index: 3;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='27' height='7' viewBox='0 0 27 7'><rect x='0' y='0' width='7' height='7' fill='%23FFDF00'/><rect x='10' y='0' width='7' height='7' fill='%23DE2A2A'/><rect x='20' y='0' width='7' height='7' fill='%231E2D7D'/></svg>");
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
    Base Slide
    -------------------------------------------------------------------------- */
 .pres-slide {
