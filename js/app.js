@@ -401,7 +401,6 @@
     html += '<div class="form-theme-toggle">';
     html += '<button class="form-theme-btn' + (slideTheme === 'trp-dark' ? ' form-theme-btn--active' : '') + '" data-set-theme="trp-dark">TRP Racing</button>';
     html += '<button class="form-theme-btn' + (slideTheme === 'tektro-light' ? ' form-theme-btn--active' : '') + '" data-set-theme="tektro-light">Tektro</button>';
-    html += '<button class="form-theme-btn' + (slideTheme === 'trp-tektro-corporate' ? ' form-theme-btn--active' : '') + '" data-set-theme="trp-tektro-corporate">Corporate</button>';
     html += '</div></div>';
 
     template.fields.forEach(function (field) {
@@ -415,18 +414,18 @@
       btn.addEventListener('click', function () {
         var oldTheme = slide.theme;
         slide.theme = btn.dataset.setTheme;
-        // Swap brand logo if it's still the prior theme's default
+        // Swap brand logo if it's still the default
         if (slide.data.hasOwnProperty('logo')) {
-          var oldLogo = defaultLogoForTheme(oldTheme);
+          var oldLogo = oldTheme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
           if (!slide.data.logo || slide.data.logo === oldLogo) {
-            slide.data.logo = defaultLogoForTheme(slide.theme);
+            slide.data.logo = slide.theme === 'tektro-light' ? 'assets/Logo Tektro.png' : 'assets/Logo TRP_w.png';
           }
         }
-        // Swap brand line if it's still the prior theme's default
+        // Swap brand line if it's still the default
         if (slide.data.hasOwnProperty('brandLine')) {
-          var oldBrand = defaultBrandLineForTheme(oldTheme);
+          var oldBrand = oldTheme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
           if (!slide.data.brandLine || slide.data.brandLine === oldBrand) {
-            slide.data.brandLine = defaultBrandLineForTheme(slide.theme);
+            slide.data.brandLine = slide.theme === 'tektro-light' ? 'Product Quality \u2014 Value Driven \u2014 Purpose Built' : 'Product Quality \u2014 Performance Driven \u2014 Innovation Forward';
           }
         }
         renderEditor();
