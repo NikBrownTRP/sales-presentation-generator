@@ -613,6 +613,7 @@
         html += '<textarea class="form-textarea form-textarea--mono" data-key="' + field.key + '" placeholder="' + escAttr(phText) + '" rows="6">' + window.escapeHtml(value || '') + '</textarea>';
         if (dm === 'gantt') {
           html += '<div class="form-hint">One task per line as <strong>name, start, end</strong> using <code>YYYY-MM-DD</code> dates (e.g., <code>Design phase, 2026-05-01, 2026-05-20</code>). Max 10 tasks.</div>';
+          html += '<div class="form-hint">Use the <strong>same date for start and end</strong> to render a milestone diamond (e.g., <code>Kickoff, 2026-05-01, 2026-05-01</code>).</div>';
           html += '<div class="form-hint">Add <code>,highlight</code> to a row to accent that bar in the secondary color (e.g., <code>Launch, 2026-06-01, 2026-06-10, highlight</code>).</div>';
         } else {
           html += '<div class="form-hint">Enter one data point per line as <strong>label,value</strong> (e.g., Q1,120). For XY plots, labels are X-values.</div>';

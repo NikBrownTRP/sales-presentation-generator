@@ -103,7 +103,15 @@
     },
 
     parseGantt: function (raw) {
-      // Accepts "name, YYYY-MM-DD, YYYY-MM-DD[, highlight]" lines
+      // Accepts "name, YYYY-MM-DD, YYYY-MM-DD[, highlight]" lines.
+      // Bare YYYY-MM-DD strings are parsed as UTC by `new Date()`, which clashes
+      // with the local-midnight tick anchors used in ganttChart and can drop
+      // ticks in non-UTC timezones. Parse them explicitly as local dates.
+      function parseDate(s) {
+        var m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        if (m) return new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+        return new Date(s);
+      }
       var rows = [];
       if (!raw) return rows;
       raw.split('\n').forEach(function (line) {
@@ -112,8 +120,8 @@
         var parts = line.split(',');
         if (parts.length < 3) return;
         var name = parts[0].trim();
-        var start = new Date(parts[1].trim());
-        var end = new Date(parts[2].trim());
+        var start = parseDate(parts[1].trim());
+        var end = parseDate(parts[2].trim());
         if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
         if (end.getTime() < start.getTime()) return;
         rows.push({
@@ -128,7 +136,7 @@
 
     ganttChart: function (tasks, w, h, accentColor) {
       if (!tasks || tasks.length === 0) return '';
-      var padL = 110, padR = 20, padT = 24, padB = 40;
+      var padL = 150, padR = 28, padT = 30, padB = 48;
       var chartW = w - padL - padR;
       var chartH = h - padT - padB;
 
@@ -146,12 +154,43 @@
       }
 
       var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      function fmt(d) {
-        return MONTHS[d.getMonth()] + ' ' + d.getDate();
+      var dayMs = 86400000;
+      var rangeDays = rangeMs / dayMs;
+
+      // Smart x-axis ticks aligned to natural calendar boundaries.
+      var ticks = [];
+      var labelMode; // 'day' | 'month' | 'monthYear'
+      var d, m;
+      if (rangeDays <= 14) {
+        labelMode = 'day';
+        d = new Date(minStart); d.setHours(0, 0, 0, 0);
+        if (d.getTime() < minStart) d.setDate(d.getDate() + 1);
+        while (d.getTime() <= maxEnd) { ticks.push(new Date(d)); d.setDate(d.getDate() + 1); }
+      } else if (rangeDays <= 60) {
+        labelMode = 'day';
+        d = new Date(minStart); d.setHours(0, 0, 0, 0);
+        while (d.getDay() !== 1) d.setDate(d.getDate() + 1); // first Monday >= start
+        while (d.getTime() <= maxEnd) { ticks.push(new Date(d)); d.setDate(d.getDate() + 7); }
+      } else if (rangeDays <= 365 * 1.5) {
+        labelMode = 'month';
+        d = new Date(minStart); d.setHours(0, 0, 0, 0); d.setDate(1);
+        if (d.getTime() < minStart) d.setMonth(d.getMonth() + 1);
+        while (d.getTime() <= maxEnd) { ticks.push(new Date(d)); d.setMonth(d.getMonth() + 1); }
+      } else {
+        labelMode = 'monthYear';
+        d = new Date(minStart); d.setHours(0, 0, 0, 0); d.setDate(1);
+        m = d.getMonth(); d.setMonth(m - (m % 3));
+        if (d.getTime() < minStart) d.setMonth(d.getMonth() + 3);
+        while (d.getTime() <= maxEnd) { ticks.push(new Date(d)); d.setMonth(d.getMonth() + 3); }
+      }
+      function fmtTick(td) {
+        if (labelMode === 'day') return MONTHS[td.getMonth()] + ' ' + td.getDate();
+        if (labelMode === 'month') return MONTHS[td.getMonth()];
+        return MONTHS[td.getMonth()] + " '" + String(td.getFullYear()).slice(2);
       }
 
       var rowH = chartH / tasks.length;
-      var barH = Math.min(22, rowH * 0.6);
+      var barH = Math.min(26, rowH * 0.6);
 
       var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" style="font-family:Inter,sans-serif;">';
 
@@ -161,31 +200,84 @@
         svg += '<line x1="' + padL + '" y1="' + ry + '" x2="' + (w - padR) + '" y2="' + ry + '" stroke="currentColor" stroke-opacity="0.06" stroke-width="1"/>';
       }
 
-      // X-axis date ticks (~5 evenly spaced)
-      var ticks = 5;
-      for (var ti = 0; ti <= ticks; ti++) {
-        var tMs = minStart + (rangeMs * ti / ticks);
-        var tx = xForMs(tMs);
+      // X-axis ticks
+      ticks.forEach(function (td) {
+        var tx = xForMs(td.getTime());
         svg += '<line x1="' + tx + '" y1="' + padT + '" x2="' + tx + '" y2="' + (padT + chartH) + '" stroke="currentColor" stroke-opacity="0.08" stroke-width="1"/>';
-        svg += '<text x="' + tx + '" y="' + (padT + chartH + 16) + '" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.55">' + fmt(new Date(tMs)) + '</text>';
+        svg += '<text x="' + tx + '" y="' + (padT + chartH + 16) + '" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.6">' + fmtTick(td) + '</text>';
+      });
+
+      // Year row when monthly ticks span multiple calendar years
+      if (labelMode === 'month') {
+        var startYr = new Date(minStart).getFullYear();
+        var endYr = new Date(maxEnd).getFullYear();
+        if (startYr !== endYr) {
+          ticks.forEach(function (td) {
+            if (td.getMonth() === 0) {
+              var tx = xForMs(td.getTime());
+              svg += '<text x="' + tx + '" y="' + (padT + chartH + 30) + '" text-anchor="middle" font-size="9" font-weight="600" fill="currentColor" opacity="0.5">' + td.getFullYear() + '</text>';
+            }
+          });
+        }
       }
 
-      // Bars + task labels
+      // Wrap task name into 1 or 2 lines on word boundaries (last line may ellipsis)
+      function wrapLabel(name, maxChars) {
+        if (name.length <= maxChars) return [name];
+        var mid = Math.floor(name.length / 2);
+        var bestIdx = -1, bestDist = Infinity;
+        for (var i = 0; i < name.length; i++) {
+          if (name.charAt(i) === ' ') {
+            var dist = Math.abs(i - mid);
+            if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+          }
+        }
+        var l1, l2;
+        if (bestIdx === -1) {
+          l1 = name.slice(0, maxChars);
+          l2 = name.slice(maxChars);
+        } else {
+          l1 = name.slice(0, bestIdx);
+          l2 = name.slice(bestIdx + 1);
+        }
+        if (l2.length > maxChars) l2 = l2.slice(0, Math.max(1, maxChars - 1)) + '…';
+        return [l1, l2];
+      }
+      var maxLabelChars = Math.max(8, Math.floor((padL - 16) / 6.5));
+
+      // Bars / milestones + task labels
       tasks.forEach(function (t, i) {
         var x1 = xForMs(t.start.getTime());
         var x2 = xForMs(t.end.getTime());
-        var bw = Math.max(2, x2 - x1);
         var by = padT + rowH * i + (rowH - barH) / 2;
+        var cy = by + barH / 2;
+        var isMilestone = t.start.getTime() === t.end.getTime();
 
-        var label = t.name.length > 16 ? t.name.slice(0, 15) + '…' : t.name;
-        svg += '<text x="' + (padL - 10) + '" y="' + (by + barH / 2 + 4) + '" text-anchor="end" font-size="11" fill="currentColor" opacity="0.85">' + escapeHtml(label) + '</text>';
+        var lines = wrapLabel(t.name, maxLabelChars);
+        var lineH = 13;
+        var firstY = lines.length === 1 ? cy + 4 : cy - lineH / 2 + 3;
+        svg += '<text text-anchor="end" font-size="11" fill="currentColor" opacity="0.85">';
+        lines.forEach(function (line, li) {
+          svg += '<tspan x="' + (padL - 10) + '" y="' + (firstY + li * lineH) + '">' + escapeHtml(line) + '</tspan>';
+        });
+        svg += '</text>';
 
         var fillStyle = t.highlight
           ? 'fill:var(--pres-accent-secondary, #de2a2a)'
           : 'fill:var(--pres-chart-color, ' + accentColor + ')';
-        svg += '<rect x="' + x1 + '" y="' + by + '" width="' + bw + '" height="' + barH + '" style="' + fillStyle + '" rx="3" opacity="0.85">';
-        svg += '<animate attributeName="width" from="0" to="' + bw + '" dur="0.5s" fill="freeze"/>';
-        svg += '</rect>';
+
+        if (isMilestone) {
+          var ds = Math.min(barH, 18) / 2 + 3;
+          var poly = x1 + ',' + (cy - ds) + ' ' + (x1 + ds) + ',' + cy + ' ' + x1 + ',' + (cy + ds) + ' ' + (x1 - ds) + ',' + cy;
+          svg += '<polygon points="' + poly + '" style="' + fillStyle + '" stroke="currentColor" stroke-opacity="0.25" stroke-width="0.75" opacity="0.95">';
+          svg += '<animate attributeName="opacity" from="0" to="0.95" dur="0.4s" fill="freeze"/>';
+          svg += '</polygon>';
+        } else {
+          var bw = Math.max(2, x2 - x1);
+          svg += '<rect x="' + x1 + '" y="' + by + '" width="' + bw + '" height="' + barH + '" style="' + fillStyle + '" rx="3" opacity="0.85">';
+          svg += '<animate attributeName="width" from="0" to="' + bw + '" dur="0.5s" fill="freeze"/>';
+          svg += '</rect>';
+        }
       });
 
       // Today marker
@@ -193,7 +285,7 @@
       if (nowMs >= minStart && nowMs <= maxEnd) {
         var nx = xForMs(nowMs);
         svg += '<line x1="' + nx + '" y1="' + padT + '" x2="' + nx + '" y2="' + (padT + chartH) + '" stroke="var(--pres-accent-secondary, #de2a2a)" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.8"/>';
-        svg += '<text x="' + nx + '" y="' + (padT - 8) + '" text-anchor="middle" font-size="9" font-weight="600" fill="var(--pres-accent-secondary, #de2a2a)" opacity="0.9">TODAY</text>';
+        svg += '<text x="' + nx + '" y="' + (padT - 10) + '" text-anchor="middle" font-size="9" font-weight="600" fill="var(--pres-accent-secondary, #de2a2a)" opacity="0.9">TODAY</text>';
       }
 
       // Axes
@@ -770,7 +862,9 @@
           if (mode === 'gantt') {
             var ganttRows = ChartRenderer.parseGantt(data.chartData);
             if (ganttRows.length > 0) {
-              html += ChartRenderer.ganttChart(ganttRows, 580, 300, concreteAccent);
+              // Wider+taller viewBox; gantt mode also suppresses the notes
+              // sidebar below so the chart gets the full slide width.
+              html += ChartRenderer.ganttChart(ganttRows, 820, 380, concreteAccent);
             } else {
               html += '<div class="pres-placeholder" style="width:100%;height:100%;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 17l4-6 4 4 5-8"/></svg><span>Enter task data to see preview</span></div>';
             }
@@ -800,8 +894,8 @@
 
         html += '</div>'; // graph-main
 
-        // Sidebar notes
-        if (data.notes && data.notes.some(function (n) {
+        // Sidebar notes (suppressed in gantt mode so the chart gets full width)
+        if (mode !== 'gantt' && data.notes && data.notes.some(function (n) {
           var t = (n && typeof n === 'object') ? n.text : n;
           return t && t.trim();
         })) {
