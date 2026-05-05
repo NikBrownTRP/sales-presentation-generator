@@ -82,10 +82,7 @@
         var fillStyle = d.highlight
           ? 'fill:var(--pres-accent-secondary, #de2a2a)'
           : 'fill:var(--pres-chart-color, ' + accentColor + ')';
-        svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" style="' + fillStyle + '" rx="2" opacity="0.85">';
-        svg += '<animate attributeName="height" from="0" to="' + barH + '" dur="0.5s" fill="freeze"/>';
-        svg += '<animate attributeName="y" from="' + (padT + chartH) + '" to="' + y + '" dur="0.5s" fill="freeze"/>';
-        svg += '</rect>';
+        svg += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" style="' + fillStyle + '" rx="2" opacity="0.85"/>';
         // Value label on top
         svg += '<text x="' + (x + barW / 2) + '" y="' + (y - 6) + '" text-anchor="middle" font-size="10" font-weight="600" fill="currentColor" opacity="0.8">' + d.value + '</text>';
         // X-axis label
@@ -269,14 +266,10 @@
         if (isMilestone) {
           var ds = Math.min(barH, 18) / 2 + 3;
           var poly = x1 + ',' + (cy - ds) + ' ' + (x1 + ds) + ',' + cy + ' ' + x1 + ',' + (cy + ds) + ' ' + (x1 - ds) + ',' + cy;
-          svg += '<polygon points="' + poly + '" style="' + fillStyle + '" stroke="currentColor" stroke-opacity="0.25" stroke-width="0.75" opacity="0.95">';
-          svg += '<animate attributeName="opacity" from="0" to="0.95" dur="0.4s" fill="freeze"/>';
-          svg += '</polygon>';
+          svg += '<polygon points="' + poly + '" style="' + fillStyle + '" stroke="currentColor" stroke-opacity="0.25" stroke-width="0.75" opacity="0.95"/>';
         } else {
           var bw = Math.max(2, x2 - x1);
-          svg += '<rect x="' + x1 + '" y="' + by + '" width="' + bw + '" height="' + barH + '" style="' + fillStyle + '" rx="3" opacity="0.85">';
-          svg += '<animate attributeName="width" from="0" to="' + bw + '" dur="0.5s" fill="freeze"/>';
-          svg += '</rect>';
+          svg += '<rect x="' + x1 + '" y="' + by + '" width="' + bw + '" height="' + barH + '" style="' + fillStyle + '" rx="3" opacity="0.85"/>';
         }
       });
 
