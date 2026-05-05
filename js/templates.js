@@ -102,6 +102,108 @@
       return svg;
     },
 
+    parseGantt: function (raw) {
+      // Accepts "name, YYYY-MM-DD, YYYY-MM-DD[, highlight]" lines
+      var rows = [];
+      if (!raw) return rows;
+      raw.split('\n').forEach(function (line) {
+        line = line.trim();
+        if (!line) return;
+        var parts = line.split(',');
+        if (parts.length < 3) return;
+        var name = parts[0].trim();
+        var start = new Date(parts[1].trim());
+        var end = new Date(parts[2].trim());
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) return;
+        if (end.getTime() < start.getTime()) return;
+        rows.push({
+          name: name,
+          start: start,
+          end: end,
+          highlight: parts.length >= 4 && parts[3].trim().toLowerCase() === 'highlight'
+        });
+      });
+      return rows.slice(0, 10);
+    },
+
+    ganttChart: function (tasks, w, h, accentColor) {
+      if (!tasks || tasks.length === 0) return '';
+      var padL = 110, padR = 20, padT = 24, padB = 40;
+      var chartW = w - padL - padR;
+      var chartH = h - padT - padB;
+
+      var minStart = tasks[0].start.getTime();
+      var maxEnd = tasks[0].end.getTime();
+      tasks.forEach(function (t) {
+        if (t.start.getTime() < minStart) minStart = t.start.getTime();
+        if (t.end.getTime() > maxEnd) maxEnd = t.end.getTime();
+      });
+      var rangeMs = maxEnd - minStart;
+      if (rangeMs <= 0) rangeMs = 86400000; // 1 day fallback
+
+      function xForMs(ms) {
+        return padL + ((ms - minStart) / rangeMs) * chartW;
+      }
+
+      var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      function fmt(d) {
+        return MONTHS[d.getMonth()] + ' ' + d.getDate();
+      }
+
+      var rowH = chartH / tasks.length;
+      var barH = Math.min(22, rowH * 0.6);
+
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" style="font-family:Inter,sans-serif;">';
+
+      // Row separators
+      for (var r = 0; r <= tasks.length; r++) {
+        var ry = padT + rowH * r;
+        svg += '<line x1="' + padL + '" y1="' + ry + '" x2="' + (w - padR) + '" y2="' + ry + '" stroke="currentColor" stroke-opacity="0.06" stroke-width="1"/>';
+      }
+
+      // X-axis date ticks (~5 evenly spaced)
+      var ticks = 5;
+      for (var ti = 0; ti <= ticks; ti++) {
+        var tMs = minStart + (rangeMs * ti / ticks);
+        var tx = xForMs(tMs);
+        svg += '<line x1="' + tx + '" y1="' + padT + '" x2="' + tx + '" y2="' + (padT + chartH) + '" stroke="currentColor" stroke-opacity="0.08" stroke-width="1"/>';
+        svg += '<text x="' + tx + '" y="' + (padT + chartH + 16) + '" text-anchor="middle" font-size="10" fill="currentColor" opacity="0.55">' + fmt(new Date(tMs)) + '</text>';
+      }
+
+      // Bars + task labels
+      tasks.forEach(function (t, i) {
+        var x1 = xForMs(t.start.getTime());
+        var x2 = xForMs(t.end.getTime());
+        var bw = Math.max(2, x2 - x1);
+        var by = padT + rowH * i + (rowH - barH) / 2;
+
+        var label = t.name.length > 16 ? t.name.slice(0, 15) + '…' : t.name;
+        svg += '<text x="' + (padL - 10) + '" y="' + (by + barH / 2 + 4) + '" text-anchor="end" font-size="11" fill="currentColor" opacity="0.85">' + escapeHtml(label) + '</text>';
+
+        var fillStyle = t.highlight
+          ? 'fill:var(--pres-accent-secondary, #de2a2a)'
+          : 'fill:var(--pres-chart-color, ' + accentColor + ')';
+        svg += '<rect x="' + x1 + '" y="' + by + '" width="' + bw + '" height="' + barH + '" style="' + fillStyle + '" rx="3" opacity="0.85">';
+        svg += '<animate attributeName="width" from="0" to="' + bw + '" dur="0.5s" fill="freeze"/>';
+        svg += '</rect>';
+      });
+
+      // Today marker
+      var nowMs = Date.now();
+      if (nowMs >= minStart && nowMs <= maxEnd) {
+        var nx = xForMs(nowMs);
+        svg += '<line x1="' + nx + '" y1="' + padT + '" x2="' + nx + '" y2="' + (padT + chartH) + '" stroke="var(--pres-accent-secondary, #de2a2a)" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.8"/>';
+        svg += '<text x="' + nx + '" y="' + (padT - 8) + '" text-anchor="middle" font-size="9" font-weight="600" fill="var(--pres-accent-secondary, #de2a2a)" opacity="0.9">TODAY</text>';
+      }
+
+      // Axes
+      svg += '<line x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (padT + chartH) + '" stroke="currentColor" stroke-opacity="0.2" stroke-width="1"/>';
+      svg += '<line x1="' + padL + '" y1="' + (padT + chartH) + '" x2="' + (w - padR) + '" y2="' + (padT + chartH) + '" stroke="currentColor" stroke-opacity="0.2" stroke-width="1"/>';
+
+      svg += '</svg>';
+      return svg;
+    },
+
     xyPlot: function (data, w, h, accentColor) {
       if (!data || data.length === 0) return '';
       var padL = 60, padR = 20, padT = 16, padB = 40;
@@ -610,6 +712,7 @@
           options: [
             { value: 'bar', label: 'Bar Chart' },
             { value: 'line', label: 'XY Line Plot' },
+            { value: 'gantt', label: 'Gantt Chart' },
             { value: 'image', label: 'Centered Image (e.g., screenshot)' }
           ]
         },
@@ -658,29 +761,38 @@
           }
         } else {
           // Chart mode
-          var chartRows = ChartRenderer.parseCSV(data.chartData);
           // Charts use var(--pres-chart-color) via inline style on SVG elements.
           // The fallback below is only used if CSS variables aren't supported.
           // TRP: #6a8da6 (accent-light blue-grey) | Tektro: #3B3B3B (charcoal)
           var concreteAccent = '#6a8da6';
 
           html += '<div class="pres-graph-chart-wrap">';
-          if (chartRows.length > 0) {
-            if (mode === 'bar') {
-              html += ChartRenderer.barChart(chartRows, 580, 300, concreteAccent);
+          if (mode === 'gantt') {
+            var ganttRows = ChartRenderer.parseGantt(data.chartData);
+            if (ganttRows.length > 0) {
+              html += ChartRenderer.ganttChart(ganttRows, 580, 300, concreteAccent);
             } else {
-              html += ChartRenderer.xyPlot(chartRows, 580, 300, concreteAccent);
+              html += '<div class="pres-placeholder" style="width:100%;height:100%;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 17l4-6 4 4 5-8"/></svg><span>Enter task data to see preview</span></div>';
             }
           } else {
-            html += '<div class="pres-placeholder" style="width:100%;height:100%;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 17l4-6 4 4 5-8"/></svg><span>Enter chart data to see preview</span></div>';
-          }
+            var chartRows = ChartRenderer.parseCSV(data.chartData);
+            if (chartRows.length > 0) {
+              if (mode === 'bar') {
+                html += ChartRenderer.barChart(chartRows, 580, 300, concreteAccent);
+              } else {
+                html += ChartRenderer.xyPlot(chartRows, 580, 300, concreteAccent);
+              }
+            } else {
+              html += '<div class="pres-placeholder" style="width:100%;height:100%;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 17l4-6 4 4 5-8"/></svg><span>Enter chart data to see preview</span></div>';
+            }
 
-          // Axis labels
-          if (data.xAxisLabel) {
-            html += '<div class="pres-graph-xlabel">' + escapeHtml(data.xAxisLabel) + '</div>';
-          }
-          if (data.yAxisLabel) {
-            html += '<div class="pres-graph-ylabel">' + escapeHtml(data.yAxisLabel) + '</div>';
+            // Axis labels (not meaningful for Gantt)
+            if (data.xAxisLabel) {
+              html += '<div class="pres-graph-xlabel">' + escapeHtml(data.xAxisLabel) + '</div>';
+            }
+            if (data.yAxisLabel) {
+              html += '<div class="pres-graph-ylabel">' + escapeHtml(data.yAxisLabel) + '</div>';
+            }
           }
 
           html += '</div>'; // chart-wrap

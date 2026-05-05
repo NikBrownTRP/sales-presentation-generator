@@ -607,9 +607,17 @@
         break;
 
       case 'chartdata':
-        html += '<textarea class="form-textarea form-textarea--mono" data-key="' + field.key + '" placeholder="' + escAttr(field.placeholder || '') + '" rows="6">' + window.escapeHtml(value || '') + '</textarea>';
-        html += '<div class="form-hint">Enter one data point per line as <strong>label,value</strong> (e.g., Q1,120). For XY plots, labels are X-values.</div>';
-        html += '<div class="form-hint">Add <code>,highlight</code> to a row to accent that bar in the secondary color (e.g., <code>Q2,185,highlight</code>).</div>';
+        var dm = (slide.data && slide.data.displayMode) || 'bar';
+        var ganttPlaceholder = 'Discovery, 2026-05-01, 2026-05-15\nDesign, 2026-05-10, 2026-06-05\nBuild, 2026-06-01, 2026-07-15, highlight';
+        var phText = dm === 'gantt' ? ganttPlaceholder : (field.placeholder || '');
+        html += '<textarea class="form-textarea form-textarea--mono" data-key="' + field.key + '" placeholder="' + escAttr(phText) + '" rows="6">' + window.escapeHtml(value || '') + '</textarea>';
+        if (dm === 'gantt') {
+          html += '<div class="form-hint">One task per line as <strong>name, start, end</strong> using <code>YYYY-MM-DD</code> dates (e.g., <code>Design phase, 2026-05-01, 2026-05-20</code>). Max 10 tasks.</div>';
+          html += '<div class="form-hint">Add <code>,highlight</code> to a row to accent that bar in the secondary color (e.g., <code>Launch, 2026-06-01, 2026-06-10, highlight</code>).</div>';
+        } else {
+          html += '<div class="form-hint">Enter one data point per line as <strong>label,value</strong> (e.g., Q1,120). For XY plots, labels are X-values.</div>';
+          html += '<div class="form-hint">Add <code>,highlight</code> to a row to accent that bar in the secondary color (e.g., <code>Q2,185,highlight</code>).</div>';
+        }
         break;
     }
 
@@ -712,6 +720,11 @@
     dom.editorForm.querySelectorAll('.form-input[data-key], .form-textarea[data-key], .form-select[data-key]').forEach(function (el) {
       el.addEventListener('input', function () {
         updateSlideData(slide.id, el.dataset.key, el.value);
+        // Re-render editor when displayMode changes so mode-aware hints (e.g.,
+        // chartdata format guidance for Gantt vs bar/line) update immediately.
+        if (el.dataset.key === 'displayMode') {
+          renderEditor();
+        }
         debouncedThumbnailUpdate();
       });
     });
