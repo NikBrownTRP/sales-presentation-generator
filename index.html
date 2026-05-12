@@ -358,7 +358,18 @@
             slidesHtml += '<div class="slideshow-slide'+(i===0?' slideshow-slide--active':'')+'" data-index="'+i+'" data-theme="'+st+'">'+r+'</div>';
           });
 
-          var sj = JSON.stringify({_format:'pres-generator-v1',slides:state.slides,theme:state.theme,meta:{title:title,updatedAt:new Date().toISOString()}});
+          // Strip "*Original" copies from the embedded JSON — they exist only
+          // so the in-app editor can re-crop losslessly and aren't needed for
+          // playback. Typically halves exported size on decks with many edits.
+          var slimSlides = state.slides.map(function(slide){
+            var slim = {};
+            Object.keys(slide).forEach(function(k){ if (k !== 'data') slim[k] = slide[k]; });
+            var d = {};
+            Object.keys(slide.data || {}).forEach(function(k){ if (!/Original$/.test(k)) d[k] = slide.data[k]; });
+            slim.data = d;
+            return slim;
+          });
+          var sj = JSON.stringify({_format:'pres-generator-v1',slides:slimSlides,theme:state.theme,meta:{title:title,updatedAt:new Date().toISOString()}});
           var h = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n';
           h += '<title>'+title.replace(/</g,'&lt;')+'</title>\n';
           h += '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n';
@@ -433,13 +444,20 @@
         // builder above.
         window.ExportManager.exportToHTML = function(state) {
           var inliner = window.ExportManager.inlineRelativeImages;
-          if (!inliner) { buildExportedHTML(state); return; }
-          inliner(state).then(function (inlined) {
-            buildExportedHTML(inlined);
+          var recompress = window.ExportManager.recompressStateImages;
+          var step1 = inliner ? inliner(state) : Promise.resolve(state);
+          step1.then(function (inlined) {
+            // Re-encode any oversized/poorly-compressed images already in the
+            // saved state — legacy slides predate the upload-time resize, and
+            // would otherwise carry their original bloated payload into the
+            // export. New uploads are already compressed, so this is a no-op
+            // for them.
+            return recompress ? recompress(inlined) : inlined;
+          }).then(function (ready) {
+            buildExportedHTML(ready);
           }).catch(function (err) {
-            console.error('Image inlining failed:', err);
-            // Still export — relative paths will break but at least the
-            // rest of the deck is usable.
+            console.error('Image preparation failed:', err);
+            // Still export — at least the deck is usable.
             buildExportedHTML(state);
           });
         };
@@ -529,7 +547,7 @@
   <!-- App modules -->
   <script src="js/templates.js?v=35" defer></script>
   <script src="js/preview.js?v=34" defer></script>
-  <script src="js/exporter.js?v=35" defer></script>
+  <script src="js/exporter.js?v=37" defer></script>
   <script src="js/pptx-import.js?v=3" defer></script>
   <script src="js/controller.js?v=38" defer></script>
 </body>

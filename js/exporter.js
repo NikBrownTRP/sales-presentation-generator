@@ -259,16 +259,21 @@
     // logo once ran it through the image editor's canvas → data URL,
     // which is why edited logos always exported fine.
     inlineRelativeImages(state).then(function (stateInlined) {
+      // Step 1b: Re-encode any oversized / poorly-compressed display images
+      // already in the saved state. New uploads are already compressed at
+      // upload time, but legacy slides keep whatever was originally stored.
+      return recompressStateImages(stateInlined);
+    }).then(function (stateCompressed) {
       // Step 2: Load slide CSS (preloaded or fetched) and build HTML.
       var css = getSlidesCSSContent();
       if (css) {
-        buildAndDownloadHTML(stateInlined, css);
+        buildAndDownloadHTML(stateCompressed, css);
         return;
       }
       var link = document.querySelector('link[href*="slides.css"]');
       var cssUrl = link ? link.href : 'css/slides.css';
       fetch(cssUrl, { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (cssContent) {
-        buildAndDownloadHTML(stateInlined, cssContent);
+        buildAndDownloadHTML(stateCompressed, cssContent);
       }).catch(function () {
         if (window.Dialog) Dialog.alert('Export Error', 'Could not load slide styles for export. Please refresh the page and try again.', 'error');
         else alert('Error: Could not load slide styles for export.');
@@ -344,6 +349,101 @@
     });
   }
 
+  /* -----------------------------------------------------------------------
+     Re-encode every image data URL through a canvas to enforce sane caps
+     and compression on legacy slides whose images predate the upload-time
+     resize. Opaque PNGs become JPEG; transparent PNGs stay PNG. Non-data
+     URLs (already-inlined ones from step 1, or any oddball entry) pass
+     through unchanged. Never mutates the caller's state.
+     ----------------------------------------------------------------------- */
+  var FIELD_CAPS = {
+    logo: [400, 200],
+    productImage: [1200, 900],
+    image: [1200, 900]
+  };
+  var FIELD_CAPS_DEFAULT = [1920, 1080];
+
+  function canvasHasTransparency(canvas) {
+    var w = Math.min(64, canvas.width);
+    var h = Math.min(64, canvas.height);
+    if (w < 1 || h < 1) return false;
+    var s = document.createElement('canvas');
+    s.width = w; s.height = h;
+    var sctx = s.getContext('2d');
+    sctx.drawImage(canvas, 0, 0, w, h);
+    var data = sctx.getImageData(0, 0, w, h).data;
+    for (var i = 3; i < data.length; i += 4) {
+      if (data[i] < 255) return true;
+    }
+    return false;
+  }
+
+  function recompressDataUrl(dataUrl, maxW, maxH, quality) {
+    return new Promise(function (resolve) {
+      if (!dataUrl || typeof dataUrl !== 'string' || dataUrl.indexOf('data:image/') !== 0) {
+        resolve(dataUrl);
+        return;
+      }
+      var img = new Image();
+      img.onload = function () {
+        var ratio = Math.min(maxW / img.width, maxH / img.height, 1);
+        var w = Math.max(1, Math.round(img.width * ratio));
+        var h = Math.max(1, Math.round(img.height * ratio));
+        var c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        var isPng = dataUrl.indexOf('data:image/png') === 0;
+        var keepPng = isPng && canvasHasTransparency(c);
+        var out = keepPng ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', quality || 0.82);
+        // If our re-encoded version is bigger than the source (rare for tiny
+        // already-optimized assets), keep the original.
+        resolve(out.length < dataUrl.length ? out : dataUrl);
+      };
+      img.onerror = function () { resolve(dataUrl); };
+      img.src = dataUrl;
+    });
+  }
+
+  function recompressStateImages(state) {
+    var pending = [];
+    var newSlides = state.slides.map(function (slide) {
+      var tpl = window.SlideTemplates[slide.templateId];
+      var imageKeys = {};
+      if (tpl && tpl.fields) {
+        tpl.fields.forEach(function (f) { if (f.type === 'image') imageKeys[f.key] = true; });
+      }
+      var newData = {};
+      for (var k in slide.data) {
+        if (Object.prototype.hasOwnProperty.call(slide.data, k)) newData[k] = slide.data[k];
+      }
+      Object.keys(newData).forEach(function (k) {
+        var val = newData[k];
+        if (!val || typeof val !== 'string' || val.indexOf('data:image/') !== 0) return;
+        // Originals are stripped from the embedded JSON entirely (see
+        // buildAndDownloadHTML), so don't waste cycles re-encoding them.
+        if (/Original$/.test(k)) return;
+        // Recognize as image if the template declares it OR if the value
+        // is already a data URL (handles legacy fields not in the schema).
+        var isImage = imageKeys[k] || true;
+        if (!isImage) return;
+        var cap = FIELD_CAPS[k] || FIELD_CAPS_DEFAULT;
+        pending.push(recompressDataUrl(val, cap[0], cap[1], 0.82).then(function (out) {
+          newData[k] = out;
+        }));
+      });
+      return {
+        id: slide.id,
+        templateId: slide.templateId,
+        theme: slide.theme,
+        hidden: slide.hidden,
+        data: newData
+      };
+    });
+    return Promise.all(pending).then(function () {
+      return { slides: newSlides, theme: state.theme, meta: state.meta };
+    });
+  }
+
   function buildAndDownloadHTML(state, cssContent) {
     var slides = state.slides.filter(function (s) { return !s.hidden; });
     var theme = state.theme;
@@ -364,10 +464,24 @@
       slidesHtml += '<div class="slideshow-slide' + (i === 0 ? ' slideshow-slide--active' : '') + '" data-index="' + i + '" data-theme="' + slideTheme + '">' + rendered + '</div>';
     });
 
-    // Embed the full state as JSON for re-import
+    // Embed the state as JSON for re-import. Strip "*Original" copies —
+    // those exist only so the in-app image editor can re-crop losslessly,
+    // and they're not needed for playback. Removing them typically halves
+    // exported HTML size on decks with many edited images.
+    var slimSlides = state.slides.map(function (slide) {
+      var slim = {};
+      Object.keys(slide).forEach(function (k) { if (k !== 'data') slim[k] = slide[k]; });
+      var data = {};
+      Object.keys(slide.data || {}).forEach(function (k) {
+        if (/Original$/.test(k)) return;
+        data[k] = slide.data[k];
+      });
+      slim.data = data;
+      return slim;
+    });
     var stateJson = JSON.stringify({
       _format: 'pres-generator-v1',
-      slides: state.slides,
+      slides: slimSlides,
       theme: state.theme,
       meta: { title: title, updatedAt: new Date().toISOString() }
     });
@@ -657,7 +771,8 @@
     // the same image-inlining logic — otherwise relative-path logos
     // ("assets/Logo TRP_w.png") never become data URLs and disappear
     // from standalone HTML exports.
-    inlineRelativeImages: inlineRelativeImages
+    inlineRelativeImages: inlineRelativeImages,
+    recompressStateImages: recompressStateImages
   };
 
 })();
