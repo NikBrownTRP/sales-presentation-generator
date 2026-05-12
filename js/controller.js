@@ -22,19 +22,39 @@
     };
   }
 
+  // Detect whether a canvas has any transparent pixels by sampling a small
+  // downscaled copy — cheap (≤64×64) and accurate enough for "is this a PNG
+  // that actually needs alpha or just a photo someone saved as PNG?".
+  function canvasHasTransparency(canvas) {
+    var w = Math.min(64, canvas.width);
+    var h = Math.min(64, canvas.height);
+    if (w < 1 || h < 1) return false;
+    var s = document.createElement('canvas');
+    s.width = w; s.height = h;
+    var sctx = s.getContext('2d');
+    sctx.drawImage(canvas, 0, 0, w, h);
+    var data = sctx.getImageData(0, 0, w, h).data;
+    for (var i = 3; i < data.length; i += 4) {
+      if (data[i] < 255) return true;
+    }
+    return false;
+  }
+
   function resizeImage(dataUrl, maxW, maxH, quality) {
     return new Promise(function (resolve) {
       var img = new Image();
       img.onload = function () {
         var ratio = Math.min(maxW / img.width, maxH / img.height, 1);
-        if (ratio >= 1) { resolve(dataUrl); return; } // No resize needed
+        var w = Math.round(img.width * ratio);
+        var h = Math.round(img.height * ratio);
         var c = document.createElement('canvas');
-        c.width = Math.round(img.width * ratio);
-        c.height = Math.round(img.height * ratio);
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        // Preserve PNG transparency; use JPEG only for non-transparent images
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        // Keep PNG only when the source has actual transparency. Opaque PNGs
+        // (photos saved as PNG) become JPEG — typically 5-10× smaller.
         var isPng = dataUrl.indexOf('data:image/png') === 0;
-        resolve(isPng ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', quality || 0.85));
+        var keepPng = isPng && canvasHasTransparency(c);
+        resolve(keepPng ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', quality || 0.82));
       };
       img.onerror = function () { resolve(dataUrl); };
       img.src = dataUrl;
@@ -926,14 +946,14 @@
       // Keep a higher-resolution copy of the ORIGINAL upload so re-editing
       // (crop, rotate, pan, zoom) stays lossless — each edit applies to
       // the pristine source, not to the already-cropped display version.
-      // Without this, cropping in → out discards pixels permanently and
-      // forces the user to re-upload to recover them.
-      var origMaxW = Math.max(maxW * 2, 2400);
-      var origMaxH = Math.max(maxH * 2, 1800);
+      // 1.5× the display size keeps room for 2× zoom-crops without visible
+      // softness while keeping payload size reasonable.
+      var origMaxW = Math.max(Math.round(maxW * 1.5), 1800);
+      var origMaxH = Math.max(Math.round(maxH * 1.5), 1350);
 
       Promise.all([
-        resizeImage(e.target.result, maxW, maxH, 0.85),
-        resizeImage(e.target.result, origMaxW, origMaxH, 0.92)
+        resizeImage(e.target.result, maxW, maxH, 0.82),
+        resizeImage(e.target.result, origMaxW, origMaxH, 0.85)
       ]).then(function (pair) {
         var display = pair[0];
         var original = pair[1];

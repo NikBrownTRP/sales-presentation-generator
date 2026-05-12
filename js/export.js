@@ -173,10 +173,25 @@
       slidesHtml += '<div class="slideshow-slide' + (i === 0 ? ' slideshow-slide--active' : '') + '" data-index="' + i + '">' + rendered + '</div>';
     });
 
-    // Embed the full state as JSON for re-import
+    // Embed the state as JSON for re-import. Strip the high-resolution
+    // "*Original" copies — they're only needed by the in-app image editor
+    // for re-cropping, not for playback. Removing them typically halves
+    // exported HTML size. The .json save (if the user wants lossless
+    // re-editing later) is unaffected.
+    var slimSlides = state.slides.map(function (slide) {
+      var slim = {};
+      Object.keys(slide).forEach(function (k) { if (k !== 'data') slim[k] = slide[k]; });
+      var data = {};
+      Object.keys(slide.data || {}).forEach(function (k) {
+        if (/Original$/.test(k)) return;
+        data[k] = slide.data[k];
+      });
+      slim.data = data;
+      return slim;
+    });
     var stateJson = JSON.stringify({
       _format: 'pres-generator-v1',
-      slides: state.slides,
+      slides: slimSlides,
       theme: state.theme,
       meta: { title: title, updatedAt: new Date().toISOString() }
     });
