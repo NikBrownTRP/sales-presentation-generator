@@ -213,9 +213,9 @@ body.builder-body {
 }
 
 .builder-layout-btn--active {
-  background: rgba(227, 24, 55, 0.12);
-  color: var(--builder-accent);
-  box-shadow: inset 0 0 0 1px rgba(227, 24, 55, 0.25);
+  background: var(--builder-surface);
+  color: var(--builder-text);
+  box-shadow: var(--builder-shadow-xs);
 }
 
 .builder-header__theme-group {
@@ -246,39 +246,53 @@ body.builder-body {
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  border: none;
-  border-radius: var(--builder-radius-sm);
+  background: var(--builder-surface);
+  color: var(--builder-text);
+  border: 1px solid var(--builder-border);
+  border-radius: var(--builder-radius);
+  box-shadow: var(--builder-shadow-xs);
   font-family: var(--builder-font-body);
   font-size: 13px;
   font-weight: 500;
+  letter-spacing: -0.005em;
   cursor: pointer;
   transition: all var(--builder-transition);
   white-space: nowrap;
   line-height: 1;
 }
+.builder-btn:hover {
+  background: var(--builder-surface-alt);
+  border-color: var(--builder-border-focus);
+}
 
 .builder-btn--primary {
-  background: var(--builder-accent);
-  color: #fff;
+  background: var(--builder-primary);
+  color: var(--builder-primary-ink);
+  border-color: var(--builder-primary);
 }
 .builder-btn--primary:hover {
-  background: var(--builder-accent-hover);
-  box-shadow: 0 0 16px var(--builder-accent-glow);
+  background: var(--builder-primary-hover);
+  border-color: var(--builder-primary-hover);
+  box-shadow: 0 2px 8px rgba(15,15,20,0.12);
+}
+.builder-btn--primary:active {
+  transform: translateY(1px);
 }
 
 .builder-btn--secondary {
-  background: var(--builder-surface-alt);
+  background: var(--builder-surface);
   color: var(--builder-text);
-  border: 1px solid var(--builder-border);
+  border: 1px solid var(--builder-border-focus);
 }
 .builder-btn--secondary:hover {
-  background: var(--builder-surface-hover);
-  border-color: var(--builder-border-focus);
+  background: var(--builder-surface-alt);
 }
 
 .builder-btn--ghost {
   background: transparent;
+  border: 1px solid transparent;
   color: var(--builder-text-secondary);
+  box-shadow: none;
 }
 .builder-btn--ghost:hover {
   background: var(--builder-surface-alt);
@@ -286,20 +300,29 @@ body.builder-body {
 }
 
 .builder-btn--accent {
-  background: var(--builder-accent);
-  color: #fff;
+  background: var(--builder-primary);
+  color: var(--builder-primary-ink);
+  border-color: var(--builder-primary);
   font-weight: 600;
 }
 .builder-btn--accent:hover {
-  background: var(--builder-accent-hover);
+  background: var(--builder-primary-hover);
+  border-color: var(--builder-primary-hover);
+  box-shadow: 0 2px 8px rgba(15,15,20,0.12);
+}
+.builder-btn--accent:active {
+  transform: translateY(1px);
 }
 
 .builder-btn--danger {
-  background: transparent;
+  background: var(--builder-surface);
   color: var(--builder-danger);
+  border-color: rgba(183,58,42,0.25);
 }
 .builder-btn--danger:hover {
-  background: rgba(231, 76, 60, 0.1);
+  background: var(--builder-danger-bg);
+  border-color: var(--builder-danger);
+  color: var(--builder-danger);
 }
 
 .builder-btn--sm {
@@ -334,7 +357,7 @@ body.builder-body {
    -------------------------------------------------------------------------- */
 .builder-select {
   appearance: none;
-  background: var(--builder-surface-alt);
+  background-color: var(--builder-surface);
   color: var(--builder-text);
   border: 1px solid var(--builder-border);
   border-radius: var(--builder-radius-sm);
@@ -342,15 +365,18 @@ body.builder-body {
   font-family: var(--builder-font-body);
   font-size: 13px;
   cursor: pointer;
-  transition: border-color var(--builder-transition);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0A0A0' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");
+  transition: border-color var(--builder-transition), box-shadow var(--builder-transition);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238E8E98' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 8px center;
 }
 
-.builder-select:hover,
-.builder-select:focus {
+.builder-select:hover {
   border-color: var(--builder-border-focus);
+}
+.builder-select:focus {
+  border-color: var(--builder-accent);
+  box-shadow: var(--builder-ring);
   outline: none;
 }
 
