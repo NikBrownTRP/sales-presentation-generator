@@ -395,7 +395,7 @@ body.builder-body {
 .builder-sidebar {
   width: var(--builder-sidebar-width);
   min-width: var(--builder-sidebar-width);
-  background: var(--builder-surface);
+  background: var(--builder-surface-alt);
   border-right: 1px solid var(--builder-border);
   display: flex;
   flex-direction: column;
@@ -452,10 +452,12 @@ body.builder-body {
   flex-direction: column;
   gap: 4px;
   padding: 8px;
+  background: var(--builder-surface);
   border-radius: var(--builder-radius);
   cursor: pointer;
   transition: all var(--builder-transition);
-  border: 1px solid transparent;
+  border: 1px solid var(--builder-border);
+  box-shadow: var(--builder-shadow-xs);
   margin-bottom: 4px;
   position: relative;
 }
@@ -467,13 +469,14 @@ body.builder-body {
 }
 
 .slide-item:hover {
-  background: var(--builder-surface-alt);
+  background: var(--builder-surface);
+  border-color: var(--builder-border-focus);
 }
 
 .slide-item--active {
-  background: var(--builder-surface-alt);
+  background: var(--builder-accent-tint);
   border-color: var(--builder-accent);
-  box-shadow: inset 3px 0 0 var(--builder-accent);
+  box-shadow: var(--builder-shadow-xs), inset 2px 0 0 var(--builder-accent);
 }
 
 .slide-item--hidden {
@@ -534,7 +537,7 @@ body.builder-body {
   height: 45px;
   border-radius: 3px;
   overflow: hidden;
-  background: var(--builder-bg);
+  background: var(--builder-surface-alt);
   border: 1px solid var(--builder-border);
   flex-shrink: 0;
   position: relative;
@@ -615,7 +618,7 @@ body.builder-body {
 }
 .slide-item__action--delete:hover {
   color: var(--builder-danger);
-  background: rgba(231, 76, 60, 0.1);
+  background: var(--builder-danger-bg);
 }
 
 /* --------------------------------------------------------------------------
