@@ -1012,14 +1012,15 @@
   z-index: 3;
 }
 
-/* Corporate theme uses a fused TEKTRO+TRP wordmark; the default size
-   reads as a stamp rather than a legible mark, so lift it. */
+/* Corporate theme uses a fused TEKTRO+TRP wordmark; bump the footprint
+   so it reads as a wordmark rather than a stamp. Opacity kept low to
+   preserve the editorial hierarchy. */
 [data-theme="trp-tektro-corporate"] .pres-slide-logo {
   bottom: 18px;
   right: 28px;
   max-height: 36px;
   max-width: 160px;
-  opacity: 0.85;
+  opacity: 0.4;
 }
 
 /* Hide placeholders everywhere by default */
