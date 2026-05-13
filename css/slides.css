@@ -1012,6 +1012,16 @@
   z-index: 3;
 }
 
+/* Corporate theme uses a fused TEKTRO+TRP wordmark; the default size
+   reads as a stamp rather than a legible mark, so lift it. */
+[data-theme="trp-tektro-corporate"] .pres-slide-logo {
+  bottom: 18px;
+  right: 28px;
+  max-height: 36px;
+  max-width: 160px;
+  opacity: 0.85;
+}
+
 /* Hide placeholders everywhere by default */
 .pres-placeholder {
   display: none;
@@ -1436,6 +1446,13 @@
   --pres-spotlight-fg-muted: rgba(0, 0, 0, 0.55);
   --pres-spotlight-value-color: #000000; /* conservative: value in black, not yellow */
 }
+[data-theme="trp-tektro-corporate"] {
+  --pres-spotlight-accent: #2A2A2A;     /* charcoal accent, matches theme */
+  --pres-spotlight-bg: #FFFFFF;
+  --pres-spotlight-fg: #1A1A1A;
+  --pres-spotlight-fg-muted: rgba(26, 26, 26, 0.55);
+  --pres-spotlight-value-color: #1A1A1A;
+}
 
 .pres-slide--spotlight {
   background: var(--pres-spotlight-bg, #000000);
@@ -1458,8 +1475,12 @@
 .pres-slide--spotlight .pres-slide__overlay {
   position: absolute;
   inset: 0;
-  background: #000;
+  background: var(--pres-spotlight-overlay, #000);
   z-index: 1;
+}
+[data-theme="tektro-light"] .pres-slide--spotlight .pres-slide__overlay,
+[data-theme="trp-tektro-corporate"] .pres-slide--spotlight .pres-slide__overlay {
+  background: #FFFFFF;
 }
 
 /* Removes the corner brackets from the spotlight slide for a cleaner canvas */
@@ -1565,6 +1586,20 @@
   width: 28px;
   height: 2px;
   background: #FFDF00;
+  margin: 8px auto 0;
+}
+
+/* Corporate spotlight: matches the white editorial treatment of all
+   other Corporate slides; charcoal type, no overlay tint. */
+[data-theme="trp-tektro-corporate"] .pres-slide--spotlight .pres-spotlight__kicker {
+  color: var(--pres-spotlight-fg, #1A1A1A);
+}
+[data-theme="trp-tektro-corporate"] .pres-slide--spotlight .pres-spotlight__kicker::after {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: #2A2A2A;
   margin: 8px auto 0;
 }
 
