@@ -1384,9 +1384,10 @@ body.builder-body {
    Slideshow Modal
    -------------------------------------------------------------------------- */
 .slideshow-modal {
-  background: #000;
+  background: #0A0A0A;
   z-index: 2000;
   flex-direction: column;
+  color: var(--builder-text-on-dark);
 }
 
 .slideshow-modal__header {
@@ -1400,6 +1401,7 @@ body.builder-body {
   padding: 16px 24px;
   z-index: 10;
   background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+  color: var(--builder-text-on-dark);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -1408,22 +1410,23 @@ body.builder-body {
 .slideshow-modal__counter {
   font-size: 14px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--builder-text-on-dark);
+  opacity: 0.75;
   font-family: var(--builder-font-heading);
 }
 
 .slideshow-modal__close {
   padding: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
   border: none;
-  color: #fff;
+  color: var(--builder-text-on-dark);
   cursor: pointer;
   border-radius: 50%;
   transition: background var(--builder-transition);
   display: flex;
 }
 .slideshow-modal__close:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .slideshow-modal__stage {
@@ -1466,9 +1469,9 @@ body.builder-body {
   top: 50%;
   transform: translateY(-50%);
   padding: 16px 10px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--builder-text-on-dark);
   cursor: pointer;
   border-radius: var(--builder-radius);
   transition: all var(--builder-transition), opacity 0.3s ease;
@@ -1477,8 +1480,8 @@ body.builder-body {
   pointer-events: none;
 }
 .slideshow-modal__nav:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--builder-text-on-dark);
 }
 
 .slideshow-modal__nav--prev {
