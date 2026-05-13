@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
 /* ==========================================================================
    Sales Presentation Generator — Builder Interface Styles
    TEKTRO / TRP Corporate Identity
@@ -7,28 +8,65 @@
    CSS Custom Properties (Builder Design Tokens)
    -------------------------------------------------------------------------- */
 :root {
-  --builder-bg: #0A0A0A;
-  --builder-surface: #111111;
-  --builder-surface-alt: #1A1A1A;
-  --builder-surface-hover: #222222;
-  --builder-border: #2A2A2A;
-  --builder-border-focus: #444444;
-  --builder-text: #FFFFFF;
-  --builder-text-secondary: #A0A0A0;
-  --builder-text-muted: #666666;
-  --builder-accent: #E31837;
-  --builder-accent-hover: #FF2D4B;
-  --builder-accent-glow: rgba(227, 24, 55, 0.25);
-  --builder-success: #2ECC71;
-  --builder-danger: #E74C3C;
-  --builder-danger-hover: #C0392B;
-  --builder-font-heading: 'Montserrat', 'Manrope', sans-serif;
-  --builder-font-body: 'Sora', 'Inter', sans-serif;
-  --builder-sidebar-width: 280px;
-  --builder-header-height: 56px;
-  --builder-radius: 8px;
-  --builder-radius-sm: 4px;
-  --builder-transition: 0.2s ease;
+  /* --- Surfaces --- */
+  --builder-bg:              #F7F7F4;
+  --builder-surface:         #FFFFFF;
+  --builder-surface-alt:     #F2F2EE;
+  --builder-surface-hover:   #ECECE7;
+
+  /* --- Preview stage (intentionally dark — frames the slides) --- */
+  --builder-stage:           #1A1B1D;
+  --builder-stage-alt:       #232427;
+
+  /* --- Borders --- */
+  --builder-border:          #E7E7E1;
+  --builder-border-focus:    #D4D4CD;
+
+  /* --- Text --- */
+  --builder-text:            #0E0E10;
+  --builder-text-secondary:  #55555F;
+  --builder-text-muted:      #8E8E98;
+  --builder-text-on-dark:    #F7F7F4;
+
+  /* --- Primary (slate buttons) --- */
+  --builder-primary:         #1F2022;
+  --builder-primary-hover:   #2A2B2D;
+  --builder-primary-ink:     #FFFFFF;
+
+  /* --- Accent (gold — focus rings, active states, highlights) --- */
+  --builder-accent:          #FFCA2B;
+  --builder-accent-hover:    #FFD64A;
+  --builder-accent-ink:      #8A6A00;
+  --builder-accent-tint:     #FFF8E0;
+  --builder-accent-glow:     rgba(255, 202, 43, 0.22);
+
+  /* --- Semantic --- */
+  --builder-success:         #117A4A;
+  --builder-success-bg:      #E6F4EC;
+  --builder-danger:          #B73A2A;
+  --builder-danger-hover:    #9A2F22;
+  --builder-danger-bg:       #FBEBE7;
+  --builder-warn:            #B7791F;
+  --builder-warn-bg:         #FFF6E0;
+
+  /* --- Typography --- */
+  --builder-font-heading:    'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  --builder-font-body:       'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+  --builder-font-mono:       'Geist Mono', ui-monospace, monospace;
+
+  /* --- Geometry --- */
+  --builder-sidebar-width:   280px;
+  --builder-header-height:   56px;
+  --builder-radius:          8px;
+  --builder-radius-lg:       12px;
+  --builder-radius-sm:       6px;
+  --builder-transition:      160ms cubic-bezier(0.4,0,0.2,1);
+
+  /* --- Shadows --- */
+  --builder-shadow-xs:       0 1px 2px rgba(15,15,20,0.04);
+  --builder-shadow-sm:       0 1px 2px rgba(15,15,20,0.05), 0 1px 1px rgba(15,15,20,0.03);
+  --builder-shadow:          0 4px 12px rgba(15,15,20,0.06);
+  --builder-ring:            0 0 0 3px var(--builder-accent-glow);
 }
 
 /* --------------------------------------------------------------------------
