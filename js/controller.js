@@ -298,15 +298,14 @@
       var isHidden = slide.hidden === true;
       html += '<li class="slide-item' + (isActive ? ' slide-item--active' : '') + (isHidden ? ' slide-item--hidden' : '') + '" data-slide-id="' + slide.id + '" draggable="true">';
 
-      // Top row: drag handle + thumbnail + info + side actions (move up/down)
-      html += '<div class="slide-item__top">';
+      // Grid: drag handle | thumbnail | info (number + title + action row) | up/down
 
-      // Drag handle
+      // Drag handle (column 1, full height)
       html += '<span class="slide-item__drag-handle" title="Drag to reorder">';
       html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="4" r="2"/><circle cx="16" cy="4" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="8" cy="20" r="2"/><circle cx="16" cy="20" r="2"/></svg>';
       html += '</span>';
 
-      // Thumbnail
+      // Thumbnail (column 2)
       html += '<div class="slide-item__thumbnail" id="thumb-' + slide.id + '">';
       html += '<div class="slide-item__thumbnail-inner" data-theme="' + (slide.theme || state.theme) + '">';
       if (template) {
@@ -314,26 +313,22 @@
       }
       html += '</div></div>';
 
-      // Info
+      // Info column (column 3): number, title, action row at the bottom
       html += '<div class="slide-item__info">';
       html += '<div class="slide-item__number">Slide ' + (i + 1) + '</div>';
       html += '<div class="slide-item__name">' + window.escapeHtml(title) + '</div>';
-      html += '</div>';
-
-      // Side actions (move up/down stay stacked on the right of the top row)
-      html += '<div class="slide-item__actions slide-item__actions--side">';
-      html += '<button class="slide-item__action" data-action="move-up" data-slide-id="' + slide.id + '" title="Move up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18,15 12,9 6,15"/></svg></button>';
-      html += '<button class="slide-item__action" data-action="move-down" data-slide-id="' + slide.id + '" title="Move down"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg></button>';
-      html += '</div>';
-
-      html += '</div>'; // /slide-item__top
-
-      // Bottom row: change-template, duplicate, hide, delete — horizontal, right-aligned
       html += '<div class="slide-item__actions slide-item__actions--bottom">';
       html += '<button class="slide-item__action" data-action="change-template" data-slide-id="' + slide.id + '" title="Change template"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></button>';
       html += '<button class="slide-item__action" data-action="duplicate" data-slide-id="' + slide.id + '" title="Duplicate slide"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>';
       html += '<button class="slide-item__action' + (isHidden ? ' slide-item__action--active' : '') + '" data-action="toggle-hide" data-slide-id="' + slide.id + '" title="' + (isHidden ? 'Show slide' : 'Hide slide') + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + (isHidden ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19M1 1l22 22"/>' : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>') + '</svg></button>';
       html += '<button class="slide-item__action slide-item__action--delete" data-action="delete" data-slide-id="' + slide.id + '" title="Delete slide"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"/></svg></button>';
+      html += '</div>';
+      html += '</div>';
+
+      // Up/Down stack (column 4, full height)
+      html += '<div class="slide-item__actions slide-item__actions--side">';
+      html += '<button class="slide-item__action" data-action="move-up" data-slide-id="' + slide.id + '" title="Move up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18,15 12,9 6,15"/></svg></button>';
+      html += '<button class="slide-item__action" data-action="move-down" data-slide-id="' + slide.id + '" title="Move down"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg></button>';
       html += '</div>';
 
       html += '</li>';
