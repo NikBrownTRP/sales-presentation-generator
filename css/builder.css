@@ -711,8 +711,8 @@ body.builder-body {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--builder-accent);
+  letter-spacing: 0.04em;
+  color: var(--builder-text-secondary);
 }
 
 .builder-preview__label {
@@ -764,6 +764,8 @@ body.builder-body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  background: var(--builder-surface);
+  border-top: 1px solid var(--builder-border);
 }
 
 .builder-editor__header {
@@ -773,12 +775,13 @@ body.builder-body {
   padding: 8px 20px;
   border-bottom: 1px solid var(--builder-border);
   background: var(--builder-surface);
+  color: var(--builder-text);
   flex-shrink: 0;
 }
 
 .builder-editor__template-name {
   font-size: 12px;
-  color: var(--builder-text-secondary);
+  color: var(--builder-text-muted);
   font-weight: 500;
 }
 
@@ -851,7 +854,15 @@ body.builder-body {
 .form-select:focus {
   outline: none;
   border-color: var(--builder-accent);
-  box-shadow: 0 0 0 3px var(--builder-accent-glow);
+  box-shadow: var(--builder-ring);
+}
+
+.form-input:disabled,
+.form-textarea:disabled,
+.form-select:disabled {
+  background: var(--builder-surface-alt);
+  color: var(--builder-text-muted);
+  cursor: not-allowed;
 }
 
 .form-input::placeholder,
@@ -867,7 +878,7 @@ body.builder-body {
 .form-select {
   appearance: none;
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A0A0A0' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238E8E98' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   padding-right: 30px;
@@ -904,19 +915,20 @@ body.builder-body {
 
 /* Image Upload Zone */
 .form-image-upload {
-  border: 2px dashed var(--builder-border);
+  border: 2px dashed var(--builder-border-focus);
   border-radius: var(--builder-radius);
   padding: 20px;
   text-align: center;
   cursor: pointer;
   transition: all var(--builder-transition);
   position: relative;
+  background: var(--builder-surface);
 }
 
 .form-image-upload:hover,
 .form-image-upload--drag-over {
   border-color: var(--builder-accent);
-  background: rgba(227, 24, 55, 0.05);
+  background: var(--builder-surface-alt);
 }
 
 .form-image-upload__placeholder {
@@ -1030,7 +1042,7 @@ body.builder-body {
 }
 .form-list__remove:hover {
   color: var(--builder-danger);
-  background: rgba(231, 76, 60, 0.1);
+  background: var(--builder-danger-bg);
 }
 
 .form-list__indent-btn {
@@ -1078,8 +1090,8 @@ body.builder-body {
 }
 .form-list__add:hover {
   border-color: var(--builder-accent);
-  color: var(--builder-accent);
-  background: rgba(227, 24, 55, 0.05);
+  color: var(--builder-text);
+  background: var(--builder-accent-glow);
 }
 
 /* Spec Table Editor */
