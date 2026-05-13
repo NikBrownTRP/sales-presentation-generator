@@ -125,7 +125,7 @@ body.builder-body {
   width: 28px;
   height: 28px;
   background: var(--builder-primary);
-  color: #fff;
+  color: var(--builder-primary-ink);
   font-family: var(--builder-font-heading);
   font-size: 0.72rem;
   font-weight: 700;
@@ -967,7 +967,7 @@ body.builder-body {
   height: 22px;
   border-radius: 50%;
   background: var(--builder-danger);
-  color: #fff;
+  color: var(--builder-text-on-dark);
   border: 2px solid var(--builder-surface);
   cursor: pointer;
   display: flex;
@@ -1302,7 +1302,7 @@ body.builder-body {
   left: 6px;
   padding: 2px 8px;
   background: var(--builder-accent);
-  color: #fff;
+  color: var(--builder-accent-ink);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1339,8 +1339,8 @@ body.builder-body {
 
 .template-theme-btn--active {
   border-color: var(--builder-accent);
-  color: var(--builder-accent);
-  background: rgba(227, 24, 55, 0.08);
+  color: var(--builder-accent-ink);
+  background: var(--builder-accent-glow);
 }
 
 /* Theme toggle in editor */
@@ -1370,8 +1370,8 @@ body.builder-body {
 
 .form-theme-btn--active {
   border-color: var(--builder-accent);
-  color: var(--builder-accent);
-  background: rgba(227, 24, 55, 0.08);
+  color: var(--builder-accent-ink);
+  background: var(--builder-accent-glow);
 }
 
 .form-group--theme {
@@ -1653,7 +1653,7 @@ body.builder-body {
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(15, 15, 20, 0.45);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -1672,11 +1672,11 @@ body.builder-body {
 .dialog {
   background: var(--builder-surface);
   border: 1px solid var(--builder-border);
-  border-radius: 12px;
+  border-radius: var(--builder-radius-lg);
   padding: 28px 32px 24px;
   max-width: 520px;
   width: 90%;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 64px rgba(15, 15, 20, 0.18), 0 2px 8px rgba(15, 15, 20, 0.08);
   transform: scale(0.95) translateY(8px);
   transition: transform 0.2s ease;
   text-align: center;
@@ -1695,7 +1695,7 @@ body.builder-body {
   height: 40px;
 }
 
-.dialog__icon--warning svg { color: #F59E0B; }
+.dialog__icon--warning svg { color: var(--builder-warn); }
 .dialog__icon--error svg { color: var(--builder-danger); }
 .dialog__icon--info svg { color: var(--builder-accent); }
 .dialog__icon--success svg { color: var(--builder-success); }
@@ -1703,7 +1703,7 @@ body.builder-body {
 .dialog__title {
   font-family: var(--builder-font-heading);
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--builder-text);
   margin-bottom: 8px;
 }
@@ -1716,6 +1716,25 @@ body.builder-body {
   white-space: pre-line;
 }
 
+.dialog__input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 20px;
+  background: var(--builder-surface);
+  border: 1px solid var(--builder-border);
+  border-radius: var(--builder-radius-sm);
+  color: var(--builder-text);
+  font-family: var(--builder-font-body);
+  font-size: 13px;
+  transition: border-color var(--builder-transition), box-shadow var(--builder-transition);
+}
+
+.dialog__input:focus {
+  outline: none;
+  border-color: var(--builder-accent);
+  box-shadow: var(--builder-ring);
+}
+
 .dialog__actions {
   display: flex;
   flex-wrap: wrap;
@@ -1725,8 +1744,8 @@ body.builder-body {
 
 .dialog__btn {
   padding: 9px 20px;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--builder-radius-sm);
   font-family: var(--builder-font-body);
   font-size: 13px;
   font-weight: 600;
@@ -1737,37 +1756,41 @@ body.builder-body {
 }
 
 .dialog__btn--primary {
-  background: var(--builder-accent);
-  color: #fff;
+  background: var(--builder-primary);
+  color: var(--builder-primary-ink);
+  border-color: var(--builder-primary);
 }
 
 .dialog__btn--primary:hover {
-  background: var(--builder-accent-hover);
+  background: var(--builder-primary-hover);
+  border-color: var(--builder-primary-hover);
 }
 
 .dialog__btn--secondary {
-  background: var(--builder-surface-alt);
-  color: var(--builder-text-secondary);
-  border: 1px solid var(--builder-border);
+  background: var(--builder-surface);
+  color: var(--builder-text);
+  border-color: var(--builder-border-focus);
 }
 
 .dialog__btn--secondary:hover {
-  background: var(--builder-surface-hover);
-  color: var(--builder-text);
+  background: var(--builder-surface-alt);
 }
 
 .dialog__btn--danger {
   background: var(--builder-danger);
-  color: #fff;
+  color: var(--builder-text-on-dark);
+  border-color: var(--builder-danger);
 }
 
 .dialog__btn--danger:hover {
   background: var(--builder-danger-hover);
+  border-color: var(--builder-danger-hover);
 }
 
 .dialog__btn--ghost {
   background: transparent;
   color: var(--builder-text-secondary);
+  border-color: transparent;
 }
 
 .dialog__btn--ghost:hover {
@@ -1791,7 +1814,8 @@ body.builder-body {
 
 .image-editor__canvas-area {
   flex: 1;
-  background: #0A0A0A;
+  background: var(--builder-surface-alt);
+  border: 1px solid var(--builder-border);
   border-radius: var(--builder-radius);
   display: flex;
   align-items: center;
@@ -1887,8 +1911,8 @@ body.builder-body {
 
 .image-editor__ratio-btn--active {
   border-color: var(--builder-accent);
-  color: var(--builder-accent);
-  background: rgba(227, 24, 55, 0.08);
+  color: var(--builder-accent-ink);
+  background: var(--builder-accent-glow);
 }
 
 .image-editor__ratio-info {
@@ -1896,7 +1920,7 @@ body.builder-body {
   background: var(--builder-surface-alt);
   border: 1px solid var(--builder-border);
   border-radius: var(--builder-radius-sm);
-  color: var(--builder-accent);
+  color: var(--builder-text);
   font-size: 13px;
   font-weight: 600;
   text-align: center;
@@ -1916,11 +1940,15 @@ body.builder-body {
   appearance: none;
   width: 100%;
   height: 4px;
-  background: var(--builder-surface-alt);
+  background: var(--builder-border);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
   margin-top: 8px;
+}
+
+.image-editor__zoom-slider:focus-visible {
+  box-shadow: var(--builder-ring);
 }
 
 .image-editor__zoom-slider::-webkit-slider-thumb {
@@ -1987,8 +2015,8 @@ body.builder-body {
 
 .image-editor__btn--picking {
   border-color: var(--builder-accent) !important;
-  background: rgba(227, 24, 55, 0.15) !important;
-  color: var(--builder-accent) !important;
+  background: var(--builder-accent-glow) !important;
+  color: var(--builder-accent-ink) !important;
 }
 
 .image-editor__spacer {
