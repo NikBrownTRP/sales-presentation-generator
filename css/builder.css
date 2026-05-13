@@ -1140,7 +1140,7 @@ body.builder-body {
 .modal__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(15, 15, 20, 0.45);
   backdrop-filter: blur(4px);
 }
 
@@ -1148,13 +1148,13 @@ body.builder-body {
   position: relative;
   background: var(--builder-surface);
   border: 1px solid var(--builder-border);
-  border-radius: var(--builder-radius);
+  border-radius: var(--builder-radius-lg);
   padding: 24px;
   max-width: 900px;
   width: 92%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 24px 64px rgba(15, 15, 20, 0.18), 0 2px 8px rgba(15, 15, 20, 0.08);
 }
 
 .modal__content--centered {
@@ -1169,12 +1169,17 @@ body.builder-body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--builder-border);
+  color: var(--builder-text);
 }
 
 .modal__title {
   font-family: var(--builder-font-heading);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--builder-text);
 }
 
 .modal__close {
@@ -1201,21 +1206,21 @@ body.builder-body {
 }
 
 .template-card {
-  background: var(--builder-surface-alt);
-  border: 2px solid var(--builder-border);
-  border-radius: var(--builder-radius);
+  background: var(--builder-surface);
+  border: 1px solid var(--builder-border);
+  border-radius: var(--builder-radius-lg);
   padding: 16px;
   cursor: pointer;
-  transition: all var(--builder-transition);
+  box-shadow: var(--builder-shadow-xs);
+  transition: transform var(--builder-transition), box-shadow var(--builder-transition), border-color var(--builder-transition);
   text-align: center;
   position: relative;
 }
 
 .template-card:hover {
-  border-color: var(--builder-accent);
-  background: var(--builder-surface-hover);
+  border-color: var(--builder-border-focus);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(227, 24, 55, 0.15);
+  box-shadow: var(--builder-shadow);
 }
 
 /* Live preview in template card */
@@ -1248,15 +1253,16 @@ body.builder-body {
   justify-content: center;
   margin-bottom: 12px;
   color: var(--builder-accent);
-  background: var(--builder-bg);
+  background: var(--builder-surface-alt);
   border-radius: var(--builder-radius-sm);
 }
 
 .template-card__name {
   font-family: var(--builder-font-heading);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 4px;
+  color: var(--builder-text);
 }
 
 .template-card__desc {
@@ -1287,7 +1293,7 @@ body.builder-body {
 /* Card styling for the template currently in use (change-mode only) */
 .template-card--current {
   border-color: var(--builder-accent);
-  box-shadow: 0 0 0 1px var(--builder-accent);
+  box-shadow: var(--builder-shadow), 0 0 0 3px var(--builder-accent-glow);
 }
 
 .template-card__badge {
@@ -2068,20 +2074,24 @@ body.builder-body {
 
 .import-picker__card {
   position: relative;
-  border: 2px solid var(--builder-border);
-  border-radius: var(--builder-radius);
+  border: 1px solid var(--builder-border);
+  border-radius: var(--builder-radius-lg);
   overflow: hidden;
   cursor: pointer;
-  transition: border-color var(--builder-transition);
-  background: var(--builder-bg);
+  box-shadow: var(--builder-shadow-xs);
+  transition: transform var(--builder-transition), box-shadow var(--builder-transition), border-color var(--builder-transition);
+  background: var(--builder-surface);
 }
 
 .import-picker__card:hover {
-  border-color: var(--builder-accent);
+  border-color: var(--builder-border-focus);
+  transform: translateY(-2px);
+  box-shadow: var(--builder-shadow);
 }
 
 .import-picker__card--selected {
   border-color: var(--builder-accent);
+  box-shadow: var(--builder-shadow), 0 0 0 3px var(--builder-accent-glow);
 }
 
 .import-picker__card__thumb {
