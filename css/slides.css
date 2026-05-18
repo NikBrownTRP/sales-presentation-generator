@@ -1862,9 +1862,3 @@
   background: var(--pres-bg-alt);
 }
 
-/* Hide the accent bar on multi-spec for light themes — it reads as a stray
-   black line that no other slide template surfaces in these themes. */
-[data-theme="tektro-light"] .pres-slide--spec--multi .pres-accent-bar,
-[data-theme="trp-tektro-corporate"] .pres-slide--spec--multi .pres-accent-bar {
-  display: none;
-}
