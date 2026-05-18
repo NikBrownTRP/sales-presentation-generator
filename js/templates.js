@@ -7,6 +7,37 @@
 (function () {
   var PLACEHOLDER_SVG = '<svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" fill="none"><rect width="120" height="80" rx="4" fill="%231A1A1A"/><path d="M44 50l12-16 12 16H44z" fill="%23333"/><path d="M56 50l16-22 16 22H56z" fill="%23444"/><circle cx="42" cy="32" r="6" fill="%23555"/></svg>';
 
+  /**
+   * Migrate legacy single-product spec slide data into the multi-product shape.
+   * Idempotent: if data.products is already an array, returns data unchanged.
+   * Mutates and returns the same data object so callers can chain.
+   *
+   *   { productName, productImage, specs, features, featuresTitle, footnote, logo }
+   *     ->
+   *   {
+   *     productCount: 1,
+   *     slideHeading: '',
+   *     products: [{ name, image, specs, features, featuresTitle }],
+   *     footnote, logo
+   *   }
+   */
+  function migrateSpecData(data) {
+    if (!data || typeof data !== 'object') return data;
+    if (Array.isArray(data.products)) return data;
+
+    var p0 = {
+      name: data.productName || '',
+      image: data.productImage || '',
+      specs: Array.isArray(data.specs) ? data.specs : [],
+      features: Array.isArray(data.features) ? data.features : [],
+      featuresTitle: data.featuresTitle || 'Key Features'
+    };
+    data.products = [p0];
+    if (typeof data.productCount !== 'number') data.productCount = 1;
+    if (typeof data.slideHeading !== 'string') data.slideHeading = '';
+    return data;
+  }
+
   var checkSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>';
 
   function renderSlideLogo(data) {
