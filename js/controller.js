@@ -1342,8 +1342,17 @@
   };
 
   function getFieldDisplayRatio(fieldKey) {
-    // Product card images all share the same fixed 16:10 aspect ratio.
+    // Product card images: measure the actual rendered card image area
+    // so the crop ratio matches the on-slide display (varies by N).
     if (typeof fieldKey === 'string' && fieldKey.indexOf('products.') === 0) {
+      var previewEl = document.getElementById('preview-slide');
+      if (previewEl) {
+        var img = previewEl.querySelector('.pres-spec-card__image');
+        if (img) {
+          var rect = img.getBoundingClientRect();
+          if (rect.width > 5 && rect.height > 5) return rect.width / rect.height;
+        }
+      }
       return 16 / 10;
     }
     var sel = FIELD_CONTAINER_SELECTOR[fieldKey];
