@@ -588,9 +588,16 @@
 .pres-spec-product-img {
   max-width: 95%;
   max-height: 85%;
+  /* Pixel cap so an oversized source image can't blow past the slide bottom
+     even if the parent's percentage chain doesn't resolve cleanly. */
+  max-height: min(85%, 380px);
   object-fit: contain;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
+
+/* Ensure the right-side image cell can actually shrink to its grid row. */
+.pres-slide--spec-n1 .pres-spec-body { min-height: 0; }
+.pres-slide--spec-n1 .pres-spec-right { min-height: 0; max-height: 100%; }
 
 .pres-slide--spec .pres-footnote {
   position: absolute;
@@ -1671,20 +1678,34 @@
   font-weight: var(--pres-heading-weight);
   text-transform: var(--pres-heading-transform);
   letter-spacing: var(--pres-heading-tracking);
-  font-size: 2.4rem;
-  margin: 0 0 0.4rem 0;
+  font-size: 20px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.pres-slide--spec--multi .pres-spec-header {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+.pres-slide--spec--multi .pres-spec-underline {
+  width: 32px;
+  height: var(--pres-underline-height);
+  background: var(--pres-accent);
+  margin-top: 4px;
 }
 
 .pres-spec-cards {
   display: grid;
-  gap: 1.5rem;
+  gap: 16px;
   width: 100%;
+  flex: 1;          /* take all remaining vertical space inside content */
+  min-height: 0;    /* allow grid items to shrink */
 }
 
 .pres-slide--spec-n2 .pres-spec-cards { grid-template-columns: 1fr 1fr; }
 .pres-slide--spec-n3 .pres-spec-cards { grid-template-columns: repeat(3, 1fr); }
-.pres-slide--spec-n4 .pres-spec-cards { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.pres-slide--spec-n5 .pres-spec-cards { grid-template-columns: repeat(5, 1fr); gap: 0.75rem; }
+.pres-slide--spec-n4 .pres-spec-cards { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.pres-slide--spec-n5 .pres-spec-cards { grid-template-columns: repeat(5, 1fr); gap: 10px; }
 
 .pres-spec-card {
   display: flex;
@@ -1692,11 +1713,15 @@
   background: var(--pres-bg-surface);
   border: 1px solid var(--pres-border);
   border-radius: var(--pres-radius);
-  padding: 1rem;
-  gap: 0.6rem;
-  min-width: 0; /* allow shrinking inside grid */
+  padding: 10px 12px;
+  gap: 6px;
+  min-width: 0;     /* allow shrinking inside grid */
+  min-height: 0;    /* allow vertical shrinking */
+  overflow: hidden; /* never overflow the card */
 }
 
+/* Image area: fixed aspect-ratio for visual consistency, but capped per-N
+   so wider cards (N=2) don't make the image so tall the rest doesn't fit. */
 .pres-spec-card__image {
   width: 100%;
   aspect-ratio: 16 / 10;
@@ -1706,7 +1731,20 @@
   justify-content: center;
   overflow: hidden;
   border-radius: var(--pres-radius);
+  flex: 0 0 auto;
 }
+.pres-slide--spec-n2 .pres-spec-card__image { max-height: 130px; }
+.pres-slide--spec-n3 .pres-spec-card__image { max-height: 115px; }
+.pres-slide--spec-n4 .pres-spec-card__image { max-height: 95px; }
+.pres-slide--spec-n5 .pres-spec-card__image { max-height: 78px; }
+
+/* Compact spec table inside cards (saves vertical space vs the wider table
+   in N=1's left column). */
+.pres-spec-card__table td { padding: 2px 0; font-size: 11px; line-height: 1.3; }
+.pres-spec-card__name { font-size: 14px; }
+.pres-spec-card__underline { margin-top: -2px; }
+.pres-spec-card__feature { font-size: 11px; line-height: 1.3; }
+.pres-spec-card__features { gap: 2px; margin-top: 0; }
 .pres-spec-card__image img { width: 100%; height: 100%; object-fit: contain; }
 .pres-placeholder--card { color: var(--pres-text-muted); }
 
@@ -1772,9 +1810,13 @@
 .pres-slide--spec-n5 .pres-spec-card__feature { font-size: 0.7rem; gap: 0.3rem; }
 .pres-slide--spec-n5 .pres-spec-card__feature-icon svg { width: 10px; height: 10px; }
 
-/* Top padding so cards don't stick to slide chrome */
+/* Multi-spec content layout: fill slide height; grid takes remaining space. */
 .pres-slide--spec--multi .pres-slide__content {
-  padding: 40px 48px 32px;
+  padding: 28px 40px 30px;
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Light themes: card surface should match the slide background (white),
