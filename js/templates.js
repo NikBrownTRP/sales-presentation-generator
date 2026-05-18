@@ -59,6 +59,133 @@
     return ' style="background-color:' + c + '"';
   }
 
+  function renderSingleProductSpec(data, p) {
+    // Equivalent to the previous spec render, but reads from p (product object) instead of flat data.
+    var html = '<div class="pres-slide pres-slide--spec pres-slide--spec-n1">';
+    html += '<div class="pres-accent-bar"></div>';
+    html += '<div class="pres-slide__content">';
+
+    html += '<div class="pres-spec-header">';
+    html += '<h2 class="pres-spec-product-name">' + escapeHtml(p.name || 'Product Specifications') + '</h2>';
+    html += '<div class="pres-spec-underline"></div>';
+    html += '</div>';
+
+    html += '<div class="pres-spec-body">';
+
+    // Left: specs + features
+    html += '<div class="pres-spec-left">';
+    if (Array.isArray(p.specs) && p.specs.length > 0) {
+      html += '<table class="pres-spec-table">';
+      p.specs.forEach(function (spec) {
+        if (spec.key && spec.key.trim()) {
+          html += '<tr><td>' + escapeHtml(spec.key) + '</td><td>' + escapeHtml(spec.value || '—') + '</td></tr>';
+        }
+      });
+      html += '</table>';
+    }
+    var hasFeatures = Array.isArray(p.features) && p.features.some(function (raw) {
+      var t = (raw && typeof raw === 'object') ? raw.text : raw;
+      return t && t.trim();
+    });
+    if (hasFeatures) {
+      html += '<div class="pres-spec-features">';
+      html += '<div class="pres-spec-features__title">' + escapeHtml(p.featuresTitle || 'Key Features') + '</div>';
+      p.features.forEach(function (raw) {
+        var item = (raw && typeof raw === 'object') ? raw : { text: raw || '', indent: 0 };
+        if (item.text && item.text.trim()) {
+          html += '<div class="pres-spec-feature' + (item.indent ? ' pres-spec-feature--indent' : '') + '">';
+          html += '<span class="pres-spec-feature__icon">' + checkSvg + '</span>';
+          html += '<span>' + escapeHtml(item.text) + '</span>';
+          html += '</div>';
+        }
+      });
+      html += '</div>';
+    }
+    html += '</div>'; // spec-left
+
+    // Right: product image
+    html += '<div class="pres-spec-right">';
+    if (p.image) {
+      html += '<img class="pres-spec-product-img" src="' + p.image + '" alt="' + escapeHtml(p.name || '') + '">';
+    } else {
+      html += '<div class="pres-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Product Image</span></div>';
+    }
+    html += '</div>'; // spec-right
+
+    html += '</div>'; // spec-body
+
+    if (data.footnote) html += '<div class="pres-footnote">' + escapeHtml(data.footnote) + '</div>';
+    html += '</div>'; // content
+    html += renderSlideLogo(data);
+    html += '</div>'; // slide
+    return html;
+  }
+
+  function renderMultiProductSpec(data, products, n) {
+    var html = '<div class="pres-slide pres-slide--spec pres-slide--spec--multi pres-slide--spec-n' + n + '">';
+    html += '<div class="pres-accent-bar"></div>';
+    html += '<div class="pres-slide__content">';
+
+    if (data.slideHeading && data.slideHeading.trim()) {
+      html += '<div class="pres-spec-header">';
+      html += '<h2 class="pres-spec-slide-heading">' + escapeHtml(data.slideHeading) + '</h2>';
+      html += '<div class="pres-spec-underline"></div>';
+      html += '</div>';
+    }
+
+    html += '<div class="pres-spec-cards">';
+    for (var i = 0; i < n; i++) {
+      html += renderProductCard(products[i] || {});
+    }
+    html += '</div>';
+
+    if (data.footnote) html += '<div class="pres-footnote">' + escapeHtml(data.footnote) + '</div>';
+    html += '</div>'; // content
+    html += renderSlideLogo(data);
+    html += '</div>'; // slide
+    return html;
+  }
+
+  function renderProductCard(p) {
+    var html = '<div class="pres-spec-card">';
+    html += '<div class="pres-spec-card__image">';
+    if (p.image) {
+      html += '<img src="' + p.image + '" alt="' + escapeHtml(p.name || '') + '">';
+    } else {
+      html += '<div class="pres-placeholder pres-placeholder--card"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>';
+    }
+    html += '</div>';
+
+    html += '<h3 class="pres-spec-card__name">' + escapeHtml(p.name || 'Product') + '</h3>';
+    html += '<div class="pres-spec-card__underline"></div>';
+
+    if (Array.isArray(p.specs) && p.specs.length > 0) {
+      html += '<table class="pres-spec-card__table">';
+      p.specs.slice(0, 4).forEach(function (spec) {
+        if (spec.key && spec.key.trim()) {
+          html += '<tr><td>' + escapeHtml(spec.key) + '</td><td>' + escapeHtml(spec.value || '—') + '</td></tr>';
+        }
+      });
+      html += '</table>';
+    }
+
+    var feats = (p.features || []).slice(0, 3).filter(function (raw) {
+      var t = (raw && typeof raw === 'object') ? raw.text : raw;
+      return t && t.trim();
+    });
+    if (feats.length) {
+      html += '<div class="pres-spec-card__features">';
+      feats.forEach(function (raw) {
+        var item = (raw && typeof raw === 'object') ? raw : { text: raw, indent: 0 };
+        html += '<div class="pres-spec-card__feature"><span class="pres-spec-card__feature-icon">' + checkSvg + '</span><span>' + escapeHtml(item.text) + '</span></div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
   /* -----------------------------------------------------------------------
      SVG Chart Renderer — builds inline SVG from data
      ----------------------------------------------------------------------- */
@@ -585,74 +712,15 @@
       },
 
       render: function (data) {
-        var html = '<div class="pres-slide pres-slide--spec">';
-        html += '<div class="pres-accent-bar"></div>';
-        html += '<div class="pres-slide__content">';
+        migrateSpecData(data);
+        var n = Number(data.productCount || 1);
+        if (n < 1) n = 1; if (n > 5) n = 5;
+        var products = data.products || [];
 
-        // Header
-        html += '<div class="pres-spec-header">';
-        html += '<h2 class="pres-spec-product-name">' + escapeHtml(data.productName || 'Product Specifications') + '</h2>';
-        html += '<div class="pres-spec-underline"></div>';
-        html += '</div>';
-
-        // Body
-        html += '<div class="pres-spec-body">';
-
-        // Left: Specs table
-        html += '<div class="pres-spec-left">';
-
-        if (data.specs && data.specs.length > 0) {
-          html += '<table class="pres-spec-table">';
-          data.specs.forEach(function (spec) {
-            if (spec.key && spec.key.trim()) {
-              html += '<tr><td>' + escapeHtml(spec.key) + '</td><td>' + escapeHtml(spec.value || '—') + '</td></tr>';
-            }
-          });
-          html += '</table>';
+        if (n === 1) {
+          return renderSingleProductSpec(data, products[0] || {});
         }
-
-        // Features below specs
-        if (data.features && data.features.some(function (raw) {
-          var t = (raw && typeof raw === 'object') ? raw.text : raw;
-          return t && t.trim();
-        })) {
-          html += '<div class="pres-spec-features">';
-          html += '<div class="pres-spec-features__title">' + escapeHtml(data.featuresTitle || 'Key Features') + '</div>';
-          data.features.forEach(function (raw) {
-            var item = (raw && typeof raw === 'object') ? raw : { text: raw || '', indent: 0 };
-            if (item.text && item.text.trim()) {
-              html += '<div class="pres-spec-feature' + (item.indent ? ' pres-spec-feature--indent' : '') + '">';
-              html += '<span class="pres-spec-feature__icon">' + checkSvg + '</span>';
-              html += '<span>' + escapeHtml(item.text) + '</span>';
-              html += '</div>';
-            }
-          });
-          html += '</div>';
-        }
-
-        html += '</div>'; // spec-left
-
-        // Right: Product image
-        html += '<div class="pres-spec-right">';
-        if (data.productImage) {
-          html += '<img class="pres-spec-product-img" src="' + data.productImage + '" alt="' + escapeHtml(data.productName || '') + '">';
-        } else {
-          html += '<div class="pres-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Product Image</span></div>';
-        }
-        html += '</div>'; // spec-right
-
-        html += '</div>'; // spec-body
-
-        // Footnote
-        if (data.footnote) {
-          html += '<div class="pres-footnote">' + escapeHtml(data.footnote) + '</div>';
-        }
-
-        html += '</div>'; // content
-        html += renderSlideLogo(data);
-        html += '</div>'; // slide
-
-        return html;
+        return renderMultiProductSpec(data, products.slice(0, n), n);
       }
     },
 
