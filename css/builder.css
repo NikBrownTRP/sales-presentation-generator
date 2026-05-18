@@ -2195,3 +2195,43 @@ body.builder-body {
   padding-top: 16px;
   border-top: 1px solid var(--builder-border);
 }
+
+/* --------------------------------------------------------------------------
+   Editor: product-group accordion (Product Spec multi-product)
+   -------------------------------------------------------------------------- */
+.form-product-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.form-product-section {
+  border: 1px solid var(--builder-border, #2A2A2A);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--builder-surface, #161616);
+}
+.form-product-section__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  background: transparent;
+  border: 0;
+  color: var(--builder-text, #fff);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+.form-product-section__header:hover { background: rgba(255,255,255,0.03); }
+.form-product-section__num { font-weight: 600; min-width: 80px; }
+.form-product-section__name { flex: 1; color: var(--builder-text-secondary, #B0B0B0); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.form-product-section__chevron { transition: transform 0.15s ease; }
+.form-product-section--open .form-product-section__chevron { transform: rotate(180deg); }
+.form-product-section__body {
+  padding: 0.75rem 0.8rem 1rem;
+  border-top: 1px solid var(--builder-border, #2A2A2A);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
