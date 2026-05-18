@@ -547,5 +547,45 @@
   <script src="js/exporter.js?v=37" defer></script>
   <script src="js/pptx-import.js?v=3" defer></script>
   <script src="js/controller.js?v=46" defer></script>
+
+  <!-- Theme designer (loaded only when ?mode=designer) -->
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('mode') !== 'designer') return;
+      document.body.classList.add('designer-mode');
+      var root = document.createElement('div');
+      root.id = 'designer-root';
+      root.className = 'designer-root';
+      document.body.appendChild(root);
+      function addCss(href) {
+        var l = document.createElement('link');
+        l.rel = 'stylesheet'; l.href = href;
+        document.head.appendChild(l);
+      }
+      function addJs(src) {
+        return new Promise(function (res, rej) {
+          var s = document.createElement('script');
+          s.src = src; s.onload = res; s.onerror = rej;
+          document.head.appendChild(s);
+        });
+      }
+      addCss('css/designer.css?v=1');
+      // Wait for templates.js (loaded with defer) before mounting designer.
+      function whenReady(cb) {
+        if (window.SlideTemplates) return cb();
+        setTimeout(function () { whenReady(cb); }, 30);
+      }
+      Promise.resolve()
+        .then(function () { return addJs('js/designer/parse-theme.js?v=1'); })
+        .then(function () { return addJs('js/designer/serialize-theme.js?v=1'); })
+        .then(function () { return addJs('js/designer/github-api.js?v=1'); })
+        .then(function () { return addJs('js/designer/preview.js?v=1'); })
+        .then(function () { return addJs('js/designer/ui.js?v=1'); })
+        .then(function () { return addJs('js/designer/controller.js?v=1'); })
+        .then(function () { whenReady(function () { window.DesignerController.mount(root); }); })
+        .catch(function (e) { console.error('Designer load failed', e); root.textContent = 'Designer failed to load: ' + e; });
+    })();
+  </script>
 </body>
 </html>
