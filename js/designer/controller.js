@@ -296,7 +296,7 @@
     card.appendChild(row);
 
     modal.appendChild(card);
-    document.body.appendChild(modal);
+    (els.root || document.body).appendChild(modal);
   }
 
   function mount(root) {
