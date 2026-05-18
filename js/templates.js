@@ -552,16 +552,36 @@
       icon: '<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="80" height="50" rx="3" fill="#111"/><rect x="6" y="6" width="32" height="3" rx="1" fill="#E31837"/><rect x="6" y="13" width="30" height="1.5" rx=".75" fill="#444"/><rect x="6" y="17" width="30" height="1.5" rx=".75" fill="#333"/><rect x="6" y="21" width="30" height="1.5" rx=".75" fill="#444"/><rect x="6" y="25" width="30" height="1.5" rx=".75" fill="#333"/><rect x="6" y="29" width="30" height="1.5" rx=".75" fill="#444"/><rect x="46" y="14" width="26" height="22" rx="2" fill="#1A1A1A"/></svg>',
 
       fields: [
-        { key: 'productName', role: 'title', type: 'text', label: 'Product Name', placeholder: 'e.g., TRP DH-R EVO', required: true },
-        { key: 'productImage', role: 'hero-image', type: 'image', label: 'Product Image' },
-        { key: 'specs', type: 'keyvalue', label: 'Specifications', keyPlaceholder: 'Spec name', valuePlaceholder: 'Value' },
-        { key: 'features', role: 'list', type: 'list', label: 'Key Features', titleKey: 'featuresTitle', titleDefault: 'Key Features', placeholder: 'Add a feature...', maxItems: 6 },
+        {
+          key: 'productCount', type: 'select', label: 'Number of products', defaultValue: 1,
+          options: [
+            { value: 1, label: '1 product' },
+            { value: 2, label: '2 products' },
+            { value: 3, label: '3 products' },
+            { value: 4, label: '4 products' },
+            { value: 5, label: '5 products' }
+          ]
+        },
+        {
+          key: 'slideHeading', type: 'text', label: 'Slide Heading',
+          placeholder: 'e.g., Product Lineup',
+          showWhen: function (data) { return Number(data.productCount || 1) >= 2; }
+        },
+        {
+          key: 'products', type: 'product-group', label: 'Products'
+        },
         { key: 'footnote', role: 'footnote', type: 'text', label: 'Footnote', placeholder: 'e.g., *Weight without rotors' },
         { key: 'logo', role: 'logo', type: 'image', label: 'Logo' }
       ],
 
       getTitle: function (data) {
-        return (data.productName || 'Spec') + ' — Specs';
+        migrateSpecData(data);
+        var n = Number(data.productCount || 1);
+        if (n === 1) {
+          var p = data.products[0] || {};
+          return (p.name || 'Spec') + ' — Specs';
+        }
+        return (data.slideHeading || 'Product Lineup') + ' — ' + n + ' products';
       },
 
       render: function (data) {
