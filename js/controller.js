@@ -541,6 +541,7 @@
     html += '</div></div>';
 
     template.fields.forEach(function (field) {
+      if (typeof field.showWhen === 'function' && !field.showWhen(slide.data)) return;
       html += renderField(field, slide);
     });
 
@@ -619,6 +620,10 @@
 
       case 'keyvalue':
         html += renderKeyValueField(field, value, slide);
+        break;
+
+      case 'product-group':
+        html += renderProductGroupField(field, slide);
         break;
 
       case 'chartdata':
@@ -718,6 +723,118 @@
     return html;
   }
 
+  function renderProductGroupField(field, slide) {
+    if (typeof window.migrateSpecData === 'function') window.migrateSpecData(slide.data);
+
+    var n = Number(slide.data.productCount || 1);
+    if (n < 1) n = 1; if (n > 5) n = 5;
+
+    var products = slide.data.products || [];
+    while (products.length < n) {
+      products.push({ name: '', image: '', specs: [], features: [], featuresTitle: 'Key Features' });
+    }
+    slide.data.products = products;
+
+    var maxSpecs = (n === 1) ? 6 : 4;
+    var maxFeatures = (n === 1) ? 6 : 3;
+
+    if (typeof slide.data._openProduct !== 'number' || slide.data._openProduct >= n) {
+      slide.data._openProduct = 0;
+    }
+    var openIdx = slide.data._openProduct;
+
+    var html = '<div class="form-product-group" data-key="' + field.key + '">';
+    for (var i = 0; i < n; i++) {
+      var p = products[i] || {};
+      var isOpen = (i === openIdx);
+      html += '<div class="form-product-section' + (isOpen ? ' form-product-section--open' : '') + '" data-product-index="' + i + '">';
+      html += '<button type="button" class="form-product-section__header" data-product-toggle="' + i + '">';
+      html += '<span class="form-product-section__num">Product ' + (i + 1) + '</span>';
+      html += '<span class="form-product-section__name">' + escAttr(p.name || '') + '</span>';
+      html += '<svg class="form-product-section__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+      html += '</button>';
+
+      if (isOpen) {
+        html += '<div class="form-product-section__body">';
+        html += '<div class="form-group"><label class="form-label form-label--required">Product Name</label>';
+        html += '<input type="text" class="form-input" data-product-key="name" data-product-index="' + i + '" value="' + escAttr(p.name || '') + '" placeholder="e.g., TRP DH-R EVO"></div>';
+        html += '<div class="form-group"><label class="form-label">Product Image</label>';
+        html += renderProductImageField(i, p.image);
+        html += '</div>';
+        html += '<div class="form-group"><label class="form-label">Specifications</label>';
+        html += renderProductKvField(i, p.specs || [], maxSpecs);
+        html += '</div>';
+        html += '<div class="form-group"><label class="form-label">Key Features</label>';
+        html += renderProductListField(i, p.features || [], maxFeatures);
+        html += '</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderProductImageField(productIndex, value) {
+    var html = '<div class="form-image-upload" data-product-image-index="' + productIndex + '">';
+    if (value) {
+      html += '<div class="form-image-upload__preview">';
+      html += '<img src="' + value + '" alt="">';
+      html += '<div class="form-image-upload__edit-overlay">';
+      html += '<button type="button" class="form-image-upload__edit-btn" data-product-image-replace="' + productIndex + '">Replace</button>';
+      html += '</div>';
+      html += '<button type="button" class="form-image-upload__remove" data-product-image-remove="' + productIndex + '" title="Remove image">&times;</button>';
+      html += '</div>';
+    } else {
+      html += '<div class="form-image-upload__placeholder">';
+      html += '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+      html += '<span>Click or drag image here</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderProductKvField(productIndex, items, maxItems) {
+    if (!items || !items.length) items = [{ key: '', value: '' }];
+    var html = '<div class="form-spectable" data-product-kv-index="' + productIndex + '">';
+    items.forEach(function (item, i) {
+      html += '<div class="form-spectable__row">';
+      html += '<input type="text" class="form-input" data-product-kv-input="' + productIndex + '" data-kv-row="' + i + '" data-kv-part="key" value="' + escAttr(item.key || '') + '" placeholder="Spec name">';
+      html += '<input type="text" class="form-input" data-product-kv-input="' + productIndex + '" data-kv-row="' + i + '" data-kv-part="value" value="' + escAttr(item.value || '') + '" placeholder="Value">';
+      html += '<button type="button" class="form-list__remove" data-product-kv-remove="' + productIndex + '" data-kv-row="' + i + '" title="Remove">';
+      html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      html += '</button></div>';
+    });
+    if (items.length < maxItems) {
+      html += '<button type="button" class="form-list__add" data-product-kv-add="' + productIndex + '">';
+      html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add row';
+      html += '</button>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderProductListField(productIndex, items, maxItems) {
+    if (!items || !items.length) items = [''];
+    var html = '<div class="form-list" data-product-list-index="' + productIndex + '">';
+    items.forEach(function (raw, i) {
+      var text = (raw && typeof raw === 'object') ? raw.text : raw;
+      html += '<div class="form-list__item">';
+      html += '<input type="text" class="form-input" data-product-list-input="' + productIndex + '" data-list-row="' + i + '" value="' + escAttr(text || '') + '" placeholder="Add a feature...">';
+      html += '<button type="button" class="form-list__remove" data-product-list-remove="' + productIndex + '" data-list-row="' + i + '" title="Remove">';
+      html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      html += '</button></div>';
+    });
+    if (items.length < maxItems) {
+      html += '<button type="button" class="form-list__add" data-product-list-add="' + productIndex + '">';
+      html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add feature';
+      html += '</button>';
+    }
+    html += '</div>';
+    return html;
+  }
+
   function escAttr(str) {
     return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
@@ -735,13 +852,18 @@
     // Text inputs and selects
     dom.editorForm.querySelectorAll('.form-input[data-key], .form-textarea[data-key], .form-select[data-key]').forEach(function (el) {
       el.addEventListener('input', function () {
-        updateSlideData(slide.id, el.dataset.key, el.value);
-        // Re-render editor when displayMode changes so mode-aware hints (e.g.,
-        // chartdata format guidance for Gantt vs bar/line) update immediately.
-        if (el.dataset.key === 'displayMode') {
-          renderEditor();
+        var key = el.dataset.key;
+        var val = el.value;
+        if (key === 'productCount') {
+          val = Math.max(1, Math.min(5, parseInt(val, 10) || 1));
         }
-        debouncedThumbnailUpdate();
+        updateSlideData(slide.id, key, val);
+        if (key === 'productCount') {
+          renderEditor();
+          updatePreview();
+        } else {
+          debouncedThumbnailUpdate();
+        }
       });
     });
 
@@ -913,6 +1035,155 @@
         renderEditor();
       });
     });
+
+    // --- product-group: section toggle ---
+    dom.editorForm.querySelectorAll('[data-product-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productToggle, 10);
+        slide.data._openProduct = (slide.data._openProduct === i) ? -1 : i;
+        renderEditor();
+      });
+    });
+
+    // --- product-group: name input ---
+    dom.editorForm.querySelectorAll('[data-product-key="name"]').forEach(function (el) {
+      el.addEventListener('input', function () {
+        var i = parseInt(el.dataset.productIndex, 10);
+        ensureProduct(slide, i).name = el.value;
+        updateSlideData(slide.id, 'products', slide.data.products);
+        debouncedThumbnailUpdate();
+      });
+    });
+
+    // --- product-group: image upload ---
+    dom.editorForm.querySelectorAll('[data-product-image-index]').forEach(function (zone) {
+      var i = parseInt(zone.dataset.productImageIndex, 10);
+      zone.addEventListener('click', function (e) {
+        if (e.target.closest('[data-product-image-remove]')) return;
+        if (e.target.closest('[data-product-image-replace]')) return;
+        if (e.target.closest('.form-image-upload__preview')) return;
+        triggerProductImageUpload(slide.id, i);
+      });
+      zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('form-image-upload--drag-over'); });
+      zone.addEventListener('dragleave', function () { zone.classList.remove('form-image-upload--drag-over'); });
+      zone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        zone.classList.remove('form-image-upload--drag-over');
+        if (e.dataTransfer.files.length) handleProductImageFile(e.dataTransfer.files[0], slide.id, i);
+      });
+    });
+    dom.editorForm.querySelectorAll('[data-product-image-replace]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) { e.stopPropagation(); triggerProductImageUpload(slide.id, parseInt(btn.dataset.productImageReplace, 10)); });
+    });
+    dom.editorForm.querySelectorAll('[data-product-image-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var i = parseInt(btn.dataset.productImageRemove, 10);
+        ensureProduct(slide, i).image = '';
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+        debouncedThumbnailUpdate();
+      });
+    });
+
+    // --- product-group: specs (key-value) ---
+    dom.editorForm.querySelectorAll('[data-product-kv-input]').forEach(function (el) {
+      el.addEventListener('input', function () {
+        var i = parseInt(el.dataset.productKvInput, 10);
+        var row = parseInt(el.dataset.kvRow, 10);
+        var part = el.dataset.kvPart;
+        var p = ensureProduct(slide, i);
+        if (!Array.isArray(p.specs)) p.specs = [];
+        if (!p.specs[row]) p.specs[row] = { key: '', value: '' };
+        p.specs[row][part] = el.value;
+        updateSlideData(slide.id, 'products', slide.data.products);
+        debouncedThumbnailUpdate();
+      });
+    });
+    dom.editorForm.querySelectorAll('[data-product-kv-add]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productKvAdd, 10);
+        var p = ensureProduct(slide, i);
+        if (!Array.isArray(p.specs)) p.specs = [];
+        p.specs.push({ key: '', value: '' });
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+      });
+    });
+    dom.editorForm.querySelectorAll('[data-product-kv-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productKvRemove, 10);
+        var row = parseInt(btn.dataset.kvRow, 10);
+        var p = ensureProduct(slide, i);
+        if (Array.isArray(p.specs)) p.specs.splice(row, 1);
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+      });
+    });
+
+    // --- product-group: features (list) ---
+    dom.editorForm.querySelectorAll('[data-product-list-input]').forEach(function (el) {
+      el.addEventListener('input', function () {
+        var i = parseInt(el.dataset.productListInput, 10);
+        var row = parseInt(el.dataset.listRow, 10);
+        var p = ensureProduct(slide, i);
+        if (!Array.isArray(p.features)) p.features = [];
+        p.features[row] = { text: el.value, indent: 0 };
+        updateSlideData(slide.id, 'products', slide.data.products);
+        debouncedThumbnailUpdate();
+      });
+    });
+    dom.editorForm.querySelectorAll('[data-product-list-add]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productListAdd, 10);
+        var p = ensureProduct(slide, i);
+        if (!Array.isArray(p.features)) p.features = [];
+        p.features.push({ text: '', indent: 0 });
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+      });
+    });
+    dom.editorForm.querySelectorAll('[data-product-list-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productListRemove, 10);
+        var row = parseInt(btn.dataset.listRow, 10);
+        var p = ensureProduct(slide, i);
+        if (Array.isArray(p.features)) p.features.splice(row, 1);
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+      });
+    });
+  }
+
+  function ensureProduct(slide, i) {
+    if (!Array.isArray(slide.data.products)) slide.data.products = [];
+    while (slide.data.products.length <= i) {
+      slide.data.products.push({ name: '', image: '', specs: [], features: [], featuresTitle: 'Key Features' });
+    }
+    return slide.data.products[i];
+  }
+
+  function triggerProductImageUpload(slideId, productIndex) {
+    pendingImageSlideId = slideId;
+    pendingImageFieldKey = '__product:' + productIndex;
+    dom.fileInputImage.value = '';
+    dom.fileInputImage.click();
+  }
+
+  function handleProductImageFile(file, slideId, productIndex) {
+    if (!file || !file.type.startsWith('image/')) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      resizeImage(e.target.result, 1200, 900, 0.85).then(function (resized) {
+        var slide = state.slides.find(function (s) { return s.id === slideId; });
+        if (!slide) return;
+        ensureProduct(slide, productIndex).image = resized;
+        updateSlideData(slideId, 'products', slide.data.products);
+        renderEditor();
+        debouncedThumbnailUpdate();
+      });
+    };
+    reader.readAsDataURL(file);
   }
 
   /* -----------------------------------------------------------------------
@@ -2053,7 +2324,16 @@
 
     dom.fileInputImage.addEventListener('change', function (e) {
       if (e.target.files[0] && pendingImageSlideId && pendingImageFieldKey) {
-        handleImageFile(e.target.files[0], pendingImageSlideId, pendingImageFieldKey);
+        var file = e.target.files[0];
+        if (typeof pendingImageFieldKey === 'string' && pendingImageFieldKey.indexOf('__product:') === 0) {
+          var pi = parseInt(pendingImageFieldKey.slice('__product:'.length), 10);
+          handleProductImageFile(file, pendingImageSlideId, pi);
+          pendingImageSlideId = null;
+          pendingImageFieldKey = null;
+          e.target.value = '';
+          return;
+        }
+        handleImageFile(file, pendingImageSlideId, pendingImageFieldKey);
       }
       e.target.value = '';
     });
