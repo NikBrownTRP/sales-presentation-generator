@@ -388,6 +388,7 @@
     html += '</div></div>';
 
     template.fields.forEach(function (field) {
+      if (typeof field.showWhen === 'function' && !field.showWhen(slide.data)) return;
       html += renderField(field, slide);
     });
 
