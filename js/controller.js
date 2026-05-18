@@ -862,6 +862,7 @@
           renderEditor();
           updatePreview();
         } else {
+          if (key === 'displayMode') renderEditor();
           debouncedThumbnailUpdate();
         }
       });
