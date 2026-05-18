@@ -1678,7 +1678,8 @@
   font-weight: var(--pres-heading-weight);
   text-transform: var(--pres-heading-transform);
   letter-spacing: var(--pres-heading-tracking);
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 1.15;
   margin: 0;
   flex-shrink: 0;
 }
@@ -1733,10 +1734,25 @@
   border-radius: var(--pres-radius);
   flex: 0 0 auto;
 }
-.pres-slide--spec-n2 .pres-spec-card__image { max-height: 130px; }
-.pres-slide--spec-n3 .pres-spec-card__image { max-height: 115px; }
-.pres-slide--spec-n4 .pres-spec-card__image { max-height: 95px; }
-.pres-slide--spec-n5 .pres-spec-card__image { max-height: 78px; }
+.pres-slide--spec-n2 .pres-spec-card__image { max-height: 220px; }
+.pres-slide--spec-n3 .pres-spec-card__image { max-height: 150px; }
+.pres-slide--spec-n4 .pres-spec-card__image { max-height: 110px; }
+.pres-slide--spec-n5 .pres-spec-card__image { max-height: 90px; }
+
+/* N=2: cards are wide; switch to a two-column inner layout so the spec
+   table and features sit side-by-side under a larger image. Keeps the
+   image-prominent feel without leaving empty horizontal space. */
+.pres-slide--spec-n2 .pres-spec-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+  row-gap: 4px;
+}
+.pres-slide--spec-n2 .pres-spec-card__image,
+.pres-slide--spec-n2 .pres-spec-card__name,
+.pres-slide--spec-n2 .pres-spec-card__underline { grid-column: 1 / -1; }
+.pres-slide--spec-n2 .pres-spec-card__table { grid-column: 1; align-self: start; }
+.pres-slide--spec-n2 .pres-spec-card__features { grid-column: 2; align-self: start; margin-top: 0; }
 
 /* Compact spec table inside cards (saves vertical space vs the wider table
    in N=1's left column). */
@@ -1810,13 +1826,23 @@
 .pres-slide--spec-n5 .pres-spec-card__feature { font-size: 0.7rem; gap: 0.3rem; }
 .pres-slide--spec-n5 .pres-spec-card__feature-icon svg { width: 10px; height: 10px; }
 
-/* Multi-spec content layout: fill slide height; grid takes remaining space. */
+/* Multi-spec content layout: fill slide height; grid takes remaining space.
+   Bottom padding clears the slide-logo (corporate logo is ~54px tall). */
 .pres-slide--spec--multi .pres-slide__content {
-  padding: 28px 40px 30px;
+  padding: 20px 40px 50px;
   box-sizing: border-box;
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+/* Override the base spec-header padding (32/20) which eats too much
+   vertical space on multi-product slides. */
+.pres-slide--spec--multi .pres-spec-header {
+  padding: 0;
+  border-bottom: 0;
+  margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 /* Light themes: card surface should match the slide background (white),
