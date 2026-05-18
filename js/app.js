@@ -682,8 +682,18 @@
     // Text inputs and selects
     dom.editorForm.querySelectorAll('.form-input[data-key], .form-textarea[data-key], .form-select[data-key]').forEach(function (el) {
       el.addEventListener('input', function () {
-        updateSlideData(slide.id, el.dataset.key, el.value);
-        debouncedThumbnailUpdate();
+        var key = el.dataset.key;
+        var val = el.value;
+        if (key === 'productCount') {
+          val = Math.max(1, Math.min(5, parseInt(val, 10) || 1));
+        }
+        updateSlideData(slide.id, key, val);
+        if (key === 'productCount') {
+          renderEditor();
+          updatePreview();
+        } else {
+          debouncedThumbnailUpdate();
+        }
       });
     });
 
@@ -814,6 +824,159 @@
         renderEditor();
       });
     });
+
+    // --- product-group: section toggle ---
+    dom.editorForm.querySelectorAll('[data-product-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productToggle, 10);
+        slide.data._openProduct = (slide.data._openProduct === i) ? -1 : i;
+        renderEditor();
+      });
+    });
+
+    // --- product-group: name input ---
+    dom.editorForm.querySelectorAll('[data-product-key="name"]').forEach(function (el) {
+      el.addEventListener('input', function () {
+        var i = parseInt(el.dataset.productIndex, 10);
+        ensureProduct(slide, i).name = el.value;
+        updateSlideData(slide.id, 'products', slide.data.products);
+        debouncedThumbnailUpdate();
+      });
+    });
+
+    // --- product-group: image upload (click / drag-drop / remove / replace) ---
+    dom.editorForm.querySelectorAll('[data-product-image-index]').forEach(function (zone) {
+      var i = parseInt(zone.dataset.productImageIndex, 10);
+
+      zone.addEventListener('click', function (e) {
+        if (e.target.closest('[data-product-image-remove]')) return;
+        if (e.target.closest('[data-product-image-replace]')) return;
+        if (e.target.closest('.form-image-upload__preview')) return;
+        triggerProductImageUpload(slide.id, i);
+      });
+
+      zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('form-image-upload--drag-over'); });
+      zone.addEventListener('dragleave', function () { zone.classList.remove('form-image-upload--drag-over'); });
+      zone.addEventListener('drop', function (e) {
+        e.preventDefault();
+        zone.classList.remove('form-image-upload--drag-over');
+        if (e.dataTransfer.files.length) handleProductImageFile(e.dataTransfer.files[0], slide.id, i);
+      });
+    });
+
+    dom.editorForm.querySelectorAll('[data-product-image-replace]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) { e.stopPropagation(); triggerProductImageUpload(slide.id, parseInt(btn.dataset.productImageReplace, 10)); });
+    });
+    dom.editorForm.querySelectorAll('[data-product-image-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var i = parseInt(btn.dataset.productImageRemove, 10);
+        ensureProduct(slide, i).image = '';
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+        debouncedThumbnailUpdate();
+      });
+    });
+
+    // --- product-group: specs (key-value) ---
+    dom.editorForm.querySelectorAll('[data-product-kv-input]').forEach(function (el) {
+      el.addEventListener('input', function () {
+        var i = parseInt(el.dataset.productKvInput, 10);
+        var row = parseInt(el.dataset.kvRow, 10);
+        var part = el.dataset.kvPart;
+        var p = ensureProduct(slide, i);
+        if (!Array.isArray(p.specs)) p.specs = [];
+        if (!p.specs[row]) p.specs[row] = { key: '', value: '' };
+        p.specs[row][part] = el.value;
+        updateSlideData(slide.id, 'products', slide.data.products);
+        debouncedThumbnailUpdate();
+      });
+    });
+    dom.editorForm.querySelectorAll('[data-product-kv-add]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productKvAdd, 10);
+        var p = ensureProduct(slide, i);
+        if (!Array.isArray(p.specs)) p.specs = [];
+        p.specs.push({ key: '', value: '' });
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+      });
+    });
+    dom.editorForm.querySelectorAll('[data-product-kv-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productKvRemove, 10);
+        var row = parseInt(btn.dataset.kvRow, 10);
+        var p = ensureProduct(slide, i);
+        if (Array.isArray(p.specs)) p.specs.splice(row, 1);
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+      });
+    });
+
+    // --- product-group: features (list) ---
+    dom.editorForm.querySelectorAll('[data-product-list-input]').forEach(function (el) {
+      el.addEventListener('input', function () {
+        var i = parseInt(el.dataset.productListInput, 10);
+        var row = parseInt(el.dataset.listRow, 10);
+        var p = ensureProduct(slide, i);
+        if (!Array.isArray(p.features)) p.features = [];
+        // Store as objects to match the legacy feature shape used by render
+        p.features[row] = { text: el.value, indent: 0 };
+        updateSlideData(slide.id, 'products', slide.data.products);
+        debouncedThumbnailUpdate();
+      });
+    });
+    dom.editorForm.querySelectorAll('[data-product-list-add]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productListAdd, 10);
+        var p = ensureProduct(slide, i);
+        if (!Array.isArray(p.features)) p.features = [];
+        p.features.push({ text: '', indent: 0 });
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+      });
+    });
+    dom.editorForm.querySelectorAll('[data-product-list-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var i = parseInt(btn.dataset.productListRemove, 10);
+        var row = parseInt(btn.dataset.listRow, 10);
+        var p = ensureProduct(slide, i);
+        if (Array.isArray(p.features)) p.features.splice(row, 1);
+        updateSlideData(slide.id, 'products', slide.data.products);
+        renderEditor();
+      });
+    });
+  }
+
+  function ensureProduct(slide, i) {
+    if (!Array.isArray(slide.data.products)) slide.data.products = [];
+    while (slide.data.products.length <= i) {
+      slide.data.products.push({ name: '', image: '', specs: [], features: [], featuresTitle: 'Key Features' });
+    }
+    return slide.data.products[i];
+  }
+
+  function triggerProductImageUpload(slideId, productIndex) {
+    pendingImageSlideId = slideId;
+    pendingImageFieldKey = '__product:' + productIndex;
+    dom.fileInputImage.value = '';
+    dom.fileInputImage.click();
+  }
+
+  function handleProductImageFile(file, slideId, productIndex) {
+    if (!file || !file.type.startsWith('image/')) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      resizeImage(e.target.result, 1200, 900, 0.85).then(function (resized) {
+        var slide = state.slides.find(function (s) { return s.id === slideId; });
+        if (!slide) return;
+        ensureProduct(slide, productIndex).image = resized;
+        updateSlideData(slideId, 'products', slide.data.products);
+        renderEditor();
+        debouncedThumbnailUpdate();
+      });
+    };
+    reader.readAsDataURL(file);
   }
 
   /* -----------------------------------------------------------------------
@@ -1466,8 +1629,17 @@
     });
 
     dom.fileInputImage.addEventListener('change', function (e) {
-      if (e.target.files[0] && pendingImageSlideId && pendingImageFieldKey) {
-        handleImageFile(e.target.files[0], pendingImageSlideId, pendingImageFieldKey);
+      var file = e.target.files[0];
+      if (file && pendingImageSlideId && pendingImageFieldKey) {
+        if (typeof pendingImageFieldKey === 'string' && pendingImageFieldKey.indexOf('__product:') === 0) {
+          var pi = parseInt(pendingImageFieldKey.slice('__product:'.length), 10);
+          handleProductImageFile(file, pendingImageSlideId, pi);
+          pendingImageSlideId = null;
+          pendingImageFieldKey = null;
+          e.target.value = '';
+          return;
+        }
+        handleImageFile(file, pendingImageSlideId, pendingImageFieldKey);
       }
       e.target.value = '';
     });
