@@ -1256,4 +1256,5 @@
 
   // Expose for use by other modules
   window.escapeHtml = escapeHtml;
+  window.migrateSpecData = migrateSpecData;
 })();

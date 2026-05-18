@@ -465,6 +465,10 @@
         html += '<textarea class="form-textarea form-textarea--mono" data-key="' + field.key + '" placeholder="' + escAttr(field.placeholder || '') + '" rows="6">' + window.escapeHtml(value || '') + '</textarea>';
         html += '<div class="form-hint">Enter one data point per line as <strong>label,value</strong> (e.g., Q1,120). For XY plots, labels are X-values.</div>';
         break;
+
+      case 'product-group':
+        html += renderProductGroupField(field, slide);
+        break;
     }
 
     html += '</div>';
@@ -534,6 +538,135 @@
     html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add row';
     html += '</button>';
 
+    html += '</div>';
+    return html;
+  }
+
+  function renderProductGroupField(field, slide) {
+    // Lean on the migration helper exposed by templates.js
+    if (typeof window.migrateSpecData === 'function') window.migrateSpecData(slide.data);
+
+    var n = Number(slide.data.productCount || 1);
+    if (n < 1) n = 1; if (n > 5) n = 5;
+
+    var products = slide.data.products || [];
+    // Ensure at least n product slots exist (without destroying any extras)
+    while (products.length < n) {
+      products.push({ name: '', image: '', specs: [], features: [], featuresTitle: 'Key Features' });
+    }
+    slide.data.products = products;
+
+    // Per-N caps (matches the design doc's "balanced" budget)
+    var maxSpecs = (n === 1) ? 6 : 4;
+    var maxFeatures = (n === 1) ? 6 : 3;
+
+    // Which section is expanded? Persisted on slide.data so re-render keeps state.
+    if (typeof slide.data._openProduct !== 'number' || slide.data._openProduct >= n) {
+      slide.data._openProduct = 0;
+    }
+    var openIdx = slide.data._openProduct;
+
+    var html = '<div class="form-product-group" data-key="' + field.key + '">';
+    for (var i = 0; i < n; i++) {
+      var p = products[i] || {};
+      var isOpen = (i === openIdx);
+      html += '<div class="form-product-section' + (isOpen ? ' form-product-section--open' : '') + '" data-product-index="' + i + '">';
+
+      // Header (clickable)
+      html += '<button type="button" class="form-product-section__header" data-product-toggle="' + i + '">';
+      html += '<span class="form-product-section__num">Product ' + (i + 1) + '</span>';
+      html += '<span class="form-product-section__name">' + escAttr(p.name || '') + '</span>';
+      html += '<svg class="form-product-section__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+      html += '</button>';
+
+      // Body (only rendered when open — keeps DOM small)
+      if (isOpen) {
+        html += '<div class="form-product-section__body">';
+
+        // Name
+        html += '<div class="form-group"><label class="form-label form-label--required">Product Name</label>';
+        html += '<input type="text" class="form-input" data-product-key="name" data-product-index="' + i + '" value="' + escAttr(p.name || '') + '" placeholder="e.g., TRP DH-R EVO"></div>';
+
+        // Image
+        html += '<div class="form-group"><label class="form-label">Product Image</label>';
+        html += renderProductImageField(i, p.image);
+        html += '</div>';
+
+        // Specs (key-value, capped)
+        html += '<div class="form-group"><label class="form-label">Specifications</label>';
+        html += renderProductKvField(i, p.specs || [], maxSpecs);
+        html += '</div>';
+
+        // Features (list, capped)
+        html += '<div class="form-group"><label class="form-label">Key Features</label>';
+        html += renderProductListField(i, p.features || [], maxFeatures);
+        html += '</div>';
+
+        html += '</div>'; // body
+      }
+
+      html += '</div>'; // section
+    }
+    html += '</div>'; // form-product-group
+    return html;
+  }
+
+  function renderProductImageField(productIndex, value) {
+    var html = '<div class="form-image-upload" data-product-image-index="' + productIndex + '">';
+    if (value) {
+      html += '<div class="form-image-upload__preview">';
+      html += '<img src="' + value + '" alt="">';
+      html += '<div class="form-image-upload__edit-overlay">';
+      html += '<button type="button" class="form-image-upload__edit-btn" data-product-image-replace="' + productIndex + '">Replace</button>';
+      html += '</div>';
+      html += '<button type="button" class="form-image-upload__remove" data-product-image-remove="' + productIndex + '" title="Remove image">&times;</button>';
+      html += '</div>';
+    } else {
+      html += '<div class="form-image-upload__placeholder">';
+      html += '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+      html += '<span>Click or drag image here</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderProductKvField(productIndex, items, maxItems) {
+    if (!items || !items.length) items = [{ key: '', value: '' }];
+    var html = '<div class="form-spectable" data-product-kv-index="' + productIndex + '">';
+    items.forEach(function (item, i) {
+      html += '<div class="form-spectable__row">';
+      html += '<input type="text" class="form-input" data-product-kv-input="' + productIndex + '" data-kv-row="' + i + '" data-kv-part="key" value="' + escAttr(item.key || '') + '" placeholder="Spec name">';
+      html += '<input type="text" class="form-input" data-product-kv-input="' + productIndex + '" data-kv-row="' + i + '" data-kv-part="value" value="' + escAttr(item.value || '') + '" placeholder="Value">';
+      html += '<button type="button" class="form-list__remove" data-product-kv-remove="' + productIndex + '" data-kv-row="' + i + '" title="Remove">';
+      html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      html += '</button></div>';
+    });
+    if (items.length < maxItems) {
+      html += '<button type="button" class="form-list__add" data-product-kv-add="' + productIndex + '">';
+      html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add row';
+      html += '</button>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderProductListField(productIndex, items, maxItems) {
+    if (!items || !items.length) items = [''];
+    var html = '<div class="form-list" data-product-list-index="' + productIndex + '">';
+    items.forEach(function (raw, i) {
+      var text = (raw && typeof raw === 'object') ? raw.text : raw;
+      html += '<div class="form-list__item">';
+      html += '<input type="text" class="form-input" data-product-list-input="' + productIndex + '" data-list-row="' + i + '" value="' + escAttr(text || '') + '" placeholder="Add a feature...">';
+      html += '<button type="button" class="form-list__remove" data-product-list-remove="' + productIndex + '" data-list-row="' + i + '" title="Remove">';
+      html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      html += '</button></div>';
+    });
+    if (items.length < maxItems) {
+      html += '<button type="button" class="form-list__add" data-product-list-add="' + productIndex + '">';
+      html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Add feature';
+      html += '</button>';
+    }
     html += '</div>';
     return html;
   }
