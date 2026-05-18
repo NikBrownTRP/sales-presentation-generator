@@ -169,7 +169,7 @@
       html += '</table>';
     }
 
-    var feats = (p.features || []).slice(0, 3).filter(function (raw) {
+    var feats = (p.features || []).slice(0, 4).filter(function (raw) {
       var t = (raw && typeof raw === 'object') ? raw.text : raw;
       return t && t.trim();
     });

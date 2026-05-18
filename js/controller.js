@@ -771,7 +771,7 @@
     slide.data.products = products;
 
     var maxSpecs = (n === 1) ? 6 : 4;
-    var maxFeatures = (n === 1) ? 6 : 3;
+    var maxFeatures = (n === 1) ? 6 : 4;
 
     if (typeof slide.data._openProduct !== 'number' || slide.data._openProduct >= n) {
       slide.data._openProduct = 0;
