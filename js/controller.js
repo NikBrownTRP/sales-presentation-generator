@@ -265,11 +265,46 @@
   function updateSlideData(slideId, key, value) {
     var slide = state.slides.find(function (s) { return s.id === slideId; });
     if (!slide) return;
-    slide.data[key] = value;
+    writeSlideField(slide.data, key, value);
     if (slideId === state.activeSlideId) {
       debouncedPreviewUpdate();
     }
     debouncedAutoSave();
+  }
+
+  function readSlideField(slide, path) {
+    if (!slide || !slide.data || !path) return undefined;
+    if (path.indexOf('.') === -1) return slide.data[path];
+    var parts = path.split('.');
+    var cur = slide.data;
+    for (var i = 0; i < parts.length; i++) {
+      if (cur == null) return undefined;
+      cur = cur[parts[i]];
+    }
+    return cur;
+  }
+
+  function writeSlideField(data, path, value) {
+    if (!data || !path) return;
+    if (path.indexOf('.') === -1) { data[path] = value; return; }
+    var parts = path.split('.');
+    var cur = data;
+    for (var i = 0; i < parts.length - 1; i++) {
+      var k = parts[i];
+      if (cur[k] == null || typeof cur[k] !== 'object') {
+        cur[k] = isNaN(parts[i + 1]) ? {} : [];
+      }
+      cur = cur[k];
+    }
+    cur[parts[parts.length - 1]] = value;
+  }
+
+  // Append a suffix to the LEAF of a dotted path. e.g.
+  //   withSuffix('logo', 'Original')           -> 'logoOriginal'
+  //   withSuffix('products.0.image', 'Original') -> 'products.0.imageOriginal'
+  function withSuffix(path, suffix) {
+    var dot = path.lastIndexOf('.');
+    return path.slice(0, dot + 1) + path.slice(dot + 1) + suffix;
   }
 
   var debouncedPreviewUpdate = debounce(function () { updatePreview(); }, 120);
@@ -781,6 +816,7 @@
       html += '<div class="form-image-upload__preview">';
       html += '<img src="' + value + '" alt="">';
       html += '<div class="form-image-upload__edit-overlay">';
+      html += '<button type="button" class="form-image-upload__edit-btn" data-product-image-edit="' + productIndex + '">Edit</button>';
       html += '<button type="button" class="form-image-upload__edit-btn" data-product-image-replace="' + productIndex + '">Replace</button>';
       html += '</div>';
       html += '<button type="button" class="form-image-upload__remove" data-product-image-remove="' + productIndex + '" title="Remove image">&times;</button>';
@@ -1062,6 +1098,7 @@
       zone.addEventListener('click', function (e) {
         if (e.target.closest('[data-product-image-remove]')) return;
         if (e.target.closest('[data-product-image-replace]')) return;
+        if (e.target.closest('[data-product-image-edit]')) return;
         if (e.target.closest('.form-image-upload__preview')) return;
         triggerProductImageUpload(slide.id, i);
       });
@@ -1075,6 +1112,13 @@
     });
     dom.editorForm.querySelectorAll('[data-product-image-replace]').forEach(function (btn) {
       btn.addEventListener('click', function (e) { e.stopPropagation(); triggerProductImageUpload(slide.id, parseInt(btn.dataset.productImageReplace, 10)); });
+    });
+    dom.editorForm.querySelectorAll('[data-product-image-edit]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var i = parseInt(btn.dataset.productImageEdit, 10);
+        openImageEditor(slide.id, 'products.' + i + '.image');
+      });
     });
     dom.editorForm.querySelectorAll('[data-product-image-remove]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
@@ -1175,10 +1219,16 @@
     if (!file || !file.type.startsWith('image/')) return;
     var reader = new FileReader();
     reader.onload = function (e) {
-      resizeImage(e.target.result, 1200, 900, 0.85).then(function (resized) {
+      Promise.all([
+        resizeImage(e.target.result, 1200, 900, 0.82),
+        resizeImage(e.target.result, 1800, 1350, 0.85)
+      ]).then(function (pair) {
         var slide = state.slides.find(function (s) { return s.id === slideId; });
         if (!slide) return;
-        ensureProduct(slide, productIndex).image = resized;
+        var p = ensureProduct(slide, productIndex);
+        p.image = pair[0];
+        p.imageOriginal = pair[1];
+        p.imageEdit = '';
         updateSlideData(slideId, 'products', slide.data.products);
         renderEditor();
         debouncedThumbnailUpdate();
@@ -1292,6 +1342,10 @@
   };
 
   function getFieldDisplayRatio(fieldKey) {
+    // Product card images all share the same fixed 16:10 aspect ratio.
+    if (typeof fieldKey === 'string' && fieldKey.indexOf('products.') === 0) {
+      return 16 / 10;
+    }
     var sel = FIELD_CONTAINER_SELECTOR[fieldKey];
     var fallback = FIELD_FALLBACK_RATIO[fieldKey] || 1;
     if (!sel) return fallback;
@@ -1357,7 +1411,7 @@
 
   function openImageEditor(slideId, fieldKey) {
     var slide = state.slides.find(function (s) { return s.id === slideId; });
-    if (!slide || !slide.data[fieldKey]) return;
+    if (!slide || !readSlideField(slide, fieldKey)) return;
 
     imgEditor.slideId = slideId;
     imgEditor.fieldKey = fieldKey;
@@ -1365,16 +1419,16 @@
     // repeated crop/rotate sessions stay lossless. Fall back to the
     // display image when there is no stored original (legacy slides,
     // imports, default brand assets).
-    imgEditor.originalSrc = slide.data[fieldKey + 'Original'] || slide.data[fieldKey];
+    imgEditor.originalSrc = readSlideField(slide, withSuffix(fieldKey, 'Original')) || readSlideField(slide, fieldKey);
     imgEditor.ratio = getFieldDisplayRatio(fieldKey);
     imgEditor.dragging = false;
     imgEditor.pickingColor = false;
     // Load previously-saved bg color (if any) so the user sees their previous choice
-    imgEditor.bgColor = slide.data[fieldKey + 'Bg'] || null;
+    imgEditor.bgColor = readSlideField(slide, withSuffix(fieldKey, 'Bg')) || null;
     // Restore previous edit state (rotation / pan / zoom) if saved — so
     // re-opening the editor shows the same framing the user had, but
     // applied on top of the original.
-    var savedEdit = slide.data[fieldKey + 'Edit'];
+    var savedEdit = readSlideField(slide, withSuffix(fieldKey, 'Edit'));
     if (savedEdit && typeof savedEdit === 'object') {
       imgEditor.rotation = (typeof savedEdit.rotation === 'number') ? savedEdit.rotation : 0;
       imgEditor._restorePan = savedEdit.pan && typeof savedEdit.pan.x === 'number' ? savedEdit.pan : null;
@@ -1762,11 +1816,11 @@
     updateSlideData(imgEditor.slideId, imgEditor.fieldKey, dataUrl);
     // Persist the chosen bg color so (a) re-opening the editor shows the previous
     // choice and (b) the slide template can paint the container background too.
-    updateSlideData(imgEditor.slideId, imgEditor.fieldKey + 'Bg', imgEditor.bgColor || '');
+    updateSlideData(imgEditor.slideId, withSuffix(imgEditor.fieldKey, 'Bg'), imgEditor.bgColor || '');
     // Persist the edit framing (rotation / pan / zoom) so re-opening the
     // editor starts from where the user left off, while still applying
     // to the pristine original — no accumulated quality loss across edits.
-    updateSlideData(imgEditor.slideId, imgEditor.fieldKey + 'Edit', {
+    updateSlideData(imgEditor.slideId, withSuffix(imgEditor.fieldKey, 'Edit'), {
       rotation: imgEditor.rotation,
       pan: { x: imgEditor.pan.x, y: imgEditor.pan.y },
       zoom: imgEditor.zoom
@@ -1775,8 +1829,8 @@
     // brand asset), preserve the pre-edit source AS the original so the
     // NEXT edit is also lossless. `src` is what we actually drew from.
     var slide = state.slides.find(function (s) { return s.id === imgEditor.slideId; });
-    if (slide && !slide.data[imgEditor.fieldKey + 'Original']) {
-      updateSlideData(imgEditor.slideId, imgEditor.fieldKey + 'Original', src);
+    if (slide && !readSlideField(slide, withSuffix(imgEditor.fieldKey, 'Original'))) {
+      updateSlideData(imgEditor.slideId, withSuffix(imgEditor.fieldKey, 'Original'), src);
     }
     renderEditor();
     debouncedThumbnailUpdate();
