@@ -1862,3 +1862,64 @@
   background: var(--pres-bg-alt);
 }
 
+/* --------------------------------------------------------------------------
+   Product Spec — Multi: subtle entrance animations
+   Heading fades up first, then cards stagger in with a small lift.
+   Inside each card the image fades, then name + content cascade.
+   Applied across all themes — kept tasteful (short durations, gentle ease).
+   -------------------------------------------------------------------------- */
+@keyframes specMultiHeading {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes specMultiCard {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes specMultiCardChild {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-header {
+  animation: specMultiHeading 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+}
+
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card {
+  animation: specMultiCard 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(1) { animation-delay: 0.20s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(2) { animation-delay: 0.28s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(3) { animation-delay: 0.36s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(4) { animation-delay: 0.44s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(5) { animation-delay: 0.52s; }
+
+/* Inside each card: name + content cascade after the card has landed.
+   Use a single keyframe staggered by selector so it stays subtle. */
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card__name,
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card__underline,
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card__table,
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card__features {
+  animation: specMultiCardChild 0.35s ease both;
+}
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(1) .pres-spec-card__name { animation-delay: 0.40s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(1) .pres-spec-card__underline { animation-delay: 0.45s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(1) .pres-spec-card__table { animation-delay: 0.50s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(1) .pres-spec-card__features { animation-delay: 0.55s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(2) .pres-spec-card__name { animation-delay: 0.48s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(2) .pres-spec-card__underline { animation-delay: 0.53s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(2) .pres-spec-card__table { animation-delay: 0.58s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(2) .pres-spec-card__features { animation-delay: 0.63s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(3) .pres-spec-card__name { animation-delay: 0.56s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(3) .pres-spec-card__underline { animation-delay: 0.61s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(3) .pres-spec-card__table { animation-delay: 0.66s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(3) .pres-spec-card__features { animation-delay: 0.71s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(4) .pres-spec-card__name { animation-delay: 0.64s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(4) .pres-spec-card__underline { animation-delay: 0.69s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(4) .pres-spec-card__table { animation-delay: 0.74s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(4) .pres-spec-card__features { animation-delay: 0.79s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(5) .pres-spec-card__name { animation-delay: 0.72s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(5) .pres-spec-card__underline { animation-delay: 0.77s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(5) .pres-spec-card__table { animation-delay: 0.82s; }
+.pres-slide--spec--multi.pres-slide--animated .pres-spec-card:nth-child(5) .pres-spec-card__features { animation-delay: 0.87s; }
+
