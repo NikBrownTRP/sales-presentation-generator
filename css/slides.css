@@ -1736,8 +1736,11 @@
 }
 .pres-slide--spec-n2 .pres-spec-card__image { max-height: 220px; }
 .pres-slide--spec-n3 .pres-spec-card__image { max-height: 150px; }
-.pres-slide--spec-n4 .pres-spec-card__image { max-height: 110px; }
-.pres-slide--spec-n5 .pres-spec-card__image { max-height: 90px; }
+/* N=4/N=5: override aspect-ratio with a fixed height so the image
+   area uses the spare vertical room (otherwise 16:10 of a narrow
+   card width leaves big gaps below the features). */
+.pres-slide--spec-n4 .pres-spec-card__image { aspect-ratio: auto; height: 165px; }
+.pres-slide--spec-n5 .pres-spec-card__image { aspect-ratio: auto; height: 130px; }
 
 /* N=2: cards are wide; switch to a two-column inner layout so the spec
    table and features sit side-by-side under a larger image. Keeps the
